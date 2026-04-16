@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Windows — HTB Reference</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><a href="../index.html" style="color:inherit">HTB::refs</a><small>personal cheatsheet</small></div>
+    <nav>
+      <h4>Index</h4>
+      <ul><li><a href="../index.html">Home</a></li></ul>
+      <h4>Linux</h4>
+      <ul>
+        <li><a href="../linux/index.html">Overview</a></li>
+        <li><a href="../linux/ffuf.html">ffuf</a></li>
+        <li><a href="../linux/gobuster.html">gobuster</a></li>
+        <li><a href="../linux/exploits.html">Exploits</a></li>
+      </ul>
+      <h4>Windows</h4>
+      <ul>
+        <li><a href="index.html" class="active">Overview</a></li>
+        <li><a href="docker-api.html">Docker API Abuse</a></li>
+        <li><a href="post-exploitation.html">Post-Exploitation</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>Windows <span class="tag">host exploitation · container escape</span></h1>
+    <p class="lead">Commands and techniques used when the target host is Windows (often running Docker Desktop with Linux containers).</p>
+
+    <h2>Pages</h2>
+    <div class="cards">
+      <a class="card" href="docker-api.html">
+        <h3>Docker API Abuse</h3>
+        <p>Unauthenticated Docker API (<span class="inline">:2375</span>) on a Windows host → privileged container → host disk access.</p>
+        <span class="tag">docker</span><span class="tag">escape</span>
+      </a>
+      <a class="card" href="post-exploitation.html">
+        <h3>Post-Exploitation</h3>
+        <p>Reverse shells via container <span class="inline">exec</span>, reading files off the mounted <span class="inline">C:\</span>, locating the flag.</p>
+        <span class="tag">reverse-shell</span><span class="tag">loot</span>
+      </a>
+    </div>
+
+    <h2>Typical attack flow on a Windows Docker host</h2>
+    <ol>
+      <li>Land inside a Linux container (from an earlier <a href="../linux/exploits.html">Linux exploit</a>).</li>
+      <li>Fingerprint the container (<span class="inline">/.dockerenv</span>, caps, sockets, ports).</li>
+      <li>Spot a Docker API on <span class="inline">192.168.65.x:2375</span> (Docker Desktop's internal bridge).</li>
+      <li>Create a <span class="inline">Privileged: true</span> container with <span class="inline">Binds: /mnt/host/c/:/mnt/windows</span>.</li>
+      <li>Start, <span class="inline">exec</span>, and walk <span class="inline">C:\Users\Administrator\Desktop</span>.</li>
+    </ol>
+
+    <footer><a href="../index.html">← back to home</a></footer>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>HTB Command Reference</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">HTB::refs<small>personal cheatsheet</small></div>
+    <nav>
+      <h4>Index</h4>
+      <ul>
+        <li><a href="index.html" class="active">Home</a></li>
+      </ul>
+      <h4>Linux</h4>
+      <ul>
+        <li><a href="linux/index.html">Overview</a></li>
+        <li><a href="linux/ffuf.html">ffuf</a></li>
+        <li><a href="linux/gobuster.html">gobuster</a></li>
+        <li><a href="linux/exploits.html">Exploits</a></li>
+      </ul>
+      <h4>Windows</h4>
+      <ul>
+        <li><a href="windows/index.html">Overview</a></li>
+        <li><a href="windows/docker-api.html">Docker API Abuse</a></li>
+        <li><a href="windows/post-exploitation.html">Post-Exploitation</a></li>
+      </ul>
+      <h4>Writeups</h4>
+      <ul>
+        <li><a href="../Easy/MonitorsFour.md">MonitorsFour</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <h1>HTB Command Reference <span class="tag">local cheatsheet</span></h1>
+    <p class="lead">Quick-access bank of scanning, enumeration and exploitation commands. Source: my own HTB writeups.</p>
+
+    <h2>Sections</h2>
+    <div class="cards">
+      <a class="card" href="linux/index.html">
+        <h3>Linux</h3>
+        <p>Commands aimed at Linux services / containers: web fuzzing, vhost discovery, Cacti RCE, SQL loot parsing.</p>
+        <span class="tag">ffuf</span><span class="tag">gobuster</span><span class="tag">metasploit</span>
+      </a>
+      <a class="card" href="windows/index.html">
+        <h3>Windows</h3>
+        <p>Commands and exploits targeting Windows hosts: Docker Desktop abuse, privileged container escape, host filesystem access.</p>
+        <span class="tag">docker-api</span><span class="tag">container-escape</span>
+      </a>
+    </div>
+
+    <h2>How to use</h2>
+    <p>Click a section on the left-hand nav. Every command block is ready to copy-paste; tweak wordlists, domains and IPs to match your engagement.</p>
+
+    <div class="note">
+      <strong>Tip:</strong> open this folder in any browser by double-clicking <span class="inline">index.html</span>. No web server required.
+    </div>
+
+    <h2>Source writeup</h2>
+    <p>All commands on this site were extracted from the <a href="../Easy/MonitorsFour.md">MonitorsFour</a> writeup. New boxes can be added as new pages under <span class="inline">linux/</span> or <span class="inline">windows/</span>.</p>
+
+    <footer>Built for personal reference. Kept intentionally static and dependency-free.</footer>
+  </main>
+</div>
+</body>
+</html>

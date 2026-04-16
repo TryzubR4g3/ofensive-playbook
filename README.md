@@ -1,174 +1,141 @@
-# HackTheBox — Writeups Collection
+# Second Brain — CTF Writeups, Tools & Bug Bounty Notes
 
-A collection of HackTheBox machine writeups organized by difficulty level. Each writeup documents the exploitation chain, vulnerabilities exploited, and key takeaways.
+Personal knowledge base for offensive security work:
 
----
-
-## 📂 Easy
-
-| Machine | OS | Key Vulnerabilities | Writeup |
-|---------|----|---------------------|---------|
-| **[Silentium](Easy/Silentium_HTB_Writeup.md)** | Linux | Flowise Low-Code RCE, Gogs Symlink Attack (CVE-2024-55947 bypass) | [Read →](Easy/Silentium_HTB_Writeup.md) |
-| **[Kobold](Easy/Kobold-Writeup.md)** | Linux | MCP API Command Injection, Docker Group Privilege Escalation | [Read →](Easy/Kobold-Writeup.md) |
-| **[CCTV](Easy/cctv.md)** | Linux | ZoneMinder SQLi, motionEye Command Injection | [Read →](Easy/cctv.md) |
+- **CTF writeups** from HackTheBox and TryHackMe, organized by difficulty.
+- **Tool reference** — per-tool notes with every command I've actually used.
+- **Exploits & abuses** — per-technique notes for every exploit chain, with prerequisites and commands.
+- **Bug bounty flows** — reusable methodology notes (recon, discovery, exploitation patterns).
 
 ---
 
-## 📂 Medium
+## Machines
 
-| Machine | OS | Key Vulnerabilities | Writeup |
-|---------|----|---------------------|---------|
-| **[DevArea](Medium/DevArea.md)** | Linux | Apache CXF XOP Include LFI, Hoverfly Middleware RCE, SUID Binary Abuse | [Read →](Medium/DevArea.md) |
-| **[Overwatch](Medium/Overwatch.md)** | Windows (AD) | ADIDNS Poisoning, Linked Server Exploitation, WCF Service Command Injection | [Read →](Medium/Overwatch.md) |
+### Easy
 
----
+| Machine | OS | Writeup |
+|---------|----|---------|
+| **Silentium** | Linux | [Writeup →](Easy/Silentium_HTB_Writeup.md) |
+| **Kobold** | Linux | [Writeup →](Easy/Kobold-Writeup.md) |
+| **CCTV** | Linux | [Writeup →](Easy/cctv.md) |
+| **MonitorsFour** | Windows (Docker) | [Writeup →](Easy/MonitorsFour.md) |
 
-## 📂 Hard
+### Medium
 
-| Machine | OS | Key Vulnerabilities | Writeup |
-|---------|----|---------------------|---------|
-| *(None yet)* | | | |
+| Machine | OS | Writeup |
+|---------|----|---------|
+| **DevArea** | Linux | [Writeup →](Medium/DevArea.md) |
+| **Overwatch** | Windows (AD) | [Writeup →](Medium/Overwatch.md) |
 
----
+### Hard
 
-## 🛡️ Vulnerability Index
-
-### Command Injection
-
-| CVE | Machine | Description | Reference |
-|-----|---------|-------------|-----------|
-| — | **Kobold** | MCP API `/api/mcp/connect` accepts unsanitized `command` and `args` parameters, enabling arbitrary OS command execution via JSON payload | [Kobold Writeup →](Easy/Kobold-Writeup.md#initial-access) |
-| [CVE-2025-60787](https://nvd.nist.gov/vuln/detail/CVE-2025-60787) | **CCTV** | motionEye configuration parameters (`picture_filename`, `image_file_name`) are written to config files without sanitization, then executed by the `motion` daemon in a shell context | [CCTV Writeup →](Easy/cctv.md#privilege-escalation) |
-| [CVE-2024-45388](https://github.com/gunzf0x/CVE-2025-60787) | **DevArea** | Hoverfly middleware API allows authenticated users to inject arbitrary scripts via PUT request to `/api/v2/hoverfly/middleware` | [DevArea Writeup →](Medium/DevArea.md#hoverfly-rce) |
-| — | **Overwatch** | WCF Monitoring Service `KillProcess` SOAP endpoint accepts unsanitized `processName` parameter, enabling command injection via semicolon chaining | [Overwatch Writeup →](Medium/Overwatch.md#privilege-escalation) |
-
-### SQL Injection
-
-| CVE | Machine | Description | Reference |
-|-----|---------|-------------|-----------|
-| [CVE-2024-51482](https://www.penligent.ai/hackinglabs/cve-2024-51482-the-zoneminder-sql-injection-that-kept-security-teams-exposed-past-1-37-61/) | **CCTV** | Time-based blind SQL injection in ZoneMinder's event tagging functionality via the `tid` parameter in `/zm/index.php?view=request&request=event&action=removetag` | [CCTV Writeup →](Easy/cctv.md#cve-2024-51482--time-based-blind-sql-injection) |
-
-### File Inclusion / SSRF
-
-| CVE | Machine | Description | Reference |
-|-----|---------|-------------|-----------|
-| [CVE-2022-46364](https://www.cve.org/CVERecord?id=CVE-2022-46364) | **DevArea** | Apache CXF XOP Include vulnerability allows arbitrary file read via `<xop:Include href="file:///path/to/file">` in multipart SOAP requests | [DevArea Writeup →](Medium/DevArea.md#cve-2022-46364--apache-cxf-xop-include-ssrflfi) |
-
-### Privilege Escalation
-
-| Technique | Machine | Description | Reference |
-|-----------|---------|-------------|-----------|
-| **Docker Group** | **Kobold** | User membership in the `docker` group allows mounting the host filesystem via `docker run --privileged -v /:/hostfs`, equivalent to root access | [Kobold Writeup →](Easy/Kobold-Writeup.md#privilege-escalation) |
-| **SUID Binary Abuse** | **DevArea** | `syswatch.sh` calls `bash` without absolute path, enabling PATH hijacking. Overwriting `/usr/bin/bash` with a SUID-creating script escalates to root | [DevArea Writeup →](Medium/DevArea.md#privilege-escalation) |
-| **Service as Root** | **CCTV** | motionEye service configured to run as `User=root` in systemd, meaning any command injection through the service executes with root privileges | [CCTV Writeup →](Easy/cctv.md#motioneye-discovery) |
-| **Gogs Symlink Attack** | **Silentium** | CVE-2024-55947 bypass — creating a symlink to `/root/.ssh/authorized_keys` in a repository, then writing SSH key content via API resolves through the symlink | [Silentium Writeup →](Easy/Silentium_HTB_Writeup.md#privilege-escalation) |
-| **WCF Service Injection** | **Overwatch** | NSSM-managed WCF service runs as SYSTEM. Command injection via SOAP `processName` parameter enables arbitrary command execution as SYSTEM | [Overwatch Writeup →](Medium/Overwatch.md#privilege-escalation) |
-
-### Active Directory Attacks
-
-| Technique | Machine | Description | Reference |
-|-----------|---------|-------------|-----------|
-| **ADIDNS Poisoning** | **Overwatch** | Service account with DNS modification rights creates fake A record for linked server `SQL07`, redirecting NTLM authentication to attacker-controlled machine for hash capture via Responder | [Overwatch Writeup →](Medium/Overwatch.md#linked-server-exploitation--adidns-poisoning) |
-| **Linked Server Exploitation** | **Overwatch** | MSSQL linked server self-mapping allows queries to execute in the context of the current user on remote servers, enabling cross-server authentication relay | [Overwatch Writeup →](Medium/Overwatch.md#step-2--check-login-mappings) |
-| **NTLM Relay + Responder** | **Overwatch** | Fake DNS record causes SQL Server to send NTLMv2 authentication to attacker, who captures the hash with Responder and cracks it offline | [Overwatch Writeup →](Medium/Overwatch.md#step-5--capture-the-hash) |
-
-### Credential Discovery
-
-| Technique | Machine | Description | Reference |
-|-----------|---------|-------------|-----------|
-| **Hardcoded Connection String** | **Overwatch** | MSSQL connection string with plaintext credentials found in `overwatch.exe` binary via `strings` analysis | [Overwatch Writeup →](Medium/Overwatch.md#credential-discovery) |
-| **Systemd Service File** | **DevArea** | Hoverfly admin credentials found in plaintext in `/etc/systemd/system/hoverfly.service` ExecStart parameter | [DevArea Writeup →](Medium/DevArea.md#credential-discovery) |
-| **Config File Inspection** | **CCTV** | motionEye admin password stored in plaintext in `/etc/motioneye/motion.conf` | [CCTV Writeup →](Easy/cctv.md#extract-motioneye-admin-credentials) |
-| **Environment Variables** | **Silentium** | SMTP password discovered in `/proc/1/environ` inside container, reused for host SSH access | [Silentium Writeup →](Easy/Silentium_HTB_Writeup.md#environment-variable-enumeration) |
-| **Default Credentials** | **CCTV** | ZoneMinder shipped with default `admin:admin` credentials | [CCTV Writeup →](Easy/cctv.md#zoneminder-default-credentials) |
-
-### Low-Code / AI Platform Exploitation
-
-| Technique | Machine | Description | Reference |
-|-----------|---------|-------------|-----------|
-| **Flowise Custom MCP Tool** | **Silentium** | Flowise low-code AI platform allows creation of custom MCP tools that execute arbitrary commands, enabling RCE as root inside the container | [Silentium Writeup →](Easy/Silentium_HTB_Writeup.md#flowise-rce) |
+*(None yet)*
 
 ---
 
-## 📊 Vulnerability Summary by Category
+## Tools
 
-### Critical (RCE)
-- **CVE-2024-51482** — ZoneMinder SQL Injection → [CCTV](Easy/cctv.md)
-- **CVE-2025-60787** — motionEye Command Injection → [CCTV](Easy/cctv.md)
-- **CVE-2024-45388** — Hoverfly Middleware RCE → [DevArea](Medium/DevArea.md)
-- **CVE-2022-46364** — Apache CXF XOP Include LFI → [DevArea](Medium/DevArea.md)
-- MCP API Command Injection → [Kobold](Easy/Kobold-Writeup.md)
-- WCF Service Command Injection → [Overwatch](Medium/Overwatch.md)
-- Flowise Custom MCP Tool RCE → [Silentium](Easy/Silentium_HTB_Writeup.md)
+Per-tool note with every command used across the writeups and a short description.
 
-### High (Privilege Escalation)
-- Docker Group Privilege Escalation → [Kobold](Easy/Kobold-Writeup.md)
-- SUID Binary PATH Hijacking → [DevArea](Medium/DevArea.md)
-- Gogs Symlink Attack → [Silentium](Easy/Silentium_HTB_Writeup.md)
-- ADIDNS Poisoning + NTLM Capture → [Overwatch](Medium/Overwatch.md)
+### Reconnaissance / Enumeration
+- [nmap](tools/nmap.md) — port & service discovery
+- [ffuf](tools/ffuf.md) — web / API fuzzing
+- [gobuster](tools/gobuster.md) — vhost & directory brute-force
+- [netexec](tools/netexec.md) — SMB / LDAP / MSSQL enumeration & spraying
+- [smbclient](tools/smbclient.md) — SMB share access
+- [impacket](tools/impacket.md) — MSSQL client, AS-REP Roast, Kerberoast
+- [kerbrute](tools/kerbrute.md) — Kerberos-based password spraying
 
-### Medium (Information Disclosure)
-- Hardcoded Credentials in Binaries → [Overwatch](Medium/Overwatch.md)
-- Plaintext Credentials in Service Files → [DevArea](Medium/DevArea.md)
-- Environment Variable Credential Leak → [Silentium](Easy/Silentium_HTB_Writeup.md)
-- Default Credentials → [CCTV](Easy/cctv.md)
+### Exploitation
+- [curl](tools/curl.md) — HTTP payload delivery (JSON, SOAP, API abuse)
+- [sqlmap](tools/sqlmap.md) — automated SQL injection
+- [metasploit](tools/metasploit.md) — public-exploit delivery
+- [responder](tools/responder.md) — NTLM hash capture
+- [dnstool](tools/dnstool.md) — ADIDNS record manipulation
 
----
+### Shells & Pivoting
+- [netcat](tools/netcat.md) — listeners & reverse shells
+- [ssh](tools/ssh.md) — login, key auth, local port forwarding
+- [evil-winrm](tools/evil-winrm.md) — interactive WinRM shell
 
-## 🔗 External References
+### Post-Exploitation
+- [docker](tools/docker.md) — container-based privilege escalation
+- [git](tools/git.md) — Gogs symlink push
+- [tcpdump](tools/tcpdump.md) — cleartext credential sniffing
+- [strings](tools/strings.md) — hardcoded credential extraction
+- [powershell](tools/powershell.md) — Windows enumeration & SOAP clients
 
-### CVE Databases
-- [CVE-2022-46364 — Apache CXF XOP Include](https://www.cve.org/CVERecord?id=CVE-2022-46364)
-- [CVE-2024-45388 — Hoverfly Middleware RCE](https://github.com/gunzf0x/CVE-2025-60787)
-- [CVE-2024-51482 — ZoneMinder SQL Injection](https://www.penligent.ai/hackinglabs/cve-2024-51482-the-zoneminder-sql-injection-that-kept-security-teams-exposed-past-1-37-61/)
-- [CVE-2024-55947 — Gogs Symlink Vulnerability](https://nvd.nist.gov/vuln/detail/CVE-2024-55947)
-- [CVE-2025-60787 — motionEye Command Injection](https://nvd.nist.gov/vuln/detail/CVE-2025-60787)
-
-### Exploit Repositories
-- [CVE-2025-60787 Exploit (gunzf0x)](https://github.com/gunzf0x/CVE-2025-60787)
-
-### Tools Used
-- [sqlmap](https://sqlmap.org/) — SQL injection exploitation
-- [Responder](https://github.com/lgandx/Responder) — LLMNR/NBT-NS/mDNS poisoner
-- [impacket](https://github.com/fortra/impacket) — Network protocol exploitation
-- [evil-winrm](https://github.com/Hackplayers/evil-winrm) — WinRM shell
-- [netexec](https://github.com/Pennyw0rth/NetExec) — Network scanner
-- [John the Ripper](https://www.openwall.com/john/) — Password cracking
-- [Hashcat](https://hashcat.net/hashcat/) — Password cracking
+### Password Cracking
+- [john](tools/john.md) — offline cracking (bcrypt, etc.)
+- [hashcat](tools/hashcat.md) — GPU cracking (NetNTLMv2, bcrypt)
 
 ---
 
-## 📝 Writeup Structure
+## Exploits & Abuses
 
-Each writeup follows this structure:
+Per-technique note with the full chain (prereqs, commands, why it works).
 
-1. **Attack Chain Overview** — Visual diagram of the exploitation path
-2. **Table of Contents** — Quick navigation
-3. **Reconnaissance** — Nmap scans, service discovery, enumeration
-4. **Initial Access** — First foothold on the system
-5. **Post-Exploitation** — System enumeration after initial access
-6. **Privilege Escalation** — Escalation to higher privileges
-7. **Flag Capture** — User and root flag retrieval
-8. **Key Takeaways** — Security lessons learned
-9. **Exploit References** — Cheat sheets and command references
+### Web / Application RCE
+- [MCP API injection](exploits/mcp-api-injection.md) — Kobold `/api/mcp/connect`
+- [Flowise Custom MCP Tool](exploits/flowise-mcp-rce.md) — Silentium
+- [Hoverfly middleware RCE](exploits/hoverfly-middleware-rce.md) — DevArea
+- [motionEye config injection](exploits/motioneye-config-injection.md) — CCTV
+- [WCF SOAP command injection](exploits/wcf-soap-injection.md) — Overwatch
+- [Cacti graph-template RCE](exploits/cacti-rce.md) — MonitorsFour
+
+### Web Read / SQLi / Disclosure
+- [Apache CXF XOP Include → LFI](exploits/apache-cxf-xop-lfi.md) — DevArea
+- [ZoneMinder time-based blind SQLi](exploits/zoneminder-sqli.md) — CCTV
+- [MailHog password reset](exploits/mailhog-password-reset.md) — Silentium
+- [Exposed `.env` / config files](exploits/env-file-exposure.md) — MonitorsFour
+- [Default credentials](exploits/default-credentials.md) — CCTV
+
+### Active Directory / Windows
+- [MSSQL linked server abuse](exploits/mssql-linked-server.md) — Overwatch
+- [MSSQL enumeration cheat sheet](exploits/mssql-enumeration.md) — Overwatch
+- [ADIDNS poisoning](exploits/adidns-poisoning.md) — Overwatch
+- [NTLM capture & crack](exploits/ntlm-capture-crack.md) — Overwatch
+- [Password spraying](exploits/password-spraying.md) — Overwatch
+- [AS-REP Roast & Kerberoast](exploits/kerberos-roasting.md) — Overwatch
+- [SMB anonymous enumeration](exploits/smb-anonymous-enum.md) — Overwatch
+- [NSSM-wrapped service abuse](exploits/nssm-service-abuse.md) — Overwatch
+
+### Credential Hunting
+- [Binary string credentials](exploits/binary-credential-hunting.md) — Overwatch
+- [systemd unit-file credentials](exploits/systemd-service-credentials.md) — DevArea
+- [`/proc/*/environ` enumeration](exploits/env-variable-enum.md) — Silentium
+- [Cleartext sniffing with tcpdump](exploits/tcpdump-credential-sniffing.md) — CCTV
+
+### Privilege Escalation (Linux)
+- [Docker group → root](exploits/docker-group-escape.md) — Kobold
+- [Sudo + `bash` overwrite → SUID root](exploits/sudo-bash-overwrite.md) — DevArea
+- [Gogs symlink write attack](exploits/gogs-symlink-attack.md) — Silentium
+
+### Container Escape
+- [Unauthenticated Docker API](exploits/docker-api-unauthenticated.md) — MonitorsFour
+
+### Pivoting
+- [SSH port forwarding](exploits/ssh-tunneling.md) — Silentium, CCTV
+
+### Enumeration Playbooks
+- [Linux post-exploitation enumeration](exploits/linux-enumeration.md) — system context, container detection, credential hunting with `find`/`grep`, SUID, cron, network
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
 ```
 HTB/
-├── README.md                  # This file
-├── Easy/                      # Easy machines (empty)
-├── Medium/                    # Medium machines
+├── README.md
+├── Easy/
+│   ├── Silentium_HTB_Writeup.md
 │   ├── Kobold-Writeup.md
-│   ├── DevArea
-│   └── cctv
-└── Hard/                      # Hard machines
-    ├── Overwatch.md
-    └── Silentium_HTB_Writeup.md
+│   ├── cctv.md
+│   └── MonitorsFour.md
+├── Medium/
+│   ├── DevArea.md
+│   └── Overwatch.md
+├── Hard/
+├── tools/           # per-tool command notes
+└── exploits/        # per-technique exploit notes
 ```
-
----
-
-*Last updated: April 2026*

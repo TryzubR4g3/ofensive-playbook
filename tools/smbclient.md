@@ -6,7 +6,7 @@ FTP-like interactive client for SMB shares. Used for anonymous enumeration, down
 
 ### Anonymous access to a specific share
 ```bash
-smbclient //10.129.28.165/software$ -N
+smbclient //TARGET_IP/software$ -N
 ```
 Used on: **Overwatch**
 
@@ -14,7 +14,7 @@ Used on: **Overwatch**
 
 ### Recursive download of SYSVOL
 ```bash
-smbclient //10.129.28.165/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
+smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *"
 ```
 Used on: **Overwatch**

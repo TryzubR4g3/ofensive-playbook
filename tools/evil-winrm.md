@@ -6,7 +6,7 @@ Ruby-based interactive shell over WinRM (port 5985/5986). Used to access Windows
 
 ### Connect with plaintext credentials
 ```bash
-evil-winrm -i 10.129.28.165 -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
+evil-winrm -i TARGET_IP -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
 ```
 Used on: **Overwatch**
 

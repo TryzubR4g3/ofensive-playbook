@@ -9,25 +9,40 @@ Personal knowledge base for offensive security work:
 
 ---
 
-## Machines
+## HackTheBox Machines
 
 ### Easy
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Silentium** | Linux | [Writeup →](Easy/Silentium_HTB_Writeup.md) |
-| **Kobold** | Linux | [Writeup →](Easy/Kobold-Writeup.md) |
-| **CCTV** | Linux | [Writeup →](Easy/cctv.md) |
-| **MonitorsFour** | Windows (Docker) | [Writeup →](Easy/MonitorsFour.md) |
+| **Silentium** | Linux | [Writeup →](HTB/Easy/Silentium_HTB_Writeup.md) |
+| **Kobold** | Linux | [Writeup →](HTB/Easy/Kobold-Writeup.md) |
+| **CCTV** | Linux | [Writeup →](HTB/Easy/cctv.md) |
+| **MonitorsFour** | Windows (Docker) | [Writeup →](HTB/Easy/MonitorsFour.md) |
 
 ### Medium
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **DevArea** | Linux | [Writeup →](Medium/DevArea.md) |
-| **Overwatch** | Windows (AD) | [Writeup →](Medium/Overwatch.md) |
+| **DevArea** | Linux | [Writeup →](HTB/Medium/DevArea.md) |
+| **Overwatch** | Windows (AD) | [Writeup →](HTB/Medium/Overwatch.md) |
 
 ### Hard
+
+*(None yet)*
+
+---
+
+## TryHackMe Machines
+
+### Easy
+
+| Machine | OS | Writeup |
+|---------|----|---------|
+| **Team** | Linux | [Writeup →](TRY/Easy/Team.md) |
+| **IDE** | Linux | [Writeup →](TRY/Easy/Ide.md) |
+
+### Medium
 
 *(None yet)*
 
@@ -41,6 +56,7 @@ Per-tool note with every command used across the writeups and a short descriptio
 - [nmap](tools/nmap.md) — port & service discovery
 - [ffuf](tools/ffuf.md) — web / API fuzzing
 - [gobuster](tools/gobuster.md) — vhost & directory brute-force
+- [feroxbuster](tools/feroxbuster.md) — recursive directory brute-force
 - [netexec](tools/netexec.md) — SMB / LDAP / MSSQL enumeration & spraying
 - [smbclient](tools/smbclient.md) — SMB share access
 - [impacket](tools/impacket.md) — MSSQL client, AS-REP Roast, Kerberoast
@@ -82,13 +98,16 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [motionEye config injection](exploits/motioneye-config-injection.md) — CCTV
 - [WCF SOAP command injection](exploits/wcf-soap-injection.md) — Overwatch
 - [Cacti graph-template RCE](exploits/cacti-rce.md) — MonitorsFour
+- [Codiad 2.8.4 authenticated RCE (CVE-2018-14009)](exploits/codiad-rce.md) — IDE
 
 ### Web Read / SQLi / Disclosure
 - [Apache CXF XOP Include → LFI](exploits/apache-cxf-xop-lfi.md) — DevArea
 - [ZoneMinder time-based blind SQLi](exploits/zoneminder-sqli.md) — CCTV
 - [MailHog password reset](exploits/mailhog-password-reset.md) — Silentium
 - [Exposed `.env` / config files](exploits/env-file-exposure.md) — MonitorsFour
-- [Default credentials](exploits/default-credentials.md) — CCTV
+- [Default credentials](exploits/default-credentials.md) — CCTV, IDE
+- [LFI via PHP `include()` parameter](exploits/lfi-php-parameter.md) — Team
+- [Backup / old script file exposure](exploits/backup-file-exposure.md) — Team
 
 ### Active Directory / Windows
 - [MSSQL linked server abuse](exploits/mssql-linked-server.md) — Overwatch
@@ -105,11 +124,15 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [systemd unit-file credentials](exploits/systemd-service-credentials.md) — DevArea
 - [`/proc/*/environ` enumeration](exploits/env-variable-enum.md) — Silentium
 - [Cleartext sniffing with tcpdump](exploits/tcpdump-credential-sniffing.md) — CCTV
+- [`.bash_history` credential discovery](exploits/bash-history-credentials.md) — IDE
 
 ### Privilege Escalation (Linux)
 - [Docker group → root](exploits/docker-group-escape.md) — Kobold
 - [Sudo + `bash` overwrite → SUID root](exploits/sudo-bash-overwrite.md) — DevArea
 - [Gogs symlink write attack](exploits/gogs-symlink-attack.md) — Silentium
+- [Sudo script unsanitized input injection](exploits/sudo-input-injection.md) — Team
+- [Cron script group-writable abuse](exploits/cron-script-abuse.md) — Team
+- [pkexec + pkttyagent authentication agent](exploits/pkexec-pkttyagent-privesc.md) — IDE
 
 ### Container Escape
 - [Unauthenticated Docker API](exploits/docker-api-unauthenticated.md) — MonitorsFour
@@ -125,17 +148,22 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 ## Directory Structure
 
 ```
-HTB/
+.
 ├── README.md
-├── Easy/
-│   ├── Silentium_HTB_Writeup.md
-│   ├── Kobold-Writeup.md
-│   ├── cctv.md
-│   └── MonitorsFour.md
-├── Medium/
-│   ├── DevArea.md
-│   └── Overwatch.md
-├── Hard/
+├── HTB/
+│   ├── Easy/
+│   │   ├── Silentium_HTB_Writeup.md
+│   │   ├── Kobold-Writeup.md
+│   │   ├── cctv.md
+│   │   └── MonitorsFour.md
+│   ├── Medium/
+│   │   ├── DevArea.md
+│   │   └── Overwatch.md
+│   └── Hard/
+├── TRY/
+│   └── Easy/
+│       ├── Team.md
+│       └── Ide.md
 ├── tools/           # per-tool command notes
 └── exploits/        # per-technique exploit notes
 ```

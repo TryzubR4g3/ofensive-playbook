@@ -46,7 +46,7 @@ Personal knowledge base for offensive security work:
 | **SoupedeCode 01** | Windows (AD) | [Writeup →](TRY/Easy/soupedocde01.md) |
 | **Anonforce (BSides GT)** | Linux | [Writeup →](TRY/Easy/bsidesgtanonforce.md) |
 | **VulnNet: Internal** | Linux | [Writeup →](TRY/Easy/vulnnetinternal.md) |
-| **Billing** 🚧 | Linux (MagnusBilling) | [Writeup →](TRY/Easy/billing.md) |
+| **Billing** | Linux (MagnusBilling) | [Writeup →](TRY/Easy/billing.md) |
 
 ### Medium
 
@@ -83,6 +83,7 @@ Per-tool note with every command used across the writeups and a short descriptio
 - [dnstool](tools/dnstool.md) — ADIDNS record manipulation
 - [redis-cli](tools/redis-cli.md) — authenticated Redis enumeration
 - [rsync](tools/rsync.md) — read/write file transfer via `rsync://` modules
+- [mysql / mysqldump](tools/mysql.md) — DB enumeration + full-schema dump
 
 ### Shells & Pivoting
 - [netcat](tools/netcat.md) — listeners & reverse shells
@@ -116,6 +117,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Cacti graph-template RCE](exploits/cacti-rce.md) — MonitorsFour
 - [Codiad 2.8.4 authenticated RCE (CVE-2018-14009)](exploits/codiad-rce.md) — IDE
 - [osCommerce 2.3.4 installer unauth RCE](exploits/oscommerce-installer-rce.md) — Blueprint
+- [MagnusBilling unauth RCE (CVE-2023-30258)](exploits/magnusbilling-rce.md) — Billing
 
 ### Web Read / SQLi / Disclosure
 - [Apache CXF XOP Include → LFI](exploits/apache-cxf-xop-lfi.md) — DevArea
@@ -162,6 +164,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Sudo script unsanitized input injection](exploits/sudo-input-injection.md) — Team
 - [Cron script group-writable abuse](exploits/cron-script-abuse.md) — Team
 - [pkexec + pkttyagent authentication agent](exploits/pkexec-pkttyagent-privesc.md) — IDE
+- [Sudo `fail2ban-client` → SUID bash](exploits/fail2ban-sudo-privesc.md) — Billing
 
 ### Container Escape
 - [Unauthenticated Docker API](exploits/docker-api-unauthenticated.md) — MonitorsFour
@@ -201,7 +204,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 │   │   ├── soupedocde01.md
 │   │   ├── bsidesgtanonforce.md
 │   │   ├── vulnnetinternal.md
-│   │   └── billing.md           # 🚧 WIP
+│   │   └── billing.md
 │   ├── Medium/
 │   └── Hard/
 ├── tools/             # per-tool command notes

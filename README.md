@@ -47,6 +47,7 @@ Personal knowledge base for offensive security work:
 | **Anonforce (BSides GT)** | Linux | [Writeup →](TRY/Easy/bsidesgtanonforce.md) |
 | **VulnNet: Internal** | Linux | [Writeup →](TRY/Easy/vulnnetinternal.md) |
 | **Billing** | Linux (MagnusBilling) | [Writeup →](TRY/Easy/billing.md) |
+| **LazyAdmin** | Linux (SweetRice CMS) | [Writeup →](TRY/Easy/lazyadmin.md) |
 
 ### Medium
 
@@ -63,9 +64,11 @@ Per-tool note with every command used across the writeups and a short descriptio
 ### Reconnaissance / Enumeration
 - [nmap](tools/nmap.md) — port & service discovery
 - [whatweb](tools/whatweb.md) — HTTP fingerprinting (server, CMS, redirects)
+- [searchsploit](tools/searchsploit.md) — offline Exploit-DB lookup
 - [ffuf](tools/ffuf.md) — web / API fuzzing
 - [gobuster](tools/gobuster.md) — vhost & directory brute-force
 - [feroxbuster](tools/feroxbuster.md) — recursive directory brute-force
+- [wget](tools/wget.md) — bulk file download from webroot
 - [netexec](tools/netexec.md) — SMB / LDAP / MSSQL enumeration & spraying
 - [smbclient](tools/smbclient.md) — SMB share access
 - [enum4linux](tools/enum4linux.md) — SMB / RPC legacy sweep
@@ -84,6 +87,7 @@ Per-tool note with every command used across the writeups and a short descriptio
 - [redis-cli](tools/redis-cli.md) — authenticated Redis enumeration
 - [rsync](tools/rsync.md) — read/write file transfer via `rsync://` modules
 - [mysql / mysqldump](tools/mysql.md) — DB enumeration + full-schema dump
+- [sqlite3 / db_dump](tools/sqlite3.md) — SQLite + Berkeley DB file triage
 
 ### Shells & Pivoting
 - [netcat](tools/netcat.md) — listeners & reverse shells
@@ -118,6 +122,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Codiad 2.8.4 authenticated RCE (CVE-2018-14009)](exploits/codiad-rce.md) — IDE
 - [osCommerce 2.3.4 installer unauth RCE](exploits/oscommerce-installer-rce.md) — Blueprint
 - [MagnusBilling unauth RCE (CVE-2023-30258)](exploits/magnusbilling-rce.md) — Billing
+- [SweetRice CMS 1.5.1 Media Center RCE](exploits/sweetrice-media-center-rce.md) — LazyAdmin
 
 ### Web Read / SQLi / Disclosure
 - [Apache CXF XOP Include → LFI](exploits/apache-cxf-xop-lfi.md) — DevArea
@@ -126,7 +131,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Exposed `.env` / config files](exploits/env-file-exposure.md) — MonitorsFour
 - [Default credentials](exploits/default-credentials.md) — CCTV, IDE
 - [LFI via PHP `include()` parameter](exploits/lfi-php-parameter.md) — Team
-- [Backup / old script file exposure](exploits/backup-file-exposure.md) — Team
+- [Backup / old script / SQL-dump exposure](exploits/backup-file-exposure.md) — Team, LazyAdmin
 
 ### CI/CD & DevOps RCE
 - [TeamCity super-user token → build-step RCE](exploits/teamcity-superuser-token-rce.md) — VulnNet: Internal
@@ -165,6 +170,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Cron script group-writable abuse](exploits/cron-script-abuse.md) — Team
 - [pkexec + pkttyagent authentication agent](exploits/pkexec-pkttyagent-privesc.md) — IDE
 - [Sudo `fail2ban-client` → SUID bash](exploits/fail2ban-sudo-privesc.md) — Billing
+- [Sudo-allowed script → writable helper hijack](exploits/sudo-script-helper-hijack.md) — LazyAdmin
 
 ### Container Escape
 - [Unauthenticated Docker API](exploits/docker-api-unauthenticated.md) — MonitorsFour
@@ -204,7 +210,8 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 │   │   ├── soupedocde01.md
 │   │   ├── bsidesgtanonforce.md
 │   │   ├── vulnnetinternal.md
-│   │   └── billing.md
+│   │   ├── billing.md
+│   │   └── lazyadmin.md
 │   ├── Medium/
 │   └── Hard/
 ├── tools/             # per-tool command notes

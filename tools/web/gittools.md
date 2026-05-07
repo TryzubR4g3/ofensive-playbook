@@ -1,4 +1,4 @@
-﻿# GitTools
+# GitTools
 
 Git repository recovery and history extraction toolkit. Useful after finding exposed `.git` folders or copying bare repositories from a compromised server.
 
@@ -25,3 +25,5 @@ Used on: **Wreath** - reconstructed commit order before reviewing the latest PHP
 
 - [git](../devops/git.md)
 - [php-exiftool-comment-webshell.md](../../exploits/web-rce/php-exiftool-comment-webshell.md)
+
+

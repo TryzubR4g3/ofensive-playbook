@@ -14,3 +14,5 @@ Used on: **Overwatch**
 - `--dc` — domain controller
 - `users.txt` — username list
 - Last argument — the password to spray
+
+

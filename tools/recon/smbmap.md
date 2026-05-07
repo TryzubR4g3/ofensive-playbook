@@ -16,3 +16,5 @@ Used on: **Kenobi** - confirmed the `anonymous` share was readable after Nmap SM
 
 - [smbclient](smbclient.md)
 - [../../exploits/ad/smb-enumeration.md](../../exploits/ad/smb-enumeration.md)
+
+

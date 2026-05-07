@@ -1,4 +1,4 @@
-﻿# Anonforce (BSides GT) - TryHackMe Writeup
+# Anonforce (BSides GT) - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.128.148.141 at time of solve)
 **OS:** Linux
@@ -10,22 +10,22 @@
 
 ```
 Port Discovery (21 FTP, 22 SSH)
-    ↓
-Anonymous FTP login → walk the filesystem
-    ↓
+    ?
+Anonymous FTP login ? walk the filesystem
+    ?
 user.txt in /home/melodias
-    ↓
-Custom directory /notread/ → private.asc (PGP key) + backup_encrypted.pgp
-    ↓
-gpg2john → john → PGP passphrase "xbox360"
-    ↓
-gpg --import private.asc → gpg --decrypt backup_encrypted.pgp
-    ↓
-Decrypted backup → /etc/shadow hashes (melodias MD5 + root SHA-512)
-    ↓
-john --wordlist=rockyou → root password
-    ↓
-SSH as root → root.txt
+    ?
+Custom directory /notread/ ? private.asc (PGP key) + backup_encrypted.pgp
+    ?
+gpg2john ? john ? PGP passphrase "xbox360"
+    ?
+gpg --import private.asc ? gpg --decrypt backup_encrypted.pgp
+    ?
+Decrypted backup ? /etc/shadow hashes (melodias MD5 + root SHA-512)
+    ?
+john --wordlist=rockyou ? root password
+    ?
+SSH as root ? root.txt
 ```
 
 ---
@@ -48,19 +48,23 @@ SSH as root → root.txt
 ### Port Discovery
 ```bash
 export TARGET=10.128.148.141
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- --min-rate 5000 -n $TARGET
 ```
 
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sVC -p21,22 $TARGET -oA service-scan
 ```
 
 | Port | Service | Notes |
 |------|---------|-------|
-| 21 | FTP | vsftpd — **anonymous login allowed** |
+| 21 | FTP | vsftpd  **anonymous login allowed** |
 | 22 | SSH | OpenSSH |
 
-The `-sC` script output flags `anonymous FTP login allowed` — that is the entire initial-access surface.
+The `-sC` script output flags `anonymous FTP login allowed`  that is the entire initial-access surface.
 
 ---
 
@@ -74,7 +78,7 @@ Password: <blank>
 
 ### Walking the filesystem
 
-Once inside, the FTP root is `/` — the box serves up the whole filesystem through FTP. Useful commands:
+Once inside, the FTP root is `/`  the box serves up the whole filesystem through FTP. Useful commands:
 
 ```
 ftp> ls -la
@@ -96,7 +100,7 @@ ftp> mget passwd
 
 ### The unusual directory
 
-Listing `/` reveals `/notread` — not a standard path on Linux. Both files inside are grabbed:
+Listing `/` reveals `/notread`  not a standard path on Linux. Both files inside are grabbed:
 
 ```
 ftp> cd /notread
@@ -114,6 +118,8 @@ ftp> get backup_encrypted.pgp
 ## User Flag
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat user.txt
 ```
 
@@ -127,7 +133,7 @@ The key header indicates the owner:
 This is a PGP private key for: anonforce <melodias@anonforce.nsa>
 ```
 
-We have the key, but the key is passphrase-protected — we need the passphrase to actually use it.
+We have the key, but the key is passphrase-protected  we need the passphrase to actually use it.
 
 ---
 
@@ -135,11 +141,15 @@ We have the key, but the key is passphrase-protected — we need the passphrase 
 
 ### Convert to a john hash
 ```bash
+# What it does: convierte/importa/descifra material PGP.
+# Why here: recuperar o usar credenciales cifradas del loot.
 gpg2john private.asc > pgp_hash.txt
 ```
 
 ### Crack with rockyou
 ```bash
+# What it does: crackea el hash indicado con la wordlist elegida.
+# Why here: recover reusable credentials.
 john --wordlist=/usr/share/wordlists/rockyou.txt pgp_hash.txt
 john --show pgp_hash.txt
 ```
@@ -152,21 +162,25 @@ john --show pgp_hash.txt
 
 ### Import the key into the keyring
 ```bash
+# What it does: convierte/importa/descifra material PGP.
+# Why here: recuperar o usar credenciales cifradas del loot.
 gpg --import private.asc
 ```
 
-GPG prompts for the passphrase — enter `xbox360`.
+GPG prompts for the passphrase  enter `xbox360`.
 
 ### Decrypt the backup
 ```bash
+# What it does: convierte/importa/descifra material PGP.
+# Why here: recuperar o usar credenciales cifradas del loot.
 gpg --decrypt backup_encrypted.pgp > backup_decrypted.txt
 ```
 
-Inside `backup_decrypted.txt` is the server's `/etc/shadow` at the time of backup — two hashes worth saving:
+Inside `backup_decrypted.txt` is the server's `/etc/shadow` at the time of backup  two hashes worth saving:
 
 ```
-melodias:$1$...$...:::::::        ← MD5 ($1$)
-root:$6$...$...:::::::            ← SHA-512 ($6$)
+melodias:$1$...$...:::::::        ? MD5 ($1$)
+root:$6$...$...:::::::            ? SHA-512 ($6$)
 ```
 
 Save both lines to `shadows.txt`.
@@ -176,6 +190,8 @@ Save both lines to `shadows.txt`.
 ## Cracking Shadow Hashes
 
 ```bash
+# What it does: crackea el hash indicado con la wordlist elegida.
+# Why here: recover reusable credentials.
 john --wordlist=/usr/share/wordlists/rockyou.txt shadows.txt
 john --show shadows.txt
 ```
@@ -187,8 +203,12 @@ Both hashes crack against rockyou. The `root` password is the flag-unlocking one
 ## Root Flag
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh root@$TARGET
 # <enter recovered password>
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /root/root.txt
 ```
 
@@ -207,14 +227,16 @@ cat /root/root.txt
 
 ### Security Lessons
 
-1. **Do not expose filesystems over anonymous FTP.** Confine FTP chroot to a dedicated directory — never serve `/etc`, `/home`, or system paths.
+1. **Do not expose filesystems over anonymous FTP.** Confine FTP chroot to a dedicated directory  never serve `/etc`, `/home`, or system paths.
 2. **Never back up `/etc/shadow` to a shared location.** Even encrypted, the key material travels with it.
-3. **PGP passphrases follow human patterns.** `xbox360`, seasons, favourite words — rotate to passphrase generators (`diceware`, `pwgen`).
+3. **PGP passphrases follow human patterns.** `xbox360`, seasons, favourite words  rotate to passphrase generators (`diceware`, `pwgen`).
 4. **SHA-512 with a weak password still cracks quickly.** Hashing alone is not defense-in-depth; password quality is.
 
 ### Related Notes
-- [ftp](../../tools/recon/ftp.md) — anonymous login + `mget`
-- [gpg](../../tools/creds/gpg.md) — key import + decrypt
-- [john](../../tools/creds/john.md) — offline cracking (PGP + shadow)
+- [ftp](../../tools/recon/ftp.md)  anonymous login + `mget`
+- [gpg](../../tools/creds/gpg.md)  key import + decrypt
+- [john](../../tools/creds/john.md)  offline cracking (PGP + shadow)
 - [PGP key cracking playbook](../../exploits/creds/pgp-key-cracking.md)
 - [Anonymous FTP enumeration](../../exploits/network-services/anonymous-ftp-enumeration.md)
+
+

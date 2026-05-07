@@ -1,21 +1,21 @@
-ï»¿# mongo / mongosh
+# mongo / mongosh
 
 MongoDB shell. Two binaries to know about:
-- **`mongo`** â€” legacy shell shipped with `mongodb-org-shell` â‰¤ 5.x. JS REPL, dies in 6.0+.
-- **`mongosh`** â€” modern shell, 6.0+ default. Same surface for read queries; some admin commands renamed.
+- **`mongo`** — legacy shell shipped with `mongodb-org-shell` = 5.x. JS REPL, dies in 6.0+.
+- **`mongosh`** — modern shell, 6.0+ default. Same surface for read queries; some admin commands renamed.
 
 Both speak the wire protocol and default to `mongodb://127.0.0.1:27017`. Use whichever the box has installed; you almost never bring your own.
 
 ## Commands Used
 
-### Connect â€” default localhost, no auth
+### Connect — default localhost, no auth
 ```bash
 mongo
 mongosh
 ```
 Used on: **cmspit**
 
-### Connect â€” custom host/port/db, optional auth
+### Connect — custom host/port/db, optional auth
 ```bash
 mongo --host 127.0.0.1 --port 27017
 mongo --host $TARGET --port 27017 dbname
@@ -28,12 +28,12 @@ mongo --quiet --eval "db.adminCommand('listDatabases').databases.forEach(d=>prin
 mongo dbname --quiet --eval "db.users.find().forEach(printjson)"
 ```
 
-### List â†’ walk databases and collections
+### List ? walk databases and collections
 ```javascript
 > show dbs
-> use sudousersbak                       // [USED â€” cmspit]
+> use sudousersbak                       // [USED — cmspit]
 > show collections
-> db.user.find()                         // [USED â€” cmspit, leaked stux:p4ssw0rdhack3d!123]
+> db.user.find()                         // [USED — cmspit, leaked stux:p4ssw0rdhack3d!123]
 > db.user.find().pretty()
 > db.flag.find()
 ```
@@ -95,3 +95,5 @@ python3 -c "from pymongo import MongoClient; c=MongoClient('mongodb://127.0.0.1'
 - [cockpit-cms-rce.md](../../exploits/web-rce/cockpit-cms-rce.md) -- cmspit's foothold that fed into the mongo dump
 - [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) -- when mongo is loopback only
 - [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) -- spotting mongod in `ss -tlnp` / `ps`
+
+

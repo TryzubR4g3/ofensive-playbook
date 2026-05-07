@@ -1,6 +1,6 @@
-ï»¿# getcap
+# getcap
 
-Reads POSIX file capabilities â€” the per-binary fine-grained replacement for SUID. A binary with `cap_setuid+ep` can change UID; one with `cap_dac_read_search+ep` can read any file; one with `cap_sys_admin+ep` is essentially root. Always run this once you have a shell â€” capabilities live next to SUID and are missed by tools that only check `find -perm -4000`.
+Reads POSIX file capabilities — the per-binary fine-grained replacement for SUID. A binary with `cap_setuid+ep` can change UID; one with `cap_dac_read_search+ep` can read any file; one with `cap_sys_admin+ep` is essentially root. Always run this once you have a shell — capabilities live next to SUID and are missed by tools that only check `find -perm -4000`.
 
 ## Commands Used
 
@@ -51,3 +51,5 @@ setcap -r ./shell               # remove
 ## Related
 - [linux-capabilities-privesc.md](../../exploits/privesc-linux/linux-capabilities-privesc.md) -- exploitation playbook
 - [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) -- where this fits in the post-foothold sweep
+
+

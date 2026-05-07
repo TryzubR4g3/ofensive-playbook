@@ -1,4 +1,4 @@
-﻿# showmount
+# showmount
 
 RPC-based NFS export lister. Queries the mount daemon to list which directories the server exports, and to which clients. Run first whenever ports 111 / 2049 are open.
 
@@ -8,7 +8,7 @@ RPC-based NFS export lister. Queries the mount daemon to list which directories 
 ```bash
 showmount -e $TARGET
 ```
-Used on: **VulnNet: Internal** — revealed `/opt/conf *` (world-mountable).
+Used on: **VulnNet: Internal** � revealed `/opt/conf *` (world-mountable).
 
 ### Useful variations
 ```bash
@@ -34,3 +34,5 @@ nmap -sV -p111,2049 --script nfs-ls,nfs-showmount,nfs-statfs $TARGET
 
 ## Related
 - [NFS share abuse playbook](../../exploits/network-services/nfs-share-abuse.md)
+
+

@@ -16,3 +16,5 @@ Used on: **CCTV** — produced `mark:opensesame`.
 john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 John auto-detects the format; `$2y$` identifies bcrypt.
+
+

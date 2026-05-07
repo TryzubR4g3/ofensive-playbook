@@ -1,11 +1,11 @@
-Ôªø# Second Brain ‚Äî Offensive-Security Notebook
+# Second Brain ó Offensive-Security Notebook
 
-Personal, CLI-searchable knowledge base for offensive security work. The repo is **tool- and exploit-centric** ‚Äî writeups are just the narrative shell. The real value is in `tools/` + `exploits/`, accessible from the terminal via the `brain` CLI.
+Personal, CLI-searchable knowledge base for offensive security work. The repo is **tool- and exploit-centric** ó writeups are just the narrative shell. The real value is in `tools/` + `exploits/`, accessible from the terminal via the `brain` CLI.
 
-- **`tools/`** ‚Äî per-tool command notes (every flag I've actually used, tagged by machine).
-- **`exploits/`** ‚Äî per-technique playbooks (prerequisites, step-by-step, defensive notes).
-- **`HTB/`, `TRY/`** ‚Äî machine writeups that link to the reusable notes above.
-- **`brain` CLI** ‚Äî grep / list / recall without leaving the terminal.
+- **`tools/`** ó per-tool command notes (every flag I've actually used, tagged by machine).
+- **`exploits/`** ó per-technique playbooks (prerequisites, step-by-step, defensive notes).
+- **`HTB/`, `TRY/`** ó machine writeups that link to the reusable notes above.
+- **`brain` CLI** ó grep / list / recall without leaving the terminal.
 
 ---
 
@@ -30,7 +30,7 @@ Topic-scoped search for tools, exploit playbooks and writeups. Tool notes do not
 ./brain open    <path>         # open in $EDITOR
 ```
 
-Zero deps ‚Äî pure Python 3. Works on Linux and Git Bash on Windows.
+Zero deps ó pure Python 3. Works on Linux and Git Bash on Windows.
 
 Spanish-friendly aliases exist for beginners: `guia`, `temas`, `buscar`, `comandos`, `herramienta`, `credenciales`, `privilegios`, `contenedor`, `base-datos`.
 
@@ -48,7 +48,7 @@ Spanish-friendly aliases exist for beginners: `guia`, `temas`, `buscar`, `comand
 | `pivot` | Port forwarding and tunnelling |
 | `ad` | Active Directory / Kerberos / SMB / LDAP |
 | `web` | Web / HTTP exploitation |
-| `container` (`docker`) | Container / Docker abuse ‚Äî incl. in-container enumeration |
+| `container` (`docker`) | Container / Docker abuse ó incl. in-container enumeration |
 | `stego` | Steganography / metadata loot |
 | `reversing` (`re`, `binary`) | SUID / custom binary reverse engineering |
 | `database` (`db`, `mongodb`, `sqlite`, `nosql`) | Backend DB enumeration & abuse (Mongo, SQLite, MySQL, Redis) |
@@ -72,7 +72,7 @@ Output pattern (example - `brain enumeration find`):
 
 ```
 exploits\linux-enumeration.md
-  :77  find / -perm -4000 -type f 2>/dev/null      # [USED ‚Äî DevArea]
+  :77  find / -perm -4000 -type f 2>/dev/null      # [USED ó DevArea]
   :92  ## Password & Credential Hunting with `find`
   used by:        # derived from writeup links, not stored in the tool note
     TRY\Easy\lazyadmin.md:179  Standard [Linux enumeration](exploits/enumeration/linux-enumeration.md)...
@@ -87,19 +87,19 @@ exploits\linux-enumeration.md
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Silentium** | Linux | [Writeup ‚Üí](HTB/Easy/Silentium_HTB_Writeup.md) |
-| **Kobold** | Linux | [Writeup ‚Üí](HTB/Easy/Kobold-Writeup.md) |
-| **CCTV** | Linux | [Writeup ‚Üí](HTB/Easy/cctv.md) |
-| **MonitorsFour** | Windows (Docker) | [Writeup ‚Üí](HTB/Easy/MonitorsFour.md) |
+| **Silentium** | Linux | [Writeup ?](HTB/Easy/Silentium_HTB_Writeup.md) |
+| **Kobold** | Linux | [Writeup ?](HTB/Easy/Kobold-Writeup.md) |
+| **CCTV** | Linux | [Writeup ?](HTB/Easy/cctv.md) |
+| **MonitorsFour** | Windows (Docker) | [Writeup ?](HTB/Easy/MonitorsFour.md) |
 
 ### Medium
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **DevArea** | Linux | [Writeup ‚Üí](HTB/Medium/DevArea.md) |
-| **Overwatch** | Windows (AD) | [Writeup ‚Üí](HTB/Medium/Overwatch.md) |
-| **Logging** üöß | Windows (AD) | [Writeup ‚Üí](HTB/Medium/Logging.md) |
-| **VariaType** üöß | Linux (nginx) | [Writeup ‚Üí](HTB/Medium/VariaType.md) |
+| **DevArea** | Linux | [Writeup ?](HTB/Medium/DevArea.md) |
+| **Overwatch** | Windows (AD) | [Writeup ?](HTB/Medium/Overwatch.md) |
+| **Logging** ?? | Windows (AD) | [Writeup ?](HTB/Medium/Logging.md) |
+| **VariaType** ?? | Linux (nginx) | [Writeup ?](HTB/Medium/VariaType.md) |
 
 ### Hard
 
@@ -113,29 +113,29 @@ exploits\linux-enumeration.md
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Team** | Linux | [Writeup ‚Üí](TRY/Easy/Team.md) |
-| **IDE** | Linux | [Writeup ‚Üí](TRY/Easy/Ide.md) |
-| **Blueprint** | Windows (XAMPP) | [Writeup ‚Üí](TRY/Easy/blueprint.md) |
-| **SoupedeCode 01** | Windows (AD) | [Writeup ‚Üí](TRY/Easy/soupedocde01.md) |
-| **Anonforce (BSides GT)** | Linux | [Writeup ‚Üí](TRY/Easy/bsidesgtanonforce.md) |
-| **VulnNet: Internal** | Linux | [Writeup ‚Üí](TRY/Easy/vulnnetinternal.md) |
-| **Billing** | Linux (MagnusBilling) | [Writeup ‚Üí](TRY/Easy/billing.md) |
-| **LazyAdmin** | Linux (SweetRice CMS) | [Writeup ‚Üí](TRY/Easy/lazyadmin.md) |
-| **Yueiua** | Linux (PHP + stego) | [Writeup ‚Üí](TRY/Easy/yueiua.md) |
-| **Vulnversity** | Linux (Apache + systemd privesc) | [Writeup ‚Üí](TRY/Easy/vulnversity.md) |
+| **Team** | Linux | [Writeup ?](TRY/Easy/Team.md) |
+| **IDE** | Linux | [Writeup ?](TRY/Easy/Ide.md) |
+| **Blueprint** | Windows (XAMPP) | [Writeup ?](TRY/Easy/blueprint.md) |
+| **SoupedeCode 01** | Windows (AD) | [Writeup ?](TRY/Easy/soupedocde01.md) |
+| **Anonforce (BSides GT)** | Linux | [Writeup ?](TRY/Easy/bsidesgtanonforce.md) |
+| **VulnNet: Internal** | Linux | [Writeup ?](TRY/Easy/vulnnetinternal.md) |
+| **Billing** | Linux (MagnusBilling) | [Writeup ?](TRY/Easy/billing.md) |
+| **LazyAdmin** | Linux (SweetRice CMS) | [Writeup ?](TRY/Easy/lazyadmin.md) |
+| **Yueiua** | Linux (PHP + stego) | [Writeup ?](TRY/Easy/yueiua.md) |
+| **Vulnversity** | Linux (Apache + systemd privesc) | [Writeup ?](TRY/Easy/vulnversity.md) |
 
 ### Medium
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Bookstore** | Linux (Flask + Werkzeug debug) | [Writeup ‚Üí](TRY/Medium/bookstoreoc.md) |
-| **Oh My Web** | Linux (Apache 2.4.49 in Docker) | [Writeup ‚Üí](TRY/Medium/ohmyweb.md) |
-| **CMSpit** | Linux (Cockpit CMS + MongoDB) | [Writeup ‚Üí](TRY/Medium/cmspit.md) |
-| **BSides GT ‚Äî develpy** | Linux (Py2 daemon + Piet stego) | [Writeup ‚Üí](TRY/Medium/bsidesgtdevelpy.md) |
-| **Recruit** | Linux (PHP LFI ‚Üí SQLi) | [Writeup ‚Üí](TRY/Medium/Recruit.md) |
-| **Relevant** | Windows (IIS + SMB) | [Writeup ‚Üí](TRY/Medium/relevant.md) |
+| **Bookstore** | Linux (Flask + Werkzeug debug) | [Writeup ?](TRY/Medium/bookstoreoc.md) |
+| **Oh My Web** | Linux (Apache 2.4.49 in Docker) | [Writeup ?](TRY/Medium/ohmyweb.md) |
+| **CMSpit** | Linux (Cockpit CMS + MongoDB) | [Writeup ?](TRY/Medium/cmspit.md) |
+| **BSides GT ó develpy** | Linux (Py2 daemon + Piet stego) | [Writeup ?](TRY/Medium/bsidesgtdevelpy.md) |
+| **Recruit** | Linux (PHP LFI ? SQLi) | [Writeup ?](TRY/Medium/Recruit.md) |
+| **Relevant** | Windows (IIS + SMB) | [Writeup ?](TRY/Medium/relevant.md) |
 
-> üöß = writeup in progress / privilege escalation still being documented.
+> ?? = writeup in progress / privilege escalation still being documented.
 
 ---
 
@@ -144,58 +144,58 @@ exploits\linux-enumeration.md
 Per-tool note with every command used across the writeups and a short description. Tool notes use `Used on: **Machine**` tags for search, but do not contain `Referenced in` / `Used by` backlink lists; the writeups own those references.
 
 ### Reconnaissance / Enumeration
-- [nmap](tools/recon/nmap.md) ‚Äî port & service discovery
-- [whatweb](tools/recon/whatweb.md) ‚Äî HTTP fingerprinting (server, CMS, redirects)
-- [searchsploit](tools/recon/searchsploit.md) ‚Äî offline Exploit-DB lookup
-- [ffuf](tools/fuzz/ffuf.md) ‚Äî web / API fuzzing
-- [gobuster](tools/fuzz/gobuster.md) ‚Äî vhost & directory brute-force
-- [feroxbuster](tools/fuzz/feroxbuster.md) ‚Äî recursive directory brute-force
-- [wget](tools/web/wget.md) ‚Äî bulk file download from webroot
-- [netexec](tools/recon/netexec.md) ‚Äî SMB / LDAP / MSSQL enumeration & spraying
-- [smbclient](tools/recon/smbclient.md) ‚Äî SMB share access
-- [enum4linux](tools/recon/enum4linux.md) ‚Äî SMB / RPC legacy sweep
-- [showmount](tools/recon/showmount.md) ‚Äî NFS export listing
-- [ftp](tools/recon/ftp.md) ‚Äî anonymous FTP triage + `mget`
-- [impacket](tools/windows/impacket.md) ‚Äî MSSQL client, AS-REP Roast, Kerberoast
-- [kerbrute](tools/recon/kerbrute.md) ‚Äî Kerberos-based password spraying
-- [bloodhound](tools/recon/bloodhound.md) ‚Äî AD ACL / session graph collection
+- [nmap](tools/recon/nmap.md) ó port & service discovery
+- [whatweb](tools/recon/whatweb.md) ó HTTP fingerprinting (server, CMS, redirects)
+- [searchsploit](tools/recon/searchsploit.md) ó offline Exploit-DB lookup
+- [ffuf](tools/fuzz/ffuf.md) ó web / API fuzzing
+- [gobuster](tools/fuzz/gobuster.md) ó vhost & directory brute-force
+- [feroxbuster](tools/fuzz/feroxbuster.md) ó recursive directory brute-force
+- [wget](tools/web/wget.md) ó bulk file download from webroot
+- [netexec](tools/recon/netexec.md) ó SMB / LDAP / MSSQL enumeration & spraying
+- [smbclient](tools/recon/smbclient.md) ó SMB share access
+- [enum4linux](tools/recon/enum4linux.md) ó SMB / RPC legacy sweep
+- [showmount](tools/recon/showmount.md) ó NFS export listing
+- [ftp](tools/recon/ftp.md) ó anonymous FTP triage + `mget`
+- [impacket](tools/windows/impacket.md) ó MSSQL client, AS-REP Roast, Kerberoast
+- [kerbrute](tools/recon/kerbrute.md) ó Kerberos-based password spraying
+- [bloodhound](tools/recon/bloodhound.md) ó AD ACL / session graph collection
 
 ### Exploitation
-- [curl](tools/web/curl.md) ‚Äî HTTP payload delivery (JSON, SOAP, API abuse)
-- [sqlmap](tools/web/sqlmap.md) ‚Äî automated SQL injection
-- [metasploit](tools/exploitation/metasploit.md) ‚Äî public-exploit delivery
-- [responder](tools/creds/responder.md) ‚Äî NTLM hash capture
-- [dnstool](tools/recon/dnstool.md) ‚Äî ADIDNS record manipulation
-- [redis-cli](tools/database/redis-cli.md) ‚Äî authenticated Redis enumeration
-- [rsync](tools/network-services/rsync.md) ‚Äî read/write file transfer via `rsync://` modules
-- [mysql / mysqldump](tools/database/mysql.md) ‚Äî DB enumeration + full-schema dump
-- [sqlite3 / db_dump](tools/database/sqlite3.md) ‚Äî SQLite + Berkeley DB file triage
-- [mongo / mongosh](tools/database/mongo.md) ‚Äî MongoDB shell, JS-REPL queries
-- [exiftool](tools/web/exiftool.md) ‚Äî image / PDF metadata
-- [steghide](tools/stego/steghide.md) ‚Äî extract hidden data from JPEG / BMP / WAV
-- [getcap](tools/container/getcap.md) ‚Äî POSIX file-capability enumeration
+- [curl](tools/web/curl.md) ó HTTP payload delivery (JSON, SOAP, API abuse)
+- [sqlmap](tools/web/sqlmap.md) ó automated SQL injection
+- [metasploit](tools/exploitation/metasploit.md) ó public-exploit delivery
+- [responder](tools/creds/responder.md) ó NTLM hash capture
+- [dnstool](tools/recon/dnstool.md) ó ADIDNS record manipulation
+- [redis-cli](tools/database/redis-cli.md) ó authenticated Redis enumeration
+- [rsync](tools/network-services/rsync.md) ó read/write file transfer via `rsync://` modules
+- [mysql / mysqldump](tools/database/mysql.md) ó DB enumeration + full-schema dump
+- [sqlite3 / db_dump](tools/database/sqlite3.md) ó SQLite + Berkeley DB file triage
+- [mongo / mongosh](tools/database/mongo.md) ó MongoDB shell, JS-REPL queries
+- [exiftool](tools/web/exiftool.md) ó image / PDF metadata
+- [steghide](tools/stego/steghide.md) ó extract hidden data from JPEG / BMP / WAV
+- [getcap](tools/container/getcap.md) ó POSIX file-capability enumeration
 
 ### Reverse Engineering
-- [strings](tools/reversing/strings.md) ‚Äî printable / UTF-16 string extraction
-- [ltrace](tools/reversing/ltrace.md) ‚Äî runtime library-call tracing
-- [objdump](tools/reversing/objdump.md) ‚Äî disassembly when `strings` / `ltrace` come up empty
+- [strings](tools/reversing/strings.md) ó printable / UTF-16 string extraction
+- [ltrace](tools/reversing/ltrace.md) ó runtime library-call tracing
+- [objdump](tools/reversing/objdump.md) ó disassembly when `strings` / `ltrace` come up empty
 
 ### Shells & Pivoting
-- [netcat](tools/pivot/netcat.md) ‚Äî listeners & reverse shells
-- [socat](tools/pivot/socat.md) ‚Äî full-PTY reverse shells, port forwarding, TLS-wrap
-- [ssh](tools/pivot/ssh.md) ‚Äî login, key auth, local port forwarding
-- [evil-winrm](tools/windows/evil-winrm.md) ‚Äî interactive WinRM shell
+- [netcat](tools/pivot/netcat.md) ó listeners & reverse shells
+- [socat](tools/pivot/socat.md) ó full-PTY reverse shells, port forwarding, TLS-wrap
+- [ssh](tools/pivot/ssh.md) ó login, key auth, local port forwarding
+- [evil-winrm](tools/windows/evil-winrm.md) ó interactive WinRM shell
 
 ### Post-Exploitation
-- [docker](tools/container/docker.md) ‚Äî container-based privilege escalation
-- [git](tools/devops/git.md) ‚Äî Gogs symlink push
-- [tcpdump](tools/creds/tcpdump.md) ‚Äî cleartext credential sniffing
-- [powershell](tools/windows/powershell.md) ‚Äî Windows enumeration & SOAP clients
+- [docker](tools/container/docker.md) ó container-based privilege escalation
+- [git](tools/devops/git.md) ó Gogs symlink push
+- [tcpdump](tools/creds/tcpdump.md) ó cleartext credential sniffing
+- [powershell](tools/windows/powershell.md) ó Windows enumeration & SOAP clients
 
 ### Password Cracking
-- [john](tools/creds/john.md) ‚Äî offline cracking (bcrypt, etc.)
-- [hashcat](tools/creds/hashcat.md) ‚Äî GPU cracking (NetNTLMv2, bcrypt)
-- [gpg / gpg2john](tools/creds/gpg.md) ‚Äî PGP passphrase + ciphertext decryption
+- [john](tools/creds/john.md) ó offline cracking (bcrypt, etc.)
+- [hashcat](tools/creds/hashcat.md) ó GPU cracking (NetNTLMv2, bcrypt)
+- [gpg / gpg2john](tools/creds/gpg.md) ó PGP passphrase + ciphertext decryption
 
 ---
 
@@ -204,98 +204,98 @@ Per-tool note with every command used across the writeups and a short descriptio
 Per-technique note with the full chain (prereqs, commands, why it works).
 
 ### Web / Application RCE
-- [MCP API injection](exploits/web-rce/mcp-api-injection.md) ‚Äî Kobold `/api/mcp/connect`
-- [Flowise Custom MCP Tool](exploits/web-rce/flowise-mcp-rce.md) ‚Äî Silentium
-- [Hoverfly middleware RCE](exploits/web-rce/hoverfly-middleware-rce.md) ‚Äî DevArea
-- [motionEye config injection](exploits/web-rce/motioneye-config-injection.md) ‚Äî CCTV
-- [WCF SOAP command injection](exploits/web-rce/wcf-soap-injection.md) ‚Äî Overwatch
-- [Cacti graph-template RCE](exploits/web-rce/cacti-rce.md) ‚Äî MonitorsFour
-- [Codiad 2.8.4 authenticated RCE (CVE-2018-14009)](exploits/web-rce/codiad-rce.md) ‚Äî IDE
-- [osCommerce 2.3.4 installer unauth RCE](exploits/web-rce/oscommerce-installer-rce.md) ‚Äî Blueprint
-- [MagnusBilling unauth RCE (CVE-2023-30258)](exploits/web-rce/magnusbilling-rce.md) ‚Äî Billing
-- [SweetRice CMS 1.5.1 Media Center RCE](exploits/web-rce/sweetrice-media-center-rce.md) ‚Äî LazyAdmin
-- [URL-parameter OS command injection](exploits/web-rce/url-param-command-injection.md) ‚Äî Yueiua
-- [Werkzeug debug console RCE (PIN via LFI)](exploits/web-rce/werkzeug-debug-rce.md) ‚Äî Bookstore
-- [Apache 2.4.49 path traversal ‚Üí RCE (CVE-2021-41773)](exploits/web-rce/apache-path-traversal-rce.md) ‚Äî Oh My Web
-- [Microsoft OMI unauthenticated RCE ‚Äî OMIGOD (CVE-2021-38647)](exploits/web-rce/omigod-rce.md) ‚Äî Oh My Web
-- [Cockpit CMS unauth user enum + reset ‚Üí PHP upload (CVE-2020-35846)](exploits/web-rce/cockpit-cms-rce.md) ‚Äî CMSpit
-- [Python `input()` injection on a `socat`-hosted daemon](exploits/web-rce/python-input-injection.md) ‚Äî BSides GT develpy
-- [PHP file-upload extension bypass (`.phtml` / `.phar`)](exploits/web-rce/php-extension-bypass-upload.md) ‚Äî Vulnversity
-- [SMB write ‚Üí IIS execution (ASP webshell)](exploits/web-rce/smb-write-iis-execution.md) ‚Äî Relevant
+- [MCP API injection](exploits/web-rce/mcp-api-injection.md) ó Kobold `/api/mcp/connect`
+- [Flowise Custom MCP Tool](exploits/web-rce/flowise-mcp-rce.md) ó Silentium
+- [Hoverfly middleware RCE](exploits/web-rce/hoverfly-middleware-rce.md) ó DevArea
+- [motionEye config injection](exploits/web-rce/motioneye-config-injection.md) ó CCTV
+- [WCF SOAP command injection](exploits/web-rce/wcf-soap-injection.md) ó Overwatch
+- [Cacti graph-template RCE](exploits/web-rce/cacti-rce.md) ó MonitorsFour
+- [Codiad 2.8.4 authenticated RCE (CVE-2018-14009)](exploits/web-rce/codiad-rce.md) ó IDE
+- [osCommerce 2.3.4 installer unauth RCE](exploits/web-rce/oscommerce-installer-rce.md) ó Blueprint
+- [MagnusBilling unauth RCE (CVE-2023-30258)](exploits/web-rce/magnusbilling-rce.md) ó Billing
+- [SweetRice CMS 1.5.1 Media Center RCE](exploits/web-rce/sweetrice-media-center-rce.md) ó LazyAdmin
+- [URL-parameter OS command injection](exploits/web-rce/url-param-command-injection.md) ó Yueiua
+- [Werkzeug debug console RCE (PIN via LFI)](exploits/web-rce/werkzeug-debug-rce.md) ó Bookstore
+- [Apache 2.4.49 path traversal ? RCE (CVE-2021-41773)](exploits/web-rce/apache-path-traversal-rce.md) ó Oh My Web
+- [Microsoft OMI unauthenticated RCE ó OMIGOD (CVE-2021-38647)](exploits/web-rce/omigod-rce.md) ó Oh My Web
+- [Cockpit CMS unauth user enum + reset ? PHP upload (CVE-2020-35846)](exploits/web-rce/cockpit-cms-rce.md) ó CMSpit
+- [Python `input()` injection on a `socat`-hosted daemon](exploits/web-rce/python-input-injection.md) ó BSides GT develpy
+- [PHP file-upload extension bypass (`.phtml` / `.phar`)](exploits/web-rce/php-extension-bypass-upload.md) ó Vulnversity
+- [SMB write ? IIS execution (ASP webshell)](exploits/web-rce/smb-write-iis-execution.md) ó Relevant
 
 ### Web Read / SQLi / Disclosure
-- [Apache CXF XOP Include ‚Üí LFI](exploits/web-disclosure/apache-cxf-xop-lfi.md) ‚Äî DevArea
-- [ZoneMinder time-based blind SQLi](exploits/web-disclosure/zoneminder-sqli.md) ‚Äî CCTV
-- [MailHog password reset](exploits/web-disclosure/mailhog-password-reset.md) ‚Äî Silentium
-- [Exposed `.env` / config files](exploits/web-disclosure/env-file-exposure.md) ‚Äî MonitorsFour
-- [Default credentials](exploits/web-disclosure/default-credentials.md) ‚Äî CCTV, IDE
-- [LFI via PHP `include()` parameter](exploits/web-disclosure/lfi-php-parameter.md) ‚Äî Team
-- [Backup / old script / SQL-dump exposure](exploits/web-disclosure/backup-file-exposure.md) ‚Äî Team, LazyAdmin
-- [Hidden parameter fuzzing (`ffuf` + payload-driven size diff)](exploits/web-disclosure/hidden-parameter-fuzzing.md) ‚Äî Bookstore
-- [`.DS_Store` information disclosure](exploits/web-disclosure/ds-store-disclosure.md) ‚Äî Oh My Web
-- [PHP source disclosure via restricted LFI (`file://` + `file_get_contents`)](exploits/web-disclosure/php-source-disclosure-lfi.md) ‚Äî Recruit
-- [SQL UNION injection ‚Äî column extraction](exploits/web-disclosure/sql-union-injection.md) ‚Äî Recruit
+- [Apache CXF XOP Include ? LFI](exploits/web-disclosure/apache-cxf-xop-lfi.md) ó DevArea
+- [ZoneMinder time-based blind SQLi](exploits/web-disclosure/zoneminder-sqli.md) ó CCTV
+- [MailHog password reset](exploits/web-disclosure/mailhog-password-reset.md) ó Silentium
+- [Exposed `.env` / config files](exploits/web-disclosure/env-file-exposure.md) ó MonitorsFour
+- [Default credentials](exploits/web-disclosure/default-credentials.md) ó CCTV, IDE
+- [LFI via PHP `include()` parameter](exploits/web-disclosure/lfi-php-parameter.md) ó Team
+- [Backup / old script / SQL-dump exposure](exploits/web-disclosure/backup-file-exposure.md) ó Team, LazyAdmin
+- [Hidden parameter fuzzing (`ffuf` + payload-driven size diff)](exploits/web-disclosure/hidden-parameter-fuzzing.md) ó Bookstore
+- [`.DS_Store` information disclosure](exploits/web-disclosure/ds-store-disclosure.md) ó Oh My Web
+- [PHP source disclosure via restricted LFI (`file://` + `file_get_contents`)](exploits/web-disclosure/php-source-disclosure-lfi.md) ó Recruit
+- [SQL UNION injection ó column extraction](exploits/web-disclosure/sql-union-injection.md) ó Recruit
 
 ### CI/CD & DevOps RCE
-- [TeamCity super-user token ‚Üí build-step RCE](exploits/ci-cd/teamcity-superuser-token-rce.md) ‚Äî VulnNet: Internal
+- [TeamCity super-user token ? build-step RCE](exploits/ci-cd/teamcity-superuser-token-rce.md) ó VulnNet: Internal
 
 ### Network Service Abuse (Linux)
-- [Anonymous FTP enumeration](exploits/network-services/anonymous-ftp-enumeration.md) ‚Äî Anonforce
-- [NFS share abuse (`showmount`, `no_root_squash`)](exploits/network-services/nfs-share-abuse.md) ‚Äî VulnNet: Internal
-- [Redis authenticated enumeration & abuse](exploits/network-services/redis-auth-abuse.md) ‚Äî VulnNet: Internal
-- [rsync module abuse (read + write)](exploits/network-services/rsync-module-abuse.md) ‚Äî VulnNet: Internal
+- [Anonymous FTP enumeration](exploits/network-services/anonymous-ftp-enumeration.md) ó Anonforce
+- [NFS share abuse (`showmount`, `no_root_squash`)](exploits/network-services/nfs-share-abuse.md) ó VulnNet: Internal
+- [Redis authenticated enumeration & abuse](exploits/network-services/redis-auth-abuse.md) ó VulnNet: Internal
+- [rsync module abuse (read + write)](exploits/network-services/rsync-module-abuse.md) ó VulnNet: Internal
 
 ### Active Directory / Windows
-- [MSSQL linked server abuse](exploits/ad/mssql-linked-server.md) ‚Äî Overwatch
-- [MSSQL enumeration cheat sheet](exploits/ad/mssql-enumeration.md) ‚Äî Overwatch
-- [ADIDNS poisoning](exploits/ad/adidns-poisoning.md) ‚Äî Overwatch
-- [NTLM capture & crack](exploits/ad/ntlm-capture-crack.md) ‚Äî Overwatch
-- [Password spraying](exploits/ad/password-spraying.md) ‚Äî Overwatch, SoupedeCode 01
-- [AS-REP Roast & Kerberoast](exploits/ad/kerberos-roasting.md) ‚Äî Overwatch, SoupedeCode 01
-- [SMB anonymous enumeration](exploits/ad/smb-anonymous-enum.md) ‚Äî Overwatch, SoupedeCode 01
-- [RID brute-force enumeration (LSA cycling)](exploits/ad/rid-brute-enumeration.md) ‚Äî SoupedeCode 01
-- [Shadow Credentials ‚Üí PKINIT ‚Üí UnPAC-the-Hash](exploits/ad/shadow-credentials.md) ‚Äî Logging
-- [NSSM-wrapped service abuse](exploits/privesc-windows/nssm-service-abuse.md) ‚Äî Overwatch
+- [MSSQL linked server abuse](exploits/ad/mssql-linked-server.md) ó Overwatch
+- [MSSQL enumeration cheat sheet](exploits/ad/mssql-enumeration.md) ó Overwatch
+- [ADIDNS poisoning](exploits/ad/adidns-poisoning.md) ó Overwatch
+- [NTLM capture & crack](exploits/ad/ntlm-capture-crack.md) ó Overwatch
+- [Password spraying](exploits/ad/password-spraying.md) ó Overwatch, SoupedeCode 01
+- [AS-REP Roast & Kerberoast](exploits/ad/kerberos-roasting.md) ó Overwatch, SoupedeCode 01
+- [SMB anonymous enumeration](exploits/ad/smb-anonymous-enum.md) ó Overwatch, SoupedeCode 01
+- [RID brute-force enumeration (LSA cycling)](exploits/ad/rid-brute-enumeration.md) ó SoupedeCode 01
+- [Shadow Credentials ? PKINIT ? UnPAC-the-Hash](exploits/ad/shadow-credentials.md) ó Logging
+- [NSSM-wrapped service abuse](exploits/privesc-windows/nssm-service-abuse.md) ó Overwatch
 
 ### Credential Hunting
-- [Binary string credentials](exploits/creds/binary-credential-hunting.md) ‚Äî Overwatch
-- [systemd unit-file credentials](exploits/creds/systemd-service-credentials.md) ‚Äî DevArea
-- [`/proc/*/environ` enumeration](exploits/creds/env-variable-enum.md) ‚Äî Silentium
-- [Cleartext sniffing with tcpdump](exploits/creds/tcpdump-credential-sniffing.md) ‚Äî CCTV
-- [`.bash_history` credential discovery](exploits/creds/bash-history-credentials.md) ‚Äî IDE
-- [PGP private key cracking (`gpg2john`)](exploits/creds/pgp-key-cracking.md) ‚Äî Anonforce
-- [Steganography ‚Äî hidden data in images](exploits/stego/steganography-image-loot.md) ‚Äî Yueiua
-- [Piet / `npiet` image steganography](exploits/stego/npiet-piet-stego.md) ‚Äî BSides GT develpy
-- [MongoDB enumeration from a foothold](exploits/creds/mongodb-enumeration.md) ‚Äî CMSpit
-- [Base64-encoded credentials in files / shares](exploits/creds/base64-encoded-credentials.md) ‚Äî Relevant
+- [Binary string credentials](exploits/creds/binary-credential-hunting.md) ó Overwatch
+- [systemd unit-file credentials](exploits/creds/systemd-service-credentials.md) ó DevArea
+- [`/proc/*/environ` enumeration](exploits/creds/env-variable-enum.md) ó Silentium
+- [Cleartext sniffing with tcpdump](exploits/creds/tcpdump-credential-sniffing.md) ó CCTV
+- [`.bash_history` credential discovery](exploits/creds/bash-history-credentials.md) ó IDE
+- [PGP private key cracking (`gpg2john`)](exploits/creds/pgp-key-cracking.md) ó Anonforce
+- [Steganography ó hidden data in images](exploits/stego/steganography-image-loot.md) ó Yueiua
+- [Piet / `npiet` image steganography](exploits/stego/npiet-piet-stego.md) ó BSides GT develpy
+- [MongoDB enumeration from a foothold](exploits/creds/mongodb-enumeration.md) ó CMSpit
+- [Base64-encoded credentials in files / shares](exploits/creds/base64-encoded-credentials.md) ó Relevant
 
 ### Privilege Escalation (Linux)
-- [Docker group ‚Üí root](exploits/privesc-linux/docker-group-escape.md) ‚Äî Kobold
-- [Sudo + `bash` overwrite ‚Üí SUID root](exploits/privesc-linux/sudo-bash-overwrite.md) ‚Äî DevArea
-- [Gogs symlink write attack](exploits/privesc-linux/gogs-symlink-attack.md) ‚Äî Silentium
-- [Sudo script unsanitized input injection](exploits/privesc-linux/sudo-input-injection.md) ‚Äî Team
-- [Cron script group-writable abuse](exploits/privesc-linux/cron-script-abuse.md) ‚Äî Team
-- [pkexec + pkttyagent authentication agent](exploits/privesc-linux/pkexec-pkttyagent-privesc.md) ‚Äî IDE
-- [Sudo `fail2ban-client` ‚Üí SUID bash](exploits/privesc-linux/fail2ban-sudo-privesc.md) ‚Äî Billing
-- [Sudo-allowed script ‚Üí writable helper hijack](exploits/privesc-linux/sudo-script-helper-hijack.md) ‚Äî LazyAdmin
-- [Sudo bash `eval` filter bypass ‚Üí sudoers append](exploits/privesc-linux/bash-eval-filter-bypass.md) ‚Äî Yueiua
-- [Linux capabilities (`cap_setuid+ep`) ‚Üí root](exploits/privesc-linux/linux-capabilities-privesc.md) ‚Äî Oh My Web
-- [SUID binary reversing (XOR magic-number style)](exploits/privesc-linux/suid-binary-reversing.md) ‚Äî Bookstore
-- [`sudo exiftool -filename=` / CVE-2021-22204](exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md) ‚Äî CMSpit
-- [Systemd unit drop / `systemctl` privesc](exploits/privesc-linux/systemd-service-privesc.md) ‚Äî Vulnversity
+- [Docker group ? root](exploits/privesc-linux/docker-group-escape.md) ó Kobold
+- [Sudo + `bash` overwrite ? SUID root](exploits/privesc-linux/sudo-bash-overwrite.md) ó DevArea
+- [Gogs symlink write attack](exploits/privesc-linux/gogs-symlink-attack.md) ó Silentium
+- [Sudo script unsanitized input injection](exploits/privesc-linux/sudo-input-injection.md) ó Team
+- [Cron script group-writable abuse](exploits/privesc-linux/cron-script-abuse.md) ó Team
+- [pkexec + pkttyagent authentication agent](exploits/privesc-linux/pkexec-pkttyagent-privesc.md) ó IDE
+- [Sudo `fail2ban-client` ? SUID bash](exploits/privesc-linux/fail2ban-sudo-privesc.md) ó Billing
+- [Sudo-allowed script ? writable helper hijack](exploits/privesc-linux/sudo-script-helper-hijack.md) ó LazyAdmin
+- [Sudo bash `eval` filter bypass ? sudoers append](exploits/privesc-linux/bash-eval-filter-bypass.md) ó Yueiua
+- [Linux capabilities (`cap_setuid+ep`) ? root](exploits/privesc-linux/linux-capabilities-privesc.md) ó Oh My Web
+- [SUID binary reversing (XOR magic-number style)](exploits/privesc-linux/suid-binary-reversing.md) ó Bookstore
+- [`sudo exiftool -filename=` / CVE-2021-22204](exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md) ó CMSpit
+- [Systemd unit drop / `systemctl` privesc](exploits/privesc-linux/systemd-service-privesc.md) ó Vulnversity
 
 ### Container Escape & Pivoting
-- [Unauthenticated Docker API](exploits/container/docker-api-unauthenticated.md) ‚Äî MonitorsFour
-- [Container / Docker enumeration from inside](exploits/container/docker-container-enumeration.md) ‚Äî Oh My Web, MonitorsFour, Silentium
-- [Container network pivot via static binary](exploits/container/container-network-pivoting.md) ‚Äî Oh My Web
+- [Unauthenticated Docker API](exploits/container/docker-api-unauthenticated.md) ó MonitorsFour
+- [Container / Docker enumeration from inside](exploits/container/docker-container-enumeration.md) ó Oh My Web, MonitorsFour, Silentium
+- [Container network pivot via static binary](exploits/container/container-network-pivoting.md) ó Oh My Web
 
 ### Pivoting
-- [SSH port forwarding](exploits/pivot/ssh-tunneling.md) ‚Äî Silentium, CCTV
+- [SSH port forwarding](exploits/pivot/ssh-tunneling.md) ó Silentium, CCTV
 
 ### Enumeration Playbooks
-- [Linux post-exploitation enumeration](exploits/enumeration/linux-enumeration.md) ‚Äî system context, container detection, credential hunting with `find`/`grep`, SUID, cron, network
-- [Windows post-exploitation enumeration](exploits/enumeration/windows-enumeration.md) ‚Äî privileges, domain context, credentials on disk, services, scheduled tasks, payload transfer
-- [SMB enumeration playbook](exploits/ad/smb-enumeration.md) ‚Äî banner, signing, anonymous / guest / authenticated share walks, RID brute, spraying, Kerberos roasting, PTH
+- [Linux post-exploitation enumeration](exploits/enumeration/linux-enumeration.md) ó system context, container detection, credential hunting with `find`/`grep`, SUID, cron, network
+- [Windows post-exploitation enumeration](exploits/enumeration/windows-enumeration.md) ó privileges, domain context, credentials on disk, services, scheduled tasks, payload transfer
+- [SMB enumeration playbook](exploits/ad/smb-enumeration.md) ó banner, signing, anonymous / guest / authenticated share walks, RID brute, spraying, Kerberos roasting, PTH
 
 ---
 
@@ -303,44 +303,44 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 
 ```
 .
-‚îú‚îÄ‚îÄ README.md
-‚îú‚îÄ‚îÄ CLAUDE.md          # project guide for Claude Code sessions
-‚îú‚îÄ‚îÄ brain              # bash wrapper for brain.py
-‚îú‚îÄ‚îÄ brain.py           # CLI search / list over tools, exploits, writeups
-‚îú‚îÄ‚îÄ HTB/
-‚îÇ   ‚îú‚îÄ‚îÄ Easy/
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Silentium_HTB_Writeup.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Kobold-Writeup.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ cctv.md
-‚îÇ   ‚îÇ   ‚îî‚îÄ‚îÄ MonitorsFour.md
-‚îÇ   ‚îú‚îÄ‚îÄ Medium/
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ DevArea.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Overwatch.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Logging.md         # üöß WIP
-‚îÇ   ‚îÇ   ‚îî‚îÄ‚îÄ VariaType.md       # üöß WIP
-‚îÇ   ‚îî‚îÄ‚îÄ Hard/
-‚îú‚îÄ‚îÄ TRY/
-‚îÇ   ‚îú‚îÄ‚îÄ Easy/
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Team.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Ide.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ blueprint.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ soupedocde01.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ bsidesgtanonforce.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ vulnnetinternal.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ billing.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ lazyadmin.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ yueiua.md
-‚îÇ   ‚îÇ   ‚îî‚îÄ‚îÄ vulnversity.md
-‚îÇ   ‚îú‚îÄ‚îÄ Medium/
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ bookstoreoc.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ bsidesgtdevelpy.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ cmspit.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ ohmyweb.md
-‚îÇ   ‚îÇ   ‚îú‚îÄ‚îÄ Recruit.md
-‚îÇ   ‚îÇ   ‚îî‚îÄ‚îÄ relevant.md
-‚îÇ   ‚îî‚îÄ‚îÄ Hard/
-‚îú‚îÄ‚îÄ tools/             # per-tool command notes  ‚Üê primary artefact
-‚îî‚îÄ‚îÄ exploits/          # per-technique exploit notes  ‚Üê primary artefact
++-- README.md
++-- CLAUDE.md          # project guide for Claude Code sessions
++-- brain              # bash wrapper for brain.py
++-- brain.py           # CLI search / list over tools, exploits, writeups
++-- HTB/
+¶   +-- Easy/
+¶   ¶   +-- Silentium_HTB_Writeup.md
+¶   ¶   +-- Kobold-Writeup.md
+¶   ¶   +-- cctv.md
+¶   ¶   +-- MonitorsFour.md
+¶   +-- Medium/
+¶   ¶   +-- DevArea.md
+¶   ¶   +-- Overwatch.md
+¶   ¶   +-- Logging.md         # ?? WIP
+¶   ¶   +-- VariaType.md       # ?? WIP
+¶   +-- Hard/
++-- TRY/
+¶   +-- Easy/
+¶   ¶   +-- Team.md
+¶   ¶   +-- Ide.md
+¶   ¶   +-- blueprint.md
+¶   ¶   +-- soupedocde01.md
+¶   ¶   +-- bsidesgtanonforce.md
+¶   ¶   +-- vulnnetinternal.md
+¶   ¶   +-- billing.md
+¶   ¶   +-- lazyadmin.md
+¶   ¶   +-- yueiua.md
+¶   ¶   +-- vulnversity.md
+¶   +-- Medium/
+¶   ¶   +-- bookstoreoc.md
+¶   ¶   +-- bsidesgtdevelpy.md
+¶   ¶   +-- cmspit.md
+¶   ¶   +-- ohmyweb.md
+¶   ¶   +-- Recruit.md
+¶   ¶   +-- relevant.md
+¶   +-- Hard/
++-- tools/             # per-tool command notes  ? primary artefact
++-- exploits/          # per-technique exploit notes  ? primary artefact
 ```
 
 ---
@@ -349,9 +349,9 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 
 Three-layer knowledge base, **with the layers inverted vs. a typical writeup repo**:
 
-1. **Exploit notes** (`exploits/`) ‚Äî the reusable techniques. Prereqs, step-by-step, variants, defensive notes. When I hit a similar box in 6 months, this is what I re-read.
-2. **Tool notes** (`tools/`) ‚Äî every flag I've actually used, tagged with the machine that needed it. `brain tool nmap` reminds me exactly how I used nmap on a specific AD box.
-3. **Machine writeups** (`HTB/`, `TRY/`) ‚Äî narrative shell. Short prose, ASCII chain diagram, then links down to the real artefacts. A writeup that duplicates commands instead of linking is a bug.
+1. **Exploit notes** (`exploits/`) ó the reusable techniques. Prereqs, step-by-step, variants, defensive notes. When I hit a similar box in 6 months, this is what I re-read.
+2. **Tool notes** (`tools/`) ó every flag I've actually used, tagged with the machine that needed it. `brain tool nmap` reminds me exactly how I used nmap on a specific AD box.
+3. **Machine writeups** (`HTB/`, `TRY/`) ó narrative shell. Short prose, ASCII chain diagram, then links down to the real artefacts. A writeup that duplicates commands instead of linking is a bug.
 
 Every new machine that introduces a new tool / technique triggers an update to `tools/` or `exploits/` **in the same commit**, plus the `Used on: **<Machine>**` tag on the new note so `brain used-on <Machine>` picks it up. Add links from the writeup to the notes, not backlink sections inside the notes.
 
@@ -411,4 +411,5 @@ See `CLAUDE.md` for the full authoring rules and machine-closing checklist.
 - [JavaScript obfuscated API key disclosure](exploits/web-disclosure/javascript-obfuscated-api-key.md)
 - [PHP mt_rand token prediction](exploits/crypto/php-mt-rand-token-prediction.md)
 - [Padding oracle to command injection](exploits/crypto/padding-oracle-command-injection.md)
+
 

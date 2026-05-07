@@ -39,3 +39,5 @@ gobuster vhost -u http://team.thm \
   --append-domain
 ```
 Used on: **Team**
+
+

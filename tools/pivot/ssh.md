@@ -78,3 +78,5 @@ Used on: **Silentium** — key later written into `/root/.ssh/authorized_keys` v
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_drac
 ```
 Used on: **IDE** — required two stable key-auth sessions to run `pkttyagent` alongside `pkexec`.
+
+

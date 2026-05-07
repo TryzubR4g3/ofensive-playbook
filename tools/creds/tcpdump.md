@@ -21,3 +21,5 @@ Used on: **CCTV**
 - `-A` — print payload in ASCII (reveals credentials sent in cleartext)
 
 Result on CCTV: a scheduled task transmitted `sa_mark:PASSWORD` in cleartext, giving lateral movement from `mark` to `sa_mark`.
+
+

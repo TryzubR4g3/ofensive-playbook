@@ -1,4 +1,4 @@
-﻿# mimikatz
+# mimikatz
 
 Windows credential extraction tool used after administrator-level access to dump local hashes, tickets, and secrets.
 
@@ -28,3 +28,5 @@ Used on: **Wreath** - dumped local SAM hashes for Administrator and Thomas, then
 - [evil-winrm](evil-winrm.md)
 - [xfreerdp](xfreerdp.md)
 - [mimikatz-sam-pth.md](../../exploits/creds/mimikatz-sam-pth.md)
+
+

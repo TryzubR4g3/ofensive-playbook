@@ -23,3 +23,5 @@ Used on: **Internal** - found `admin:my2boys`.
 ## Related
 
 - [../../exploits/web-rce/wordpress-theme-editor-webshell.md](../../exploits/web-rce/wordpress-theme-editor-webshell.md)
+
+

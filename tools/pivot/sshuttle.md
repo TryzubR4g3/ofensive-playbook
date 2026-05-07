@@ -1,4 +1,4 @@
-﻿# sshuttle
+# sshuttle
 
 Transparent subnet tunneling over SSH. It behaves like a lightweight VPN when you have SSH access to a pivot host.
 
@@ -35,3 +35,5 @@ sshuttle -r user@PIVOT_HOST -N
 - [ssh](ssh.md)
 - [chisel](chisel.md)
 - [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md)
+
+

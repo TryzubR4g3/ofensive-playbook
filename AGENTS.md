@@ -275,3 +275,4 @@ Cross-reference other notes by relative path (e.g. `see \`adidns-poisoning.md\``
 - Not a generic pentest methodology book. `exploits/` and `bugbounty/` notes capture **what I actually run**, not every known variant.
 - Not a writeup archive. Writeups are the narrative shell around the real artefacts (tools/exploits). If a writeup has more content than the tools/exploits it references, something went wrong.
 - `reference/` (the legacy HTML mini-site) has been removed. New content goes into the `.md` system exclusively.
+

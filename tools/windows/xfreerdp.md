@@ -1,4 +1,4 @@
-﻿# xfreerdp
+# xfreerdp
 
 FreeRDP client for interactive RDP sessions, clipboard sharing, dynamic resolution, and drive redirection.
 
@@ -38,3 +38,5 @@ Used on: **Wreath** - mounted Kali's Windows tooling at `\\tsclient\share`.
 
 - [mimikatz](mimikatz.md)
 - [windows-admin-stabilization.md](../../exploits/privesc-windows/windows-admin-stabilization.md)
+
+

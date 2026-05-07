@@ -17,3 +17,5 @@ Used on: **Overwatch**
 - Final argument — the domain controller IP
 
 Used in combination with `responder` to capture the NTLMv2 hash of the MSSQL service account when it resolves the linked server `SQL07`.
+
+

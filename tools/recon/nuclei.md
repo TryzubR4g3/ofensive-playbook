@@ -15,3 +15,5 @@ Used on: **Internal** - identified WordPress, XML-RPC exposure, a user enumerati
 ## Related
 
 - [../../exploits/web-rce/wordpress-theme-editor-webshell.md](../../exploits/web-rce/wordpress-theme-editor-webshell.md)
+
+

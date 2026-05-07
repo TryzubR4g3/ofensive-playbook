@@ -1,4 +1,4 @@
-﻿# chisel
+# chisel
 
 Fast TCP/UDP tunnel over HTTP, useful for reverse SOCKS pivots and port forwards when SSH is unavailable or blocked.
 
@@ -58,3 +58,5 @@ Used on: **Wreath** - the GitStack host could reach the intermediate server but 
 - [proxychains](proxychains.md)
 - [foxyproxy](foxyproxy.md)
 - [chisel-pivoting.md](../../exploits/pivot/chisel-pivoting.md)
+
+

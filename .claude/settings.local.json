@@ -1,4 +1,32 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(python3 \"C:\\\\Users\\\\mykoh\\\\Desktop\\\\Writeups/brain.py\" cmd \"find .*creds\")",
+      "Bash(python3 \"C:\\\\Users\\\\mykoh\\\\Desktop\\\\Writeups/brain.py\" used-on \"Yueiua\")",
+      "Bash(python3 brain.py enumeration find)",
+      "Bash(python3 brain.py fuzz ffuf)",
+      "Bash(python3 brain.py exploit sudo)",
+      "Bash(python3 brain.py privesc sudo)",
+      "Bash(python3 brain.py topics)",
+      "Bash(python3 brain.py reversing)",
+      "Bash(python3 brain.py container getcap)",
+      "Bash(python3 brain.py enumeration getcap)",
+      "Bash(python3 brain.py backrefs werkzeug-debug-rce)",
+      "Bash(python3 brain.py backrefs apache-path-traversal-rce)",
+      "Bash(python3 brain.py used-on Bookstore)",
+      "Bash(python3 brain.py used-on \"Oh My Web\")",
+      "Bash(python3 brain.py used-on ohmyweb)",
+      "Bash(python3 brain.py reversing strings)",
+      "Bash(python3 brain.py web werkzeug)",
+      "Bash(python3 brain.py privesc cap_setuid)",
+      "Bash(python3 brain.py used-on cmspit)",
+      "Bash(python3 brain.py used-on bsidesgtdevelpy)",
+      "Bash(python3 brain.py database mongo)",
+      "Bash(python brain.py topics)",
+      "Bash(python *)"
+    ]
+  },
   "enabledPlugins": {
     "context7@claude-plugins-official": true
   }

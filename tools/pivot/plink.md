@@ -1,4 +1,4 @@
-﻿# plink
+# plink
 
 PuTTY's command-line SSH client. Useful on Windows targets that lack OpenSSH but can execute uploaded binaries.
 
@@ -33,3 +33,5 @@ Plink expects `.ppk` keys, not standard OpenSSH private keys.
 
 - [ssh](ssh.md)
 - [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md)
+
+

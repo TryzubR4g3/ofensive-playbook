@@ -1,4 +1,4 @@
-﻿# proxychains
+# proxychains
 
 CLI wrapper that forces a command through a SOCKS or HTTP proxy. Useful after creating SSH or Chisel tunnels into internal networks.
 
@@ -56,3 +56,5 @@ When scanning with Nmap through proxychains, comment out `proxy_dns`; otherwise 
 - [chisel](chisel.md)
 - [ssh](ssh.md)
 - [chisel-pivoting.md](../../exploits/pivot/chisel-pivoting.md)
+
+

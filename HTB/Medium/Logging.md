@@ -61,6 +61,8 @@ export TARGET=10.129.41.161
 # What it does: full TCP port scan with fast rate.
 # Why here: discover all open services on the DC and the secondary WSUS port.
 nmap -sS -p- --min-rate 5000 -n $TARGET
+# What it does: perform a service and script scan on identified open ports.
+# Why here: confirm the Active Directory roles and check for the presence of the WSUS service.
 nmap -sVC -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,8530 $TARGET -oA service-scan
 ```
 
@@ -94,24 +96,24 @@ sudo ntpdate -u $TARGET
 
 ### List shares
 ```bash
-# What it does: check SMB share permissions using Wallace's credentials.
-# Why here: identify non-standard shares that might contain sensitive data.
+# What it does: validate Wallace's credentials and list available SMB shares.
+# Why here: discover the custom Logs share which is the primary starting point for sensitive data recovery.
 crackmapexec smb $TARGET --shares -u 'wallace.everette' -p 'Welcome2026@'
 ```
 
-Standard AD shares plus a **`Logs`** custom share  always interesting on HTB.
+Standard AD shares plus a **`Logs`** custom share — always interesting on HTB.
 
-### Walk NETLOGON (baseline)
+### Explore NETLOGON for Configuration Artifacts
 ```bash
-# What it does: recursively list the NETLOGON share.
-# Why here: check for scripts or configuration files that might contain credentials.
+# What it does: recursively list the contents of the NETLOGON share.
+# Why here: search for startup scripts or environment configurations that might leak credentials or provide lateral movement hints.
 smbclient //$TARGET/NETLOGON -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 ```
 
-### Dump the Logs share
+### Exfiltrate Sensitive Logs
 ```bash
-# What it does: list and download files from the custom Logs share.
-# Why here: recover the application log files for offline analysis.
+# What it does: download log files from the custom Logs share.
+# Why here: recover the Verbose logs that contain the connection-context dump with service account credentials.
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@'
 ```

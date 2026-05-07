@@ -48,14 +48,14 @@ SSH as root ? root.txt
 ### Port Discovery
 ```bash
 export TARGET=10.128.148.141
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform a full port scan on the target.
+# Why here: identify exposed services, specifically port 21 (FTP) and 22 (SSH) for initial enumeration.
 nmap -sS -p- --min-rate 5000 -n $TARGET
 ```
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: run service version detection and default scripts on discovered ports.
+# Why here: confirm anonymous FTP access and identify the SSH version.
 nmap -sVC -p21,22 $TARGET -oA service-scan
 ```
 
@@ -118,8 +118,8 @@ ftp> get backup_encrypted.pgp
 ## User Flag
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the user flag.
+# Why here: confirm initial foothold and capture the first objective.
 cat user.txt
 ```
 
@@ -141,15 +141,15 @@ We have the key, but the key is passphrase-protected  we need the passphrase t
 
 ### Convert to a john hash
 ```bash
-# What it does: convierte/importa/descifra material PGP.
-# Why here: recuperar o usar credenciales cifradas del loot.
+# What it does: extract the password hash from the PGP private key file.
+# Why here: prepare the PGP key for offline brute-forcing with John the Ripper.
 gpg2john private.asc > pgp_hash.txt
 ```
 
 ### Crack with rockyou
 ```bash
-# What it does: crackea el hash indicado con la wordlist elegida.
-# Why here: recover reusable credentials.
+# What it does: brute-force the PGP passphrase using the rockyou wordlist.
+# Why here: recover the cleartext passphrase needed to import and use the private key for decryption.
 john --wordlist=/usr/share/wordlists/rockyou.txt pgp_hash.txt
 john --show pgp_hash.txt
 ```
@@ -162,8 +162,8 @@ john --show pgp_hash.txt
 
 ### Import the key into the keyring
 ```bash
-# What it does: convierte/importa/descifra material PGP.
-# Why here: recuperar o usar credenciales cifradas del loot.
+# What it does: import the PGP private key into the local keyring.
+# Why here: enable the decryption of the backup file using the recovered passphrase.
 gpg --import private.asc
 ```
 
@@ -171,8 +171,8 @@ GPG prompts for the passphrase  enter `xbox360`.
 
 ### Decrypt the backup
 ```bash
-# What it does: convierte/importa/descifra material PGP.
-# Why here: recuperar o usar credenciales cifradas del loot.
+# What it does: decrypt the PGP-encrypted backup file.
+# Why here: extract the /etc/shadow contents archived within the backup to obtain user password hashes.
 gpg --decrypt backup_encrypted.pgp > backup_decrypted.txt
 ```
 
@@ -190,8 +190,8 @@ Save both lines to `shadows.txt`.
 ## Cracking Shadow Hashes
 
 ```bash
-# What it does: crackea el hash indicado con la wordlist elegida.
-# Why here: recover reusable credentials.
+# What it does: crack the captured /etc/shadow hashes using the rockyou wordlist.
+# Why here: recover the root user's cleartext password to gain full administrative access via SSH.
 john --wordlist=/usr/share/wordlists/rockyou.txt shadows.txt
 john --show shadows.txt
 ```
@@ -203,12 +203,12 @@ Both hashes crack against rockyou. The `root` password is the flag-unlocking one
 ## Root Flag
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in as root via SSH using the cracked password.
+# Why here: obtain full control over the target system and retrieve the root flag.
 ssh root@$TARGET
 # <enter recovered password>
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root flag.
+# Why here: confirm full system compromise and complete the machine.
 cat /root/root.txt
 ```
 

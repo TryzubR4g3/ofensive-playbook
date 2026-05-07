@@ -1,4 +1,4 @@
-# Logging - HackTheBox Writeup
+﻿# Logging - HackTheBox Writeup
 
 **Status:** 🚧 _Work in progress — user foothold achieved as `msa_health$`; root path under enumeration via `monitor.ps1`._
 
@@ -322,8 +322,8 @@ This section will be expanded once root is reached.
 4. **Protect `msDS-KeyCredentialLink`.** Monitor writes to this attribute — Shadow Credentials shows up loudly in event 5136 with the right SACL.
 
 ### Related Notes
-- [netexec / crackmapexec](../../tools/netexec.md) — SMB bind and share listing
-- [impacket](../../tools/impacket.md) — `getTGT`
-- [evil-winrm](../../tools/evil-winrm.md) — WinRM with hash auth
-- [Kerberos roasting notes](../../exploits/kerberos-roasting.md) (for related AD ticketing)
+- [netexec / crackmapexec](../../tools/recon/netexec.md) — SMB bind and share listing
+- [impacket](../../tools/windows/impacket.md) — `getTGT`
+- [evil-winrm](../../tools/windows/evil-winrm.md) — WinRM with hash auth
+- [Kerberos roasting notes](../../exploits/ad/kerberos-roasting.md) (for related AD ticketing)
 - _TODO_: dedicated `exploits/shadow-credentials.md` covering pywhisker + PKINIT + UnPAC workflow

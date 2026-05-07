@@ -1,4 +1,4 @@
-# Billing - TryHackMe Writeup
+﻿# Billing - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.130.173.152 at time of solve)
 **OS:** Linux (Debian)
@@ -86,7 +86,7 @@ feroxbuster -u http://$TARGET/mbilling/ \
 
 ## 3. Initial Access — MagnusBilling CVE-2023-30258
 
-Metasploit ships the exploit module. Full playbook in [magnusbilling-rce.md](../../exploits/magnusbilling-rce.md).
+Metasploit ships the exploit module. Full playbook in [magnusbilling-rce.md](../../exploits/web-rce/magnusbilling-rce.md).
 
 ```bash
 msfconsole
@@ -113,7 +113,7 @@ uname -a
 
 ## 4. Post-Exploitation Enumeration (`asterisk`)
 
-First pass of the [Linux enumeration playbook](../../exploits/linux-enumeration.md) — system context + `sudo -l` + credential hunt.
+First pass of the [Linux enumeration playbook](../../exploits/enumeration/linux-enumeration.md) — system context + `sudo -l` + credential hunt.
 
 ### System context & sudo
 ```bash
@@ -164,7 +164,7 @@ The user flag lives at `/home/asterisk/user.txt`.
 
 ## 5. Database Looting
 
-Remote MySQL is filtered (confirmed by `mysql -h $TARGET -u mbillingUser --password=...`), so everything goes through the local client in the meterpreter session. Tool note: [mysql.md](../../tools/mysql.md).
+Remote MySQL is filtered (confirmed by `mysql -h $TARGET -u mbillingUser --password=...`), so everything goes through the local client in the meterpreter session. Tool note: [mysql.md](../../tools/database/mysql.md).
 
 ### Full dump
 ```bash
@@ -217,7 +217,7 @@ meterpreter > download /tmp/mbilling_backup.sql
 
 ## 6. Privilege Escalation — `sudo fail2ban-client` → root
 
-Full technique note: [fail2ban-sudo-privesc.md](../../exploits/fail2ban-sudo-privesc.md).
+Full technique note: [fail2ban-sudo-privesc.md](../../exploits/privesc-linux/fail2ban-sudo-privesc.md).
 
 `fail2ban-server` runs as root. `fail2ban-client` (sudo-allowed here) can overwrite the `actionban` shell snippet of an existing jail. Any later ban triggers the snippet **as root**.
 
@@ -261,10 +261,10 @@ cat /root/passwordMysql.log     # dropped during setup, another loot file
 ---
 
 ## Related Notes
-- [magnusbilling-rce.md](../../exploits/magnusbilling-rce.md) — exploit playbook
-- [fail2ban-sudo-privesc.md](../../exploits/fail2ban-sudo-privesc.md) — privesc playbook
-- [mysql](../../tools/mysql.md) — DB enumeration tool note
-- [metasploit](../../tools/metasploit.md) — public-exploit delivery
-- [hashcat](../../tools/hashcat.md) — SHA-1 mode 100
-- [linux-enumeration.md](../../exploits/linux-enumeration.md) — post-foothold checklist
-- [nmap](../../tools/nmap.md), [whatweb](../../tools/whatweb.md), [feroxbuster](../../tools/feroxbuster.md) — recon
+- [magnusbilling-rce.md](../../exploits/web-rce/magnusbilling-rce.md) — exploit playbook
+- [fail2ban-sudo-privesc.md](../../exploits/privesc-linux/fail2ban-sudo-privesc.md) — privesc playbook
+- [mysql](../../tools/database/mysql.md) — DB enumeration tool note
+- [metasploit](../../tools/exploitation/metasploit.md) — public-exploit delivery
+- [hashcat](../../tools/creds/hashcat.md) — SHA-1 mode 100
+- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) — post-foothold checklist
+- [nmap](../../tools/recon/nmap.md), [whatweb](../../tools/recon/whatweb.md), [feroxbuster](../../tools/fuzz/feroxbuster.md) — recon

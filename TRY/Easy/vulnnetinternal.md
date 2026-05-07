@@ -1,4 +1,4 @@
-# VulnNet: Internal - TryHackMe Writeup
+﻿# VulnNet: Internal - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.128.153.142 at time of solve)
 **OS:** Linux
@@ -356,10 +356,10 @@ cat /root/root.txt
 5. **Build agents inherit the server's privileges** — running TeamCity as root means every build step is root RCE.
 
 ### Related Notes
-- [ftp](../../tools/ftp.md) / [smbclient](../../tools/smbclient.md) / [enum4linux](../../tools/enum4linux.md) — initial SMB triage
-- [showmount + NFS abuse playbook](../../exploits/nfs-share-abuse.md)
-- [Redis authenticated enumeration](../../exploits/redis-auth-abuse.md)
-- [rsync module read/write abuse](../../exploits/rsync-module-abuse.md)
-- [TeamCity super-user token RCE](../../exploits/teamcity-superuser-token-rce.md)
-- [SSH port forwarding](../../exploits/ssh-tunneling.md)
-- [Linux enumeration playbook](../../exploits/linux-enumeration.md)
+- [ftp](../../tools/recon/ftp.md) / [smbclient](../../tools/recon/smbclient.md) / [enum4linux](../../tools/recon/enum4linux.md) — initial SMB triage
+- [showmount + NFS abuse playbook](../../exploits/network-services/nfs-share-abuse.md)
+- [Redis authenticated enumeration](../../exploits/network-services/redis-auth-abuse.md)
+- [rsync module read/write abuse](../../exploits/network-services/rsync-module-abuse.md)
+- [TeamCity super-user token RCE](../../exploits/ci-cd/teamcity-superuser-token-rce.md)
+- [SSH port forwarding](../../exploits/pivot/ssh-tunneling.md)
+- [Linux enumeration playbook](../../exploits/enumeration/linux-enumeration.md)

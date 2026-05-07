@@ -1,2 +1,4 @@
-".claude/" 
-"CLAUDE.md"
+.claude/
+.obsidian/
+__pycache__/
+*.py[cod]

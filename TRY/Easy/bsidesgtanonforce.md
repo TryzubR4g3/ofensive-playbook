@@ -1,4 +1,4 @@
-# Anonforce (BSides GT) - TryHackMe Writeup
+﻿# Anonforce (BSides GT) - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.128.148.141 at time of solve)
 **OS:** Linux
@@ -213,8 +213,8 @@ cat /root/root.txt
 4. **SHA-512 with a weak password still cracks quickly.** Hashing alone is not defense-in-depth; password quality is.
 
 ### Related Notes
-- [ftp](../../tools/ftp.md) — anonymous login + `mget`
-- [gpg](../../tools/gpg.md) — key import + decrypt
-- [john](../../tools/john.md) — offline cracking (PGP + shadow)
-- [PGP key cracking playbook](../../exploits/pgp-key-cracking.md)
-- [Anonymous FTP enumeration](../../exploits/anonymous-ftp-enumeration.md)
+- [ftp](../../tools/recon/ftp.md) — anonymous login + `mget`
+- [gpg](../../tools/creds/gpg.md) — key import + decrypt
+- [john](../../tools/creds/john.md) — offline cracking (PGP + shadow)
+- [PGP key cracking playbook](../../exploits/creds/pgp-key-cracking.md)
+- [Anonymous FTP enumeration](../../exploits/network-services/anonymous-ftp-enumeration.md)

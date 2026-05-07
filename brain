@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Thin bash wrapper so `./brain search foo` works without typing python3.
+HERE="$(cd "$(dirname "$0")" && pwd)"
+exec python3 "$HERE/brain.py" "$@"

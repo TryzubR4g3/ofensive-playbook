@@ -1,4 +1,4 @@
-# Blueprint - TryHackMe Writeup
+﻿# Blueprint - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.130.183.22 at time of solve)
 **Domain:** `blueprint.thm`
@@ -214,5 +214,5 @@ Or from the recovered cleartext password, authenticate cleanly via RDP / WinRM /
 4. **Enforce strong Administrator passwords** — once SAM hashes are dumped, weak passwords fall in seconds.
 
 ### Related Notes
-- [metasploit](../../tools/metasploit.md) — module delivery
-- [hashcat](../../tools/hashcat.md) — NTLM cracking mode `-m 1000`
+- [metasploit](../../tools/exploitation/metasploit.md) — module delivery
+- [hashcat](../../tools/creds/hashcat.md) — NTLM cracking mode `-m 1000`

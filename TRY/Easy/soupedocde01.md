@@ -1,4 +1,4 @@
-# SoupedeCode 01 - TryHackMe Writeup
+﻿# SoupedeCode 01 - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.128.129.244 at time of solve)
 **Domain:** `SOUPEDECODE.LOCAL`
@@ -245,10 +245,10 @@ C:\> type C:\Users\Administrator\Desktop\root.txt
 5. **Machine accounts belong in least-privilege groups.** `FileServer$` should not be a Domain Admin.
 
 ### Related Notes
-- [netexec](../../tools/netexec.md) — RID brute, spraying, PTH
-- [impacket](../../tools/impacket.md) — `GetUserSPNs`, `wmiexec`
-- [hashcat](../../tools/hashcat.md) — `-m 13100` Kerberos TGS RC4
-- [evil-winrm](../../tools/evil-winrm.md) — hash-authenticated WinRM
-- [SMB anonymous enumeration](../../exploits/smb-anonymous-enum.md)
-- [Password spraying](../../exploits/password-spraying.md)
-- [AS-REP Roast & Kerberoast](../../exploits/kerberos-roasting.md)
+- [netexec](../../tools/recon/netexec.md) — RID brute, spraying, PTH
+- [impacket](../../tools/windows/impacket.md) — `GetUserSPNs`, `wmiexec`
+- [hashcat](../../tools/creds/hashcat.md) — `-m 13100` Kerberos TGS RC4
+- [evil-winrm](../../tools/windows/evil-winrm.md) — hash-authenticated WinRM
+- [SMB anonymous enumeration](../../exploits/ad/smb-anonymous-enum.md)
+- [Password spraying](../../exploits/ad/password-spraying.md)
+- [AS-REP Roast & Kerberoast](../../exploits/ad/kerberos-roasting.md)

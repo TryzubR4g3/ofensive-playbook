@@ -1,4 +1,4 @@
-# LazyAdmin - TryHackMe Writeup
+﻿# LazyAdmin - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.130.171.51 at time of solve)
 **OS:** Linux (Ubuntu 16.04)
@@ -137,13 +137,13 @@ Raw MD5 → CrackStation (hashcat `-m 0` also works):
 
 **Admin credentials:** `manager / Password123`.
 
-Full pattern: [backup-file-exposure.md](../../exploits/backup-file-exposure.md).
+Full pattern: [backup-file-exposure.md](../../exploits/web-disclosure/backup-file-exposure.md).
 
 ---
 
 ## 4. Initial Access — SweetRice CMS Media Center RCE
 
-Full technique note: [sweetrice-media-center-rce.md](../../exploits/sweetrice-media-center-rce.md).
+Full technique note: [sweetrice-media-center-rce.md](../../exploits/web-rce/sweetrice-media-center-rce.md).
 
 Login:
 ```
@@ -176,7 +176,7 @@ Lands as **`www-data`** on `THM-Chal`.
 
 ## 5. Post-Exploitation (`www-data`)
 
-Standard [Linux enumeration](../../exploits/linux-enumeration.md) pass:
+Standard [Linux enumeration](../../exploits/enumeration/linux-enumeration.md) pass:
 
 ```bash
 whoami
@@ -222,7 +222,7 @@ ls -la /etc/copy.sh
 # -rwxrwxrwx 1 root root ... /etc/copy.sh
 ```
 
-Full technique: [sudo-script-helper-hijack.md](../../exploits/sudo-script-helper-hijack.md).
+Full technique: [sudo-script-helper-hijack.md](../../exploits/privesc-linux/sudo-script-helper-hijack.md).
 
 ```bash
 # 1. Replace the helper with the payload
@@ -262,9 +262,10 @@ cat /root/root.txt
 ---
 
 ## Related Notes
-- [backup-file-exposure.md](../../exploits/backup-file-exposure.md) — exposed `.sql` / `.db` in webroot
-- [sweetrice-media-center-rce.md](../../exploits/sweetrice-media-center-rce.md) — authenticated RCE chain
-- [sudo-script-helper-hijack.md](../../exploits/sudo-script-helper-hijack.md) — privesc via writable helper
-- [linux-enumeration.md](../../exploits/linux-enumeration.md) — post-foothold checklist
-- [searchsploit](../../tools/searchsploit.md), [wget](../../tools/wget.md), [sqlite3](../../tools/sqlite3.md) — tool notes for this chain
-- [nmap](../../tools/nmap.md), [feroxbuster](../../tools/feroxbuster.md) — recon
+- [backup-file-exposure.md](../../exploits/web-disclosure/backup-file-exposure.md) — exposed `.sql` / `.db` in webroot
+- [sweetrice-media-center-rce.md](../../exploits/web-rce/sweetrice-media-center-rce.md) — authenticated RCE chain
+- [sudo-script-helper-hijack.md](../../exploits/privesc-linux/sudo-script-helper-hijack.md) — privesc via writable helper
+- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) — post-foothold checklist
+- [searchsploit](../../tools/recon/searchsploit.md), [wget](../../tools/web/wget.md), [sqlite3](../../tools/database/sqlite3.md) — tool notes for this chain
+- [nmap](../../tools/recon/nmap.md), [feroxbuster](../../tools/fuzz/feroxbuster.md) — recon
+

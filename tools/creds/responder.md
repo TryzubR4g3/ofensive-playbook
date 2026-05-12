@@ -4,6 +4,12 @@ LLMNR/NBT-NS/mDNS poisoner and rogue SMB/HTTP server. Used to capture NetNTLM(v1
 
 ## Commands Used
 
+### Start Responder on the Breaching AD VPN interface
+```bash
+sudo responder -I breachad
+```
+Used on: **Breaching Active Directory** - captured a NetNTLMv2 challenge for `ZA\svcFileCopy`.
+
 ### Start Responder on the VPN interface
 ```bash
 sudo responder -I tun0

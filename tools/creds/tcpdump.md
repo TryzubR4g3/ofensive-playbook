@@ -11,6 +11,15 @@ Packet sniffer. Used to capture cleartext credentials sent over the wire by sche
 
 ## Commands Used
 
+### Capture LDAP bind traffic in hex and ASCII
+```bash
+sudo tcpdump -SX -i breachad tcp port 389
+```
+Used on: **Breaching Active Directory** - captured cleartext LDAP pass-back credentials after lowering rogue LDAP SASL requirements.
+
+- `-S` - print absolute TCP sequence numbers
+- `-X` - print packet payload in hex and ASCII
+- `tcp port 389` - only LDAP traffic
 ### Capture all traffic on all interfaces with ASCII output
 ```bash
 /usr/bin/tcpdump -i any -A

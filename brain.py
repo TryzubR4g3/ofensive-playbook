@@ -44,13 +44,12 @@ Examples
 """
 from __future__ import annotations
 
-import io
 import os
 import re
 import sys
 import subprocess
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, NamedTuple
 
 # Force UTF-8 stdout on Windows consoles (cp1252 breaks on any non-ASCII)
 if sys.platform == "win32":
@@ -93,7 +92,7 @@ TOPICS: dict[str, dict] = {
         "desc": "Port scan, banner grab, directory brute, service banners",
         "tools": ["nmap", "whatweb", "searchsploit", "enum4linux", "showmount", "ftp",
                   "smbclient", "smbmap", "nuclei", "feroxbuster", "ffuf",
-                  "gobuster", "wget", "proxychains", "foxyproxy"],
+                  "gobuster", "wget", "proxychains", "foxyproxy", "ldap-utils"],
         "exploits": ["smb-anonymous-enum", "anonymous-ftp-enumeration",
                      "smb-enumeration", "rid-brute-enumeration"],
     },
@@ -102,7 +101,7 @@ TOPICS: dict[str, dict] = {
         "tools": ["nmap", "enum4linux", "netexec", "smbclient", "impacket", "kerbrute",
                   "bloodhound", "showmount", "ftp", "redis-cli", "rsync", "mysql",
                   "mongo", "sqlite3", "ffuf", "gobuster", "feroxbuster", "getcap",
-                  "proxychains", "powershell-empire", "smbmap", "nuclei"],
+                  "proxychains", "powershell-empire", "smbmap", "nuclei", "ldap-utils"],
         "exploits": ["enum", "linux-enumeration", "windows-enumeration",
                      "smb-enumeration", "smb-anonymous-enum", "mssql-enumeration",
                      "rid-brute-enumeration", "anonymous-ftp-enumeration",
@@ -142,7 +141,7 @@ TOPICS: dict[str, dict] = {
     "creds": {
         "desc": "Credential hunting, cracking, reuse",
         "tools": ["hashcat", "john", "gpg", "tcpdump", "strings", "responder",
-                  "mimikatz", "hydra"],
+                  "mimikatz", "hydra", "ldap-utils"],
         "exploits": ["cred", "bash-history-credentials", "env-variable-enum",
                      "env-file-exposure", "ntlm-capture-crack", "pgp-key-cracking",
                      "password-spraying", "kerberos-roasting", "shadow-credentials",
@@ -150,18 +149,20 @@ TOPICS: dict[str, dict] = {
                      "systemd-service-credentials", "backup-file-exposure",
                      "base64-encoded-credentials", "mimikatz-sam-pth",
                      "windows-sam-hive-dump", "wordpress-wp-config-credentials",
-                     "jenkins-http-form-bruteforce"],
+                     "jenkins-http-form-bruteforce", "ldap-passback-attack"],
     },
     "ad": {
         "desc": "Active Directory / Kerberos / SMB / LDAP",
         "tools": ["netexec", "impacket", "kerbrute", "smbclient", "evil-winrm",
-                  "dnstool", "responder", "bloodhound", "mimikatz", "xfreerdp"],
+                  "dnstool", "responder", "bloodhound", "mimikatz", "xfreerdp",
+                  "hydra", "ldap-utils"],
         "exploits": ["adidns-poisoning", "kerberos-roasting", "password-spraying",
                      "smb-anonymous-enum", "smb-enumeration", "shadow-credentials",
                      "rid-brute-enumeration", "mssql-", "ntlm-capture-crack",
                      "windows-enumeration", "smb-write-iis-execution",
                      "base64-encoded-credentials", "mimikatz-sam-pth",
-                     "windows-admin-stabilization", "windows-sam-hive-dump"],
+                     "windows-admin-stabilization", "windows-sam-hive-dump",
+                     "ldap-passback-attack"],
     },
     "web": {
         "desc": "Web / HTTP exploitation",
@@ -179,12 +180,19 @@ TOPICS: dict[str, dict] = {
                      "hidden-parameter-fuzzing", "ds-store-disclosure",
                      "omigod-rce", "cockpit-cms-rce", "python-input-injection",
                      "php-source-disclosure-lfi", "sql-union-injection",
+                     "cuppa-cms-alertconfig-lfi-rfi",
                      "php-extension-bypass-upload", "smb-write-iis-execution",
                      "webmin-cve-2019-15107-rce", "gitstack-rce",
                      "php-exiftool-comment-webshell", "wordpress-theme-editor-webshell",
                      "jenkins-script-console-rce", "public-log-invite-code-disclosure",
                      "javascript-obfuscated-api-key", "php-mt-rand-token-prediction",
-                     "padding-oracle-command-injection"],
+                     "padding-oracle-command-injection", "fuel-cms-rce",
+                     "sql-injection", "sqli", "blind-sql", "time-based", "in-band"],
+    },
+    "xss": {
+        "desc": "Cross-site scripting payloads and XSS note types",
+        "tools": [],
+        "exploits": ["xss", "stored-xss", "reflected-xss", "dom-based-xss", "blind-xss"],
     },
     "container": {
         "desc": "Container / Docker abuse",
@@ -204,12 +212,14 @@ TOPICS: dict[str, dict] = {
         "desc": "SQL injection",
         "tools": ["sqlmap"],
         "exploits": ["zoneminder-sqli", "lfi-php-parameter", "backup-file-exposure",
-                     "sql-union-injection"],
+                     "sql-union-injection", "sql-injection", "sqli", "blind-sql",
+                     "time-based", "in-band"],
     },
     "lfi": {
         "desc": "Local File Inclusion / arbitrary read",
         "tools": ["curl", "ffuf"],
         "exploits": ["lfi-php-parameter", "apache-cxf-xop-lfi", "env-file-exposure",
+                     "cuppa-cms-alertconfig-lfi-rfi",
                      "apache-path-traversal-rce", "ds-store-disclosure",
                      "hidden-parameter-fuzzing", "werkzeug-debug-rce",
                      "php-source-disclosure-lfi", "php-exiftool-comment-webshell",
@@ -228,7 +238,8 @@ TOPICS: dict[str, dict] = {
                      "php-extension-bypass-upload", "smb-write-iis-execution",
                      "webmin-cve-2019-15107-rce", "gitstack-rce",
                      "php-exiftool-comment-webshell", "wordpress-theme-editor-webshell",
-                     "jenkins-script-console-rce", "padding-oracle-command-injection"],
+                     "jenkins-script-console-rce", "padding-oracle-command-injection",
+                     "fuel-cms-rce", "cuppa-cms-alertconfig-lfi-rfi"],
     },
     "reversing": {
         "desc": "Binary reverse engineering (SUID, custom binaries)",
@@ -263,7 +274,8 @@ TOPIC_ALIASES = {
     "recon": "recon", "reconnaissance": "recon", "reconocimiento": "recon",
     "escalation": "privesc", "shell": "shells", "reverse-shell": "shells",
     "pivoting": "pivot", "tunel": "pivot", "tunnel": "pivot",
-    "active-directory": "ad", "kerberos": "ad",
+    "active-directory": "ad", "kerberos": "ad", "xss": "xss",
+    "cross-site-scripting": "xss",
     "steganography": "stego", "credentials": "creds", "credenciales": "creds",
     "password": "creds", "passwords": "creds", "cred": "creds", "http": "web",
     "reverse": "reversing", "binary": "reversing", "re": "reversing",
@@ -295,6 +307,64 @@ def relpath(p: Path) -> str:
         return str(p.relative_to(ROOT))
     except ValueError:
         return str(p)
+
+
+def read_text(p: Path) -> str:
+    encodings = ("utf-8", "utf-8-sig", "cp1252", "latin-1")
+    for enc in encodings:
+        try:
+            return _repair_text(p.read_text(encoding=enc))
+        except UnicodeDecodeError:
+            continue
+        except OSError:
+            return ""
+    try:
+        return _repair_text(p.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return ""
+
+
+def _repair_text(text: str) -> str:
+    replacements = {
+        "â€”": "—",
+        "â†’": "→",
+        "â‰¤": "≤",
+        "â‰¥": "≥",
+        "â€˜": "'",
+        "â€™": "'",
+        "â€œ": '"',
+        "â€": '"',
+        "â€¢": "•",
+        "Ã¢â‚¬â€": "—",
+        "Ã¢â€ â€™": "→",
+        "Ã¢â‚¬Ëœ": "'",
+        "Ã¢â‚¬â„¢": "'",
+        "Ã¢â‚¬Å“": '"',
+        "Ã¢â‚¬ï¿½": '"',
+    }
+    for bad, good in replacements.items():
+        text = text.replace(bad, good)
+    return text
+
+
+class LineHit(NamedTuple):
+    lineno: int
+    text: str
+    in_code: bool
+
+
+def scan_markdown(p: Path) -> list[LineHit]:
+    text = read_text(p)
+    if not text:
+        return []
+    lines: list[LineHit] = []
+    in_code = False
+    for i, line in enumerate(text.splitlines(), 1):
+        if line.lstrip().startswith("```"):
+            in_code = not in_code
+            continue
+        lines.append(LineHit(i, line.rstrip(), in_code))
+    return lines
 
 
 # ---- Topic resolution ----
@@ -334,11 +404,7 @@ def backrefs(target: Path) -> list[tuple[Path, int, str]]:
     basename = target.name
     hits: list[tuple[Path, int, str]] = []
     for p in iter_category("writeups"):
-        try:
-            text = p.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
-        for i, line in enumerate(text.splitlines(), 1):
+        for i, line in enumerate(read_text(p).splitlines(), 1):
             if basename in line:
                 hits.append((p, i, line.strip()))
     return hits
@@ -347,21 +413,38 @@ def backrefs(target: Path) -> list[tuple[Path, int, str]]:
 # ---- Search primitives ----
 
 def _grep_file(p: Path, pat: re.Pattern, code_only: bool = False) -> list[tuple[int, str]]:
-    try:
-        text = p.read_text(encoding="utf-8", errors="replace")
-    except OSError:
-        return []
     hits: list[tuple[int, str]] = []
-    in_code = False
-    for i, line in enumerate(text.splitlines(), 1):
-        if line.lstrip().startswith("```"):
-            in_code = not in_code
+    for hit in scan_markdown(p):
+        if code_only and not hit.in_code:
             continue
-        if code_only and not in_code:
-            continue
-        if pat.search(line):
-            hits.append((i, line.rstrip()))
+        if pat.search(hit.text):
+            hits.append((hit.lineno, hit.text))
     return hits
+
+
+def _looks_command_like(query: str) -> bool:
+    command_markers = (
+        " -", "--", "/", "\\", "$", "|", ">", "<", "=", "http", ".php", ".py",
+        "curl", "nmap", "ffuf", "feroxbuster", "gobuster", "sqlmap", "hydra",
+        "nc ", "ssh", "smbclient", "python", "bash", "find ", "grep ", "git ",
+    )
+    q = query.lower()
+    return any(marker in q for marker in command_markers)
+
+
+def _topic_hits(p: Path, pat: re.Pattern, query: str) -> list[tuple[int, str]]:
+    scanned = scan_markdown(p)
+    if not scanned:
+        return []
+
+    code_hits = [(h.lineno, h.text) for h in scanned if h.in_code and pat.search(h.text)]
+    if code_hits:
+        return code_hits
+
+    if _looks_command_like(query):
+        return []
+
+    return [(h.lineno, h.text) for h in scanned if pat.search(h.text)]
 
 
 # ---- Commands ----
@@ -417,7 +500,7 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
     pat = re.compile(re.escape(query), re.IGNORECASE)
     total = 0
     for p in files:
-        hits = _grep_file(p, pat, code_only=False)
+        hits = _topic_hits(p, pat, query)
         if not hits:
             continue
         total += len(hits)
@@ -473,7 +556,7 @@ def cmd_search(argv: list[str], code_only: bool = False) -> int:
     return 0
 
 
-def _resolve_file(cat: str, name: str) -> Path | None:
+def _resolve_file(cat: str, name: str, quiet: bool = False) -> Path | None:
     name_low = name.lower()
     exact, partials = [], []
     for p in iter_category(cat):
@@ -487,11 +570,13 @@ def _resolve_file(cat: str, name: str) -> Path | None:
     if len(partials) == 1:
         return partials[0]
     if partials:
-        print(yellow(f"Ambiguous '{name}'. Candidates:"))
-        for p in partials:
-            print(f"  {relpath(p)}")
+        if not quiet:
+            print(yellow(f"Ambiguous '{name}'. Candidates:"))
+            for p in partials:
+                print(f"  {relpath(p)}")
         return None
-    print(red(f"No {cat[:-1]} matching '{name}'."))
+    if not quiet:
+        print(red(f"No {cat[:-1]} matching '{name}'."))
     return None
 
 
@@ -501,7 +586,7 @@ def cmd_show(cat: str, argv: list[str]) -> int:
     p = _resolve_file(cat, argv[0])
     if not p:
         return 1
-    print(p.read_text(encoding="utf-8", errors="replace"))
+    print(read_text(p))
     # Plus back-references at the bottom for tools/exploits
     if cat in ("tools", "exploits"):
         refs = backrefs(p)
@@ -519,10 +604,7 @@ def cmd_used_on(argv: list[str]) -> int:
     pat = re.compile(r"Used on:.*" + re.escape(machine), re.IGNORECASE)
     hits = 0
     for cat, p in iter_all():
-        try:
-            text = p.read_text(encoding="utf-8", errors="replace")
-        except OSError:
-            continue
+        text = read_text(p)
         if pat.search(text):
             hits += 1
             print(f"  {cyan(relpath(p))}")
@@ -538,7 +620,7 @@ def cmd_backrefs(argv: list[str]) -> int:
     # Try to resolve by stem across tools/exploits
     p: Path | None = None
     for cat in ("tools", "exploits"):
-        p = _resolve_file(cat, target)
+        p = _resolve_file(cat, target, quiet=True)
         if p:
             break
     if not p:
@@ -568,7 +650,7 @@ def cmd_open(argv: list[str]) -> int:
     editor = os.environ.get("EDITOR") or os.environ.get("VISUAL")
     if editor:
         return subprocess.call([editor, str(p)])
-    print(p.read_text(encoding="utf-8", errors="replace"))
+    print(read_text(p))
     return 0
 
 

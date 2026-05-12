@@ -210,7 +210,9 @@ Expected structure (loose — don't enforce against existing files):
 9. Key Takeaways — the 4–6 lessons I want to remember next time I see this pattern
 10. Related Notes section at the bottom, linking every referenced `tools/` + `exploits/` file
 
-**Hard rule**: a writeup must NEVER be the only place a command, flag or technique lives. If it is, move the content to `tools/` or `exploits/` and link back.
+**Hard rule**: a writeup must NEVER be the only place a command, flag or technique lives. If it is reusable, also extract it to `tools/` or `exploits/` and link back.
+
+**Do not remove commands from writeups just because they were extracted.** Writeups should still feel organic and readable, with the commands/code that were actually run preserved in place. Extraction means duplication into the reusable note, not deleting the command from the narrative.
 
 ### Tool Notes (`tools/`)
 - One-paragraph description at the top.
@@ -254,7 +256,7 @@ Cross-reference other notes by relative path (e.g. `see \`adidns-poisoning.md\``
 
 1. Before creating a new note, **search first**: `./brain guide`, `./brain <topic> <keyword>`, then `./brain search <keyword>` if you are unsure of the topic. Extend an existing note when possible.
 2. When adding a new tool / exploit, update `README.md` in the same change.
-3. When editing a writeup, any command that isn't box-specific must be moved to `tools/` or `exploits/` — the writeup links instead of duplicating prose.
+3. When editing a writeup, any command that isn't box-specific must be copied into `tools/` or `exploits/` and linked back, while leaving the original command/code in the writeup so the walkthrough remains organic.
 4. Every new `tools/` or `exploits/` note must carry the `Used on: **<Machine>**` line. `brain used-on` depends on it.
 5. Never embed raw flag values that I didn't personally capture — use placeholders (`<CAPTURED_TOKEN>`, `ATTACKER_IP`).
 6. Commits are user-initiated. Don't commit unless explicitly asked.

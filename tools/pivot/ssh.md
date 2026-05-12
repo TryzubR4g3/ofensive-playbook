@@ -29,7 +29,7 @@ Standard SSH client, used for login with reused credentials, private-key authent
 ```bash
 ssh ben@TARGET_IP
 ```
-Used on: **Silentium** — `SMTP_PASSWORD` from container env reused as host password.
+Used on: **Silentium** â€” `SMTP_PASSWORD` from container env reused as host password.
 
 ```bash
 ssh mark@TARGET_IP
@@ -47,18 +47,18 @@ Used on: **Silentium**
 ```bash
 ssh -L 8080:127.0.0.1:3001 ben@TARGET_IP
 ```
-Used on: **Silentium** — expose Gogs (`127.0.0.1:3001`) on local `8080`.
+Used on: **Silentium** â€” expose Gogs (`127.0.0.1:3001`) on local `8080`.
 
 ```bash
 ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ```
-Used on: **CCTV** — expose motionEye (`127.0.0.1:7999`) on local `8765`.
+Used on: **CCTV** â€” expose motionEye (`127.0.0.1:7999`) on local `8765`.
 
 ### Login with private key recovered via LFI
 ```bash
 ssh -i dale_id_rsa dale@team.thm
 ```
-Used on: **Team** — Dale's private key read from the target via LFI on `sshd_config`.
+Used on: **Team** â€” Dale's private key read from the target via LFI on `sshd_config`.
 
 ### Login with reused database credentials
 ```bash
@@ -71,12 +71,12 @@ Used on: **IDE**
 ```bash
 ssh-keygen -t rsa -f /tmp/htb_key -N ""
 ```
-Used on: **Silentium** — key later written into `/root/.ssh/authorized_keys` via the symlink write.
+Used on: **Silentium** â€” key later written into `/root/.ssh/authorized_keys` via the symlink write.
 
 ### Generate SSH key pair for dual-session authentication agent
 ```bash
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_drac
 ```
-Used on: **IDE** — required two stable key-auth sessions to run `pkttyagent` alongside `pkexec`.
+Used on: **IDE** â€” required two stable key-auth sessions to run `pkttyagent` alongside `pkexec`.
 
 

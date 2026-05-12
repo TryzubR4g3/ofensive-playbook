@@ -43,23 +43,23 @@ feroxbuster \
 ```
 Used on: **VariaType**
 
-- `-x` — comma-separated extensions appended to each word
-- `-d 4` — recurse 4 levels deep
-- `-C 404,403` — collect-and-skip these codes (filter)
-- `-s 200,...` — only emit these status codes
-- `--force-recursion` — recurse into 200s even when they look like files
-- `-o file.txt` — persist results so a long run survives a disconnect
+- `-x` â€” comma-separated extensions appended to each word
+- `-d 4` â€” recurse 4 levels deep
+- `-C 404,403` â€” collect-and-skip these codes (filter)
+- `-s 200,...` â€” only emit these status codes
+- `--force-recursion` â€” recurse into 200s even when they look like files
+- `-o file.txt` â€” persist results so a long run survives a disconnect
 
 ### Brute-force a non-default web port (Apache 3333)
 ```bash
 feroxbuster -u http://$TARGET:3333 -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
 ```
-Used on: **vulnversity** — found `internal/uploads/` upload directory.
+Used on: **vulnversity** â€” found `internal/uploads/` upload directory.
 
 ### Brute-force IIS root with Recruit-style wordlist
 ```bash
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
-Used on: **Recruit** — discovered `/phpmyadmin/` plus the entry-point `file.php`.
+Used on: **Recruit** â€” discovered `/phpmyadmin/` plus the entry-point `file.php`.
 
 

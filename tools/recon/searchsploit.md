@@ -12,12 +12,25 @@ Offline CLI for the Exploit-DB database. Given a product + version, returns ever
 
 ## Commands Used
 
+### Fuel CMS exploit lookup and copy
+```bash
+searchsploit Fuel
+searchsploit -m linux/webapps/47138.py
+```
+Used on: **Vulnerability Capstone** - found and copied the Fuel CMS 1.4 RCE PoC before editing the target URL.
+
+### Search by vulnerable parameter or file name
+```bash
+searchsploit alertConfigField
+```
+Used on: **Skynet** - identified the public Cuppa CMS `alertConfigField.php` LFI/RFI path.
+
 ### Version-string search
 ```bash
 searchsploit OpenSSH 7.2p2
 # OpenSSH 7.2p2 - Username Enumeration   | linux/remote/40136.py
 ```
-Used on: **LazyAdmin** � flagged CVE-2016-6210 (username enumeration on OpenSSH = 7.2p2). Not exploited in the end, but noted as a viable pivot if brute-forceable.
+Used on: **LazyAdmin** â€” flagged CVE-2016-6210 (username enumeration on OpenSSH = 7.2p2). Not exploited in the end, but noted as a viable pivot if brute-forceable.
 
 ### General product lookup
 ```bash
@@ -53,13 +66,13 @@ searchsploit -u         # git-pulls the latest exploits DB
 
 ## Tips
 
-- Match Nmap version strings verbatim. A trailing build number (`p2`, `-4ubuntu2.8`) often flips results � try with and without it.
+- Match Nmap version strings verbatim. A trailing build number (`p2`, `-4ubuntu2.8`) often flips results â€” try with and without it.
 - Combine with `whatweb` on web targets: the banner version goes straight into `searchsploit` before anything else.
 - `--cve <CVE-id>` is the reverse lookup when you already know the CVE.
 
 ## Related
-- [nmap](nmap.md) � feeds the version string
-- [whatweb](whatweb.md) � feeds the CMS / framework version
-- [metasploit](../exploitation/metasploit.md) � many Exploit-DB entries already have an MSF module � try `search <cve>` there first
+- [nmap](nmap.md) â€” feeds the version string
+- [whatweb](whatweb.md) â€” feeds the CMS / framework version
+- [metasploit](../exploitation/metasploit.md) â€” many Exploit-DB entries already have an MSF module â€” try `search <cve>` there first
 
 

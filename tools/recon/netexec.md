@@ -49,3 +49,9 @@ netexec ldap TARGET_IP -u users.txt -p 'TI0LKcfHzZw1Vv' -d overwatch.htb --conti
 Used on: **Overwatch**
 
 
+
+### SMB credential validation from user/password lists
+```bash
+netexec smb 10.130.191.119 -u users.txt -p passwords.txt --continue-on-success
+```
+Used on: **coldvvars** - validated SMB credentials extracted from the web login/XPath path.

@@ -63,3 +63,10 @@ feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Con
 Used on: **Recruit** â€” discovered `/phpmyadmin/` plus the entry-point `file.php`.
 
 
+
+### Brute-force multiple HTTP ports on the same target
+```bash
+feroxbuster -u http://$TARGET:8080 -w /usr/share/seclists/Discovery/Web-Content/big.txt
+feroxbuster -u http://$TARGET:8082 -w /usr/share/seclists/Discovery/Web-Content/big.txt
+```
+Used on: **coldvvars** - mapped the web apps on both non-standard ports before deeper `/dev` fuzzing.

@@ -4,7 +4,7 @@ Personal, CLI-searchable knowledge base for offensive security work. The repo is
 
 - **`tools/`** â€” per-tool command notes (every flag I've actually used, tagged by machine).
 - **`exploits/`** â€” per-technique playbooks (prerequisites, step-by-step, defensive notes).
-- **`HTB/`, `TRY/`** â€” machine writeups that link to the reusable notes above.
+- **`writeups/HTB/`, `writeups/TRY/`** â€” machine writeups that link to the reusable notes above.
 - **`brain` CLI** â€” grep / list / recall without leaving the terminal.
 
 ---
@@ -87,19 +87,19 @@ exploits\linux-enumeration.md
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Silentium** | Linux | [Writeup ?](HTB/Easy/Silentium_HTB_Writeup.md) |
-| **Kobold** | Linux | [Writeup ?](HTB/Easy/Kobold-Writeup.md) |
-| **CCTV** | Linux | [Writeup ?](HTB/Easy/cctv.md) |
-| **MonitorsFour** | Windows (Docker) | [Writeup ?](HTB/Easy/MonitorsFour.md) |
+| **Silentium** | Linux | [Writeup ?](writeups/HTB/Easy/Silentium_HTB_Writeup.md) |
+| **Kobold** | Linux | [Writeup ?](writeups/HTB/Easy/Kobold-Writeup.md) |
+| **CCTV** | Linux | [Writeup ?](writeups/HTB/Easy/cctv.md) |
+| **MonitorsFour** | Windows (Docker) | [Writeup ?](writeups/HTB/Easy/MonitorsFour.md) |
 
 ### Medium
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **DevArea** | Linux | [Writeup ?](HTB/Medium/DevArea.md) |
-| **Overwatch** | Windows (AD) | [Writeup ?](HTB/Medium/Overwatch.md) |
-| **Logging** ?? | Windows (AD) | [Writeup ?](HTB/Medium/Logging.md) |
-| **VariaType** ?? | Linux (nginx) | [Writeup ?](HTB/Medium/VariaType.md) |
+| **DevArea** | Linux | [Writeup ?](writeups/HTB/Medium/DevArea.md) |
+| **Overwatch** | Windows (AD) | [Writeup ?](writeups/HTB/Medium/Overwatch.md) |
+| **Logging** ?? | Windows (AD) | [Writeup ?](writeups/HTB/Medium/Logging.md) |
+| **VariaType** ?? | Linux (nginx) | [Writeup ?](writeups/HTB/Medium/VariaType.md) |
 
 ### Hard
 
@@ -113,45 +113,51 @@ exploits\linux-enumeration.md
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Team** | Linux | [Writeup ?](TRY/Easy/Team.md) |
-| **IDE** | Linux | [Writeup ?](TRY/Easy/Ide.md) |
-| **Blueprint** | Windows (XAMPP) | [Writeup ?](TRY/Easy/blueprint.md) |
-| **SoupedeCode 01** | Windows (AD) | [Writeup ?](TRY/Easy/soupedocde01.md) |
-| **Anonforce (BSides GT)** | Linux | [Writeup ?](TRY/Easy/bsidesgtanonforce.md) |
-| **VulnNet: Internal** | Linux | [Writeup ?](TRY/Easy/vulnnetinternal.md) |
-| **Billing** | Linux (MagnusBilling) | [Writeup ?](TRY/Easy/billing.md) |
-| **LazyAdmin** | Linux (SweetRice CMS) | [Writeup ?](TRY/Easy/lazyadmin.md) |
-| **Yueiua** | Linux (PHP + stego) | [Writeup ?](TRY/Easy/yueiua.md) |
-| **Vulnversity** | Linux (Apache + systemd privesc) | [Writeup ?](TRY/Easy/vulnversity.md) |
-| **Vulnerability Capstone** | Linux (Fuel CMS) | [Writeup ?](TRY/Easy/vulnerabilitycapstone.md) |
-| **Skynet** | Linux (Samba + SquirrelMail + Cuppa CMS) | [Writeup ?](TRY/Easy/Skynet.md) |
-| **chronicle** | Linux (Werkzeug API + exposed Git repo) | [Writeup ?](TRY/Easy/chronicle.md) |
+| **Team** | Linux | [Writeup ?](writeups/TRY/Easy/Team.md) |
+| **IDE** | Linux | [Writeup ?](writeups/TRY/Easy/Ide.md) |
+| **Blueprint** | Windows (XAMPP) | [Writeup ?](writeups/TRY/Easy/blueprint.md) |
+| **SoupedeCode 01** | Windows (AD) | [Writeup ?](writeups/TRY/Easy/soupedocde01.md) |
+| **Anonforce (BSides GT)** | Linux | [Writeup ?](writeups/TRY/Easy/bsidesgtanonforce.md) |
+| **VulnNet: Internal** | Linux | [Writeup ?](writeups/TRY/Easy/vulnnetinternal.md) |
+| **Billing** | Linux (MagnusBilling) | [Writeup ?](writeups/TRY/Easy/billing.md) |
+| **LazyAdmin** | Linux (SweetRice CMS) | [Writeup ?](writeups/TRY/Easy/lazyadmin.md) |
+| **Yueiua** | Linux (PHP + stego) | [Writeup ?](writeups/TRY/Easy/yueiua.md) |
+| **Vulnversity** | Linux (Apache + systemd privesc) | [Writeup ?](writeups/TRY/Easy/vulnversity.md) |
+| **Vulnerability Capstone** | Linux (Fuel CMS) | [Writeup ?](writeups/TRY/Easy/vulnerabilitycapstone.md) |
+| **Skynet** | Linux (Samba + SquirrelMail + Cuppa CMS) | [Writeup ?](writeups/TRY/Easy/Skynet.md) |
+| **chronicle** | Linux (Werkzeug API + exposed Git repo) | [Writeup ?](writeups/TRY/Easy/chronicle.md) |
+| **Lookup** ?? | Linux | [Writeup ?](writeups/TRY/Easy/Lookup.md) |
+| **BSides GT Dav** | Linux (WebDAV) | [Writeup ?](writeups/TRY/Easy/bsidesgtdav.md) |
+| **BSides GT Thompson** ?? | Linux (Tomcat) | [Writeup ?](writeups/TRY/Easy/bsidesgtthompson.md) |
+| **checkmate** ?? | TBD | [Writeup ?](writeups/TRY/Easy/checkmate.md) |
 
 ### Medium
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Bookstore** | Linux (Flask + Werkzeug debug) | [Writeup ?](TRY/Medium/bookstoreoc.md) |
-| **Oh My Web** | Linux (Apache 2.4.49 in Docker) | [Writeup ?](TRY/Medium/ohmyweb.md) |
-| **CMSpit** | Linux (Cockpit CMS + MongoDB) | [Writeup ?](TRY/Medium/cmspit.md) |
-| **BSides GT â€” develpy** | Linux (Py2 daemon + Piet stego) | [Writeup ?](TRY/Medium/bsidesgtdevelpy.md) |
-| **Recruit** | Linux (PHP LFI ? SQLi) | [Writeup ?](TRY/Medium/Recruit.md) |
-| **Relevant** | Windows (IIS + SMB) | [Writeup ?](TRY/Medium/relevant.md) |
-| **Operation Takeover** ?? | Linux (FRRouting) | [Writeup ?](TRY/Medium/operationtakeover.md) |
+| **Bookstore** | Linux (Flask + Werkzeug debug) | [Writeup ?](writeups/TRY/Medium/bookstoreoc.md) |
+| **Oh My Web** | Linux (Apache 2.4.49 in Docker) | [Writeup ?](writeups/TRY/Medium/ohmyweb.md) |
+| **CMSpit** | Linux (Cockpit CMS + MongoDB) | [Writeup ?](writeups/TRY/Medium/cmspit.md) |
+| **BSides GT â€” develpy** | Linux (Py2 daemon + Piet stego) | [Writeup ?](writeups/TRY/Medium/bsidesgtdevelpy.md) |
+| **Recruit** | Linux (PHP LFI ? SQLi) | [Writeup ?](writeups/TRY/Medium/Recruit.md) |
+| **Relevant** | Windows (IIS + SMB) | [Writeup ?](writeups/TRY/Medium/relevant.md) |
+| **Operation Takeover** ?? | Linux (FRRouting) | [Writeup ?](writeups/TRY/Medium/operationtakeover.md) |
+| **blog** | Linux (WordPress) | [Writeup ?](writeups/TRY/Medium/blog.md) |
+| **coldvvars** ?? | Linux (SMB + web) | [Writeup ?](writeups/TRY/Medium/coldvvars.md) |
 
 ### Hard
 
 | Machine | OS | Writeup |
 |---------|----|---------|
-| **Daily Bugle** ?? | Linux (Joomla) | [Writeup ?](TRY/Hard/dailybugle.md) |
+| **Daily Bugle** ?? | Linux (Joomla) | [Writeup ?](writeups/TRY/Hard/dailybugle.md) |
 
 ### Networks
 
 | Room | Difficulty | Writeup |
 |------|------------|---------|
-| **Wreath** | Easy | [Writeup ?](TRY/Networks/Easy/Wreath.md) |
-| **Breaching Active Directory** | Medium | [Writeup ?](TRY/Networks/Medium/Breaching%20Active%20Directory.md) |
-| **Bandit** ?? | Hard | [Writeup ?](TRY/Networks/Hard/Bandit.md) |
+| **Wreath** | Easy | [Writeup ?](writeups/TRY/Networks/Easy/Wreath.md) |
+| **Breaching Active Directory** | Medium | [Writeup ?](writeups/TRY/Networks/Medium/Breaching%20Active%20Directory.md) |
+| **Bandit** ?? | Hard | [Writeup ?](writeups/TRY/Networks/Hard/Bandit.md) |
 > ?? = writeup in progress / privilege escalation still being documented.
 
 ---
@@ -182,6 +188,7 @@ Per-tool note with every command used across the writeups and a short descriptio
 - [curl](tools/web/curl.md) â€” HTTP payload delivery (JSON, SOAP, API abuse)
 - [sqlmap](tools/web/sqlmap.md) â€” automated SQL injection
 - [metasploit](tools/exploitation/metasploit.md) â€” public-exploit delivery
+- [msfvenom](tools/exploitation/msfvenom.md) - payload artifact generation
 - [responder](tools/creds/responder.md) â€” NTLM hash capture
 - [dnstool](tools/recon/dnstool.md) â€” ADIDNS record manipulation
 - [redis-cli](tools/database/redis-cli.md) â€” authenticated Redis enumeration
@@ -241,8 +248,16 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [PHP file-upload extension bypass (`.phtml` / `.phar`)](exploits/web-rce/php-extension-bypass-upload.md) â€” Vulnversity
 - [SMB write ? IIS execution (ASP webshell)](exploits/web-rce/smb-write-iis-execution.md) â€” Relevant
 - [Fuel CMS 1.4 RCE](exploits/web-rce/fuel-cms-rce.md) â€” Vulnerability Capstone
+- [Tomcat Manager WAR upload RCE](exploits/web-rce/tomcat-manager-war-upload.md) - BSides GT Thompson
+- [WordPress crop-image RCE](exploits/web-rce/wordpress-crop-image-rce.md) - blog
+- [SMB writable webroot to PHP execution](exploits/web-rce/smb-write-webroot-php-execution.md) - coldvvars
+- [Rejetto HFS RCE](exploits/web-rce/rejetto-hfs-rce.md) - Steel Mountain
+- [Joomla `com_fields` SQL injection](exploits/web-rce/joomla-com-fields-sqli.md) - Daily Bugle
+- [Joomla template editor webshell](exploits/web-rce/joomla-template-editor-webshell.md) - Daily Bugle
 
 ### Web Read / SQLi / Disclosure
+- [XPath login injection](exploits/web-auth/xpath-login-injection.md) - coldvvars
+- [Git history disclosure](exploits/web-disclosure/git-history-disclosure.md) - chronicle
 - [Apache CXF XOP Include ? LFI](exploits/web-disclosure/apache-cxf-xop-lfi.md) â€” DevArea
 - [ZoneMinder time-based blind SQLi](exploits/web-disclosure/zoneminder-sqli.md) â€” CCTV
 - [MailHog password reset](exploits/web-disclosure/mailhog-password-reset.md) â€” Silentium
@@ -261,6 +276,13 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 
 - [Cuppa CMS `alertConfigField.php` LFI / RFI](exploits/web-disclosure/cuppa-cms-alertconfig-lfi-rfi.md) - Skynet
 
+### Payloads
+- [PHP exec Bash reverse shell](payloads/reverse-shells/php-exec-bash.md)
+- [PHP proc_open reverse shell](payloads/reverse-shells/php-proc-open.md)
+- [JSP WAR reverse shell](payloads/webshells/jsp-war-reverse-shell.md)
+- [Python PTY stabilization](payloads/shell-stabilization/python-pty.md)
+- [SSH authorized_keys persistence](payloads/persistence/ssh-authorized-keys.md)
+
 ### XSS
 - [Stored XSS](exploits/xss/Stored-XSS.md)
 - [Reflected XSS](exploits/xss/Reflected-XSS.md)
@@ -275,6 +297,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [NFS share abuse (`showmount`, `no_root_squash`)](exploits/network-services/nfs-share-abuse.md) â€” VulnNet: Internal
 - [Redis authenticated enumeration & abuse](exploits/network-services/redis-auth-abuse.md) â€” VulnNet: Internal
 - [rsync module abuse (read + write)](exploits/network-services/rsync-module-abuse.md) â€” VulnNet: Internal
+- [WebDAV upload to PHP RCE](exploits/network-services/webdav-upload-rce.md) - BSides GT Dav
 
 ### Active Directory / Windows
 - [MSSQL linked server abuse](exploits/ad/mssql-linked-server.md) â€” Overwatch
@@ -288,6 +311,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Shadow Credentials ? PKINIT ? UnPAC-the-Hash](exploits/ad/shadow-credentials.md) â€” Logging
 - [LDAP pass-back attack](exploits/ad/ldap-passback-attack.md) â€” Breaching Active Directory
 - [NSSM-wrapped service abuse](exploits/privesc-windows/nssm-service-abuse.md) â€” Overwatch
+- [PrintSpoofer SeImpersonate privesc](exploits/privesc-windows/printspoofer-seimpersonate.md) - Relevant
 
 ### Credential Hunting
 - [Binary string credentials](exploits/creds/binary-credential-hunting.md) â€” Overwatch
@@ -300,6 +324,7 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [Piet / `npiet` image steganography](exploits/stego/npiet-piet-stego.md) â€” BSides GT develpy
 - [MongoDB enumeration from a foothold](exploits/creds/mongodb-enumeration.md) â€” CMSpit
 - [Base64-encoded credentials in files / shares](exploits/creds/base64-encoded-credentials.md) â€” Relevant
+- [Firefox credential extraction](exploits/creds/firefox-credential-extraction.md) - chronicle
 
 ### Privilege Escalation (Linux)
 - [Docker group ? root](exploits/privesc-linux/docker-group-escape.md) â€” Kobold
@@ -315,6 +340,10 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 - [SUID binary reversing (XOR magic-number style)](exploits/privesc-linux/suid-binary-reversing.md) â€” Bookstore
 - [`sudo exiftool -filename=` / CVE-2021-22204](exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md) â€” CMSpit
 - [Systemd unit drop / `systemctl` privesc](exploits/privesc-linux/systemd-service-privesc.md) â€” Vulnversity
+- [Sudo `cat` arbitrary file read](exploits/privesc-linux/sudo-cat-file-read.md) - BSides GT Dav
+- [SUID environment-variable gate bypass](exploits/privesc-linux/suid-env-var-checker.md) - blog
+- [Tar wildcard injection](exploits/privesc-linux/tar-wildcard-injection.md) - Skynet
+- [Yum sudo plugin injection](exploits/privesc-linux/yum-sudo-plugin-injection.md) - Daily Bugle
 
 ### Container Escape & Pivoting
 - [Unauthenticated Docker API](exploits/container/docker-api-unauthenticated.md) â€” MonitorsFour
@@ -333,46 +362,25 @@ Per-technique note with the full chain (prereqs, commands, why it works).
 
 ## Directory Structure
 
-```
+```text
 .
 +-- README.md
 +-- CLAUDE.md          # project guide for Claude Code sessions
 +-- brain              # bash wrapper for brain.py
 +-- brain.py           # CLI search / list over tools, exploits, writeups
-+-- HTB/
-Â¦   +-- Easy/
-Â¦   Â¦   +-- Silentium_HTB_Writeup.md
-Â¦   Â¦   +-- Kobold-Writeup.md
-Â¦   Â¦   +-- cctv.md
-Â¦   Â¦   +-- MonitorsFour.md
-Â¦   +-- Medium/
-Â¦   Â¦   +-- DevArea.md
-Â¦   Â¦   +-- Overwatch.md
-Â¦   Â¦   +-- Logging.md         # ?? WIP
-Â¦   Â¦   +-- VariaType.md       # ?? WIP
-Â¦   +-- Hard/
-+-- TRY/
-Â¦   +-- Easy/
-Â¦   Â¦   +-- Team.md
-Â¦   Â¦   +-- Ide.md
-Â¦   Â¦   +-- blueprint.md
-Â¦   Â¦   +-- soupedocde01.md
-Â¦   Â¦   +-- bsidesgtanonforce.md
-Â¦   Â¦   +-- vulnnetinternal.md
-Â¦   Â¦   +-- billing.md
-Â¦   Â¦   +-- lazyadmin.md
-Â¦   Â¦   +-- yueiua.md
-Â¦   Â¦   +-- vulnversity.md
-Â¦   +-- Medium/
-Â¦   Â¦   +-- bookstoreoc.md
-Â¦   Â¦   +-- bsidesgtdevelpy.md
-Â¦   Â¦   +-- cmspit.md
-Â¦   Â¦   +-- ohmyweb.md
-Â¦   Â¦   +-- Recruit.md
-Â¦   Â¦   +-- relevant.md
-Â¦   +-- Hard/
-+-- tools/             # per-tool command notes  ? primary artefact
-+-- exploits/          # per-technique exploit notes  ? primary artefact
++-- writeups/
+|   +-- HTB/
+|   |   +-- Easy/
+|   |   +-- Medium/
+|   |   +-- Hard/
+|   +-- TRY/
+|       +-- Easy/
+|       +-- Medium/
+|       +-- Hard/
+|       +-- Networks/
++-- tools/             # per-tool command notes
++-- exploits/          # real exploit / abuse notes
++-- payloads/          # reusable shells, webshells, snippets and persistence
 ```
 
 ---
@@ -383,7 +391,7 @@ Three-layer knowledge base, **with the layers inverted vs. a typical writeup rep
 
 1. **Exploit notes** (`exploits/`) â€” the reusable techniques. Prereqs, step-by-step, variants, defensive notes. When I hit a similar box in 6 months, this is what I re-read.
 2. **Tool notes** (`tools/`) â€” every flag I've actually used, tagged with the machine that needed it. `brain tool nmap` reminds me exactly how I used nmap on a specific AD box.
-3. **Machine writeups** (`HTB/`, `TRY/`) â€” narrative shell. Short prose, ASCII chain diagram, then links down to the real artefacts. A writeup that duplicates commands instead of linking is a bug.
+3. **Machine writeups** (`writeups/HTB/`, `writeups/TRY/`) â€” narrative shell. Short prose, ASCII chain diagram, then links down to the real artefacts. A writeup that duplicates commands instead of linking is a bug.
 
 Every new machine that introduces a new tool / technique triggers an update to `tools/` or `exploits/` **in the same commit**, plus the `Used on: **<Machine>**` tag on the new note so `brain used-on <Machine>` picks it up. Add links from the writeup to the notes, not backlink sections inside the notes.
 
@@ -394,13 +402,13 @@ See `CLAUDE.md` for the full authoring rules and machine-closing checklist.
 ## Latest Additions
 
 ### TryHackMe Added from This Pass
-- [Vulnerability Capstone](TRY/Easy/vulnerabilitycapstone.md) - Fuel CMS 1.4 RCE
-- [Breaching Active Directory](TRY/Networks/Medium/Breaching%20Active%20Directory.md) - NTLM spray, LDAP pass-back, NetNTLM capture
-- [Daily Bugle](TRY/Hard/dailybugle.md) - WIP, left in Spanish
-- [Operation Takeover](TRY/Medium/operationtakeover.md) - WIP, left in Spanish
-- [Bandit](TRY/Networks/Hard/Bandit.md) - WIP, left in Spanish
-- [Skynet](TRY/Easy/Skynet.md) - SquirrelMail credential reuse, Cuppa CMS LFI/RFI, tar wildcard privesc
-- [chronicle](TRY/Easy/chronicle.md) - exposed Git history, API key recovery, Firefox credential extraction
+- [Vulnerability Capstone](writeups/TRY/Easy/vulnerabilitycapstone.md) - Fuel CMS 1.4 RCE
+- [Breaching Active Directory](writeups/TRY/Networks/Medium/Breaching%20Active%20Directory.md) - NTLM spray, LDAP pass-back, NetNTLM capture
+- [Daily Bugle](writeups/TRY/Hard/dailybugle.md) - WIP, left in Spanish
+- [Operation Takeover](writeups/TRY/Medium/operationtakeover.md) - WIP, left in Spanish
+- [Bandit](writeups/TRY/Networks/Hard/Bandit.md) - WIP, left in Spanish
+- [Skynet](writeups/TRY/Easy/Skynet.md) - SquirrelMail credential reuse, Cuppa CMS LFI/RFI, tar wildcard privesc
+- [chronicle](writeups/TRY/Easy/chronicle.md) - exposed Git history, API key recovery, Firefox credential extraction
 
 ### Tools / Techniques Added from This Pass
 - [ldap-utils](tools/recon/ldap-utils.md) - LDAP search/modify helpers
@@ -409,7 +417,7 @@ See `CLAUDE.md` for the full authoring rules and machine-closing checklist.
 - [SQL injection fundamentals](exploits/sql-injection/in-Band-SQLi.md)
 
 ### TryHackMe Networks
-- [Wreath](TRY/Networks/Easy/Wreath.md) - Linux + Windows network chain
+- [Wreath](writeups/TRY/Networks/Easy/Wreath.md) - Linux + Windows network chain
 
 ### Tools Added from Wreath
 - [chisel](tools/pivot/chisel.md) - reverse SOCKS and remote port forwards
@@ -434,9 +442,9 @@ See `CLAUDE.md` for the full authoring rules and machine-closing checklist.
 - [Windows SAM hive dump](exploits/creds/windows-sam-hive-dump.md)
 
 ### TryHackMe Added
-- [Kenobi](TRY/Easy/kenobi.md) - ProFTPd mod_copy, NFS key loot, SUID PATH hijack
-- [Internal](TRY/Hard/Internal.md) - WordPress admin RCE, Jenkins Script Console, Docker secret hunting
-- [Decryptify](TRY/Medium/Decryptify.md) - predictable PHP tokens and padding-oracle command injection
+- [Kenobi](writeups/TRY/Easy/kenobi.md) - ProFTPd mod_copy, NFS key loot, SUID PATH hijack
+- [Internal](writeups/TRY/Hard/Internal.md) - WordPress admin RCE, Jenkins Script Console, Docker secret hunting
+- [Decryptify](writeups/TRY/Medium/Decryptify.md) - predictable PHP tokens and padding-oracle command injection
 
 ### Tools Added from Kenobi / Internal / Decryptify
 - [smbmap](tools/recon/smbmap.md)
@@ -458,5 +466,3 @@ See `CLAUDE.md` for the full authoring rules and machine-closing checklist.
 - [JavaScript obfuscated API key disclosure](exploits/web-disclosure/javascript-obfuscated-api-key.md)
 - [PHP mt_rand token prediction](exploits/crypto/php-mt-rand-token-prediction.md)
 - [Padding oracle to command injection](exploits/crypto/padding-oracle-command-injection.md)
-
-

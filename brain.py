@@ -19,8 +19,9 @@ Usage
 
   brain tool    [name]           Show a tool note (or list all).
   brain exploit [name]           Show an exploit note (or list all).
+  brain payload [name]           Show a payload/snippet note (or list all).
   brain writeup [name]           Show a writeup (or list all).
-  brain list    [tools|exploits|writeups|all]
+  brain list    [tools|exploits|payloads|writeups|all]
 
   brain used-on <Machine>        Every note tagged "Used on: <Machine>".
   brain backrefs <note>          Every writeup that links to <note>.
@@ -63,10 +64,16 @@ ROOT = Path(__file__).resolve().parent
 DIRS = {
     "tools":    [ROOT / "tools"],
     "exploits": [ROOT / "exploits"],
-    "writeups": [ROOT / "HTB" / "Easy", ROOT / "HTB" / "Medium", ROOT / "HTB" / "Hard",
-                 ROOT / "TRY" / "Easy", ROOT / "TRY" / "Medium", ROOT / "TRY" / "Hard",
-                 ROOT / "TRY" / "Networks" / "Easy", ROOT / "TRY" / "Networks" / "Medium",
-                 ROOT / "TRY" / "Networks" / "Hard"],
+    "payloads": [ROOT / "payloads"],
+    "writeups": [ROOT / "writeups" / "HTB" / "Easy",
+                 ROOT / "writeups" / "HTB" / "Medium",
+                 ROOT / "writeups" / "HTB" / "Hard",
+                 ROOT / "writeups" / "TRY" / "Easy",
+                 ROOT / "writeups" / "TRY" / "Medium",
+                 ROOT / "writeups" / "TRY" / "Hard",
+                 ROOT / "writeups" / "TRY" / "Networks" / "Easy",
+                 ROOT / "writeups" / "TRY" / "Networks" / "Medium",
+                 ROOT / "writeups" / "TRY" / "Networks" / "Hard"],
 }
 
 # ---- ANSI colors ----
@@ -86,7 +93,9 @@ def blue(s):   return _c(s, "34")
 # Each topic resolves to a union of:
 #   tools        = exact tool stems in tools/
 #   exploits     = substrings that must appear in exploit filenames
+#   payloads     = substrings that must appear in payload filenames
 #   all_exploits = include every file in exploits/
+#   all_payloads = include every file in payloads/
 TOPICS: dict[str, dict] = {
     "recon": {
         "desc": "Port scan, banner grab, directory brute, service banners",
@@ -126,17 +135,26 @@ TOPICS: dict[str, dict] = {
                      "cron-script-abuse", "gogs-symlink-attack", "nfs-share-abuse",
                      "rsync-module-abuse", "nssm-service-abuse", "bash-eval-filter",
                      "shadow-credentials", "linux-capabilities-privesc",
+                     "sudo-cat-file-read", "suid-env-var-checker",
                      "suid-binary-reversing", "exiftool-sudo",
                      "systemd-service-privesc", "windows-unquoted-service-path",
-                     "suid-path-hijack"],
+                     "suid-path-hijack", "tar-wildcard-injection",
+                     "yum-sudo-plugin-injection", "printspoofer-seimpersonate"],
     },
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
-        "tools": ["netcat", "socat", "ssh", "evil-winrm", "impacket", "metasploit",
+        "tools": ["netcat", "socat", "ssh", "evil-winrm", "impacket", "metasploit", "msfvenom",
                   "chisel", "plink"],
         "exploits": [],
+        "all_payloads": True,
         "keywords": ["bash -i", "/dev/tcp/", "nc -lvnp", "pty.spawn",
                      "socat", "mkfifo", "stty raw -echo", "powershell -enc"],
+    },
+    "payloads": {
+        "desc": "Reusable payload snippets, webshells and shell stabilization",
+        "tools": ["netcat", "socat", "ssh", "msfvenom"],
+        "exploits": [],
+        "all_payloads": True,
     },
     "creds": {
         "desc": "Credential hunting, cracking, reuse",
@@ -149,6 +167,7 @@ TOPICS: dict[str, dict] = {
                      "systemd-service-credentials", "backup-file-exposure",
                      "base64-encoded-credentials", "mimikatz-sam-pth",
                      "windows-sam-hive-dump", "wordpress-wp-config-credentials",
+                     "firefox-credential-extraction",
                      "jenkins-http-form-bruteforce", "ldap-passback-attack"],
     },
     "ad": {
@@ -167,7 +186,8 @@ TOPICS: dict[str, dict] = {
     "web": {
         "desc": "Web / HTTP exploitation",
         "tools": ["curl", "sqlmap", "ffuf", "gobuster", "feroxbuster", "wget",
-                  "whatweb", "exiftool", "gittools", "wpscan", "nuclei", "padre"],
+                  "whatweb", "exiftool", "gittools", "wpscan", "nuclei", "padre",
+                  "metasploit", "msfvenom"],
         "exploits": ["sweetrice-media-center-rce", "magnusbilling-rce",
                      "cacti-rce", "apache-cxf-xop-lfi", "oscommerce-installer-rce",
                      "zoneminder-sqli", "backup-file-exposure", "lfi-php-parameter",
@@ -187,6 +207,11 @@ TOPICS: dict[str, dict] = {
                      "jenkins-script-console-rce", "public-log-invite-code-disclosure",
                      "javascript-obfuscated-api-key", "php-mt-rand-token-prediction",
                      "padding-oracle-command-injection", "fuel-cms-rce",
+                     "webdav-upload-rce", "tomcat-manager-war-upload",
+                     "wordpress-crop-image-rce", "xpath-login-injection",
+                     "smb-write-webroot-php-execution",
+                     "git-history-disclosure", "rejetto-hfs-rce",
+                     "joomla-com-fields-sqli", "joomla-template-editor-webshell",
                      "sql-injection", "sqli", "blind-sql", "time-based", "in-band"],
     },
     "xss": {
@@ -227,7 +252,7 @@ TOPICS: dict[str, dict] = {
     },
     "rce": {
         "desc": "Remote Code Execution chains",
-        "tools": ["curl", "metasploit", "searchsploit"],
+        "tools": ["curl", "metasploit", "msfvenom", "searchsploit"],
         "exploits": ["rce", "url-param-command-injection", "cacti-rce",
                      "codiad-rce", "oscommerce-installer-rce",
                      "sweetrice-media-center-rce", "magnusbilling-rce",
@@ -239,7 +264,11 @@ TOPICS: dict[str, dict] = {
                      "webmin-cve-2019-15107-rce", "gitstack-rce",
                      "php-exiftool-comment-webshell", "wordpress-theme-editor-webshell",
                      "jenkins-script-console-rce", "padding-oracle-command-injection",
-                     "fuel-cms-rce", "cuppa-cms-alertconfig-lfi-rfi"],
+                     "fuel-cms-rce", "cuppa-cms-alertconfig-lfi-rfi",
+                     "webdav-upload-rce", "tomcat-manager-war-upload",
+                     "wordpress-crop-image-rce", "smb-write-webroot-php-execution",
+                     "rejetto-hfs-rce", "joomla-com-fields-sqli",
+                     "joomla-template-editor-webshell"],
     },
     "reversing": {
         "desc": "Binary reverse engineering (SUID, custom binaries)",
@@ -273,6 +302,7 @@ TOPIC_ALIASES = {
     "enum": "enumeration", "enumeracion": "enumeration", "enumeration": "enumeration",
     "recon": "recon", "reconnaissance": "recon", "reconocimiento": "recon",
     "escalation": "privesc", "shell": "shells", "reverse-shell": "shells",
+    "payload": "payloads", "payloads": "payloads", "payloades": "payloads",
     "pivoting": "pivot", "tunel": "pivot", "tunnel": "pivot",
     "active-directory": "ad", "kerberos": "ad", "xss": "xss",
     "cross-site-scripting": "xss",
@@ -298,7 +328,7 @@ def iter_category(cat: str) -> Iterable[Path]:
             yield p
 
 def iter_all() -> Iterable[tuple[str, Path]]:
-    for cat in ("tools", "exploits", "writeups"):
+    for cat in ("tools", "exploits", "payloads", "writeups"):
         for p in iter_category(cat):
             yield cat, p
 
@@ -389,6 +419,15 @@ def topic_files(name: str) -> list[Path]:
             for p in iter_category("exploits"):
                 stem = p.stem.lower()
                 if any(s in stem for s in substrs):
+                    files.append(p)
+    if spec.get("all_payloads"):
+        files.extend(iter_category("payloads"))
+    else:
+        payload_substrs = [s.lower() for s in spec.get("payloads", [])]
+        if payload_substrs:
+            for p in iter_category("payloads"):
+                stem = p.stem.lower()
+                if any(s in stem for s in payload_substrs):
                     files.append(p)
     # dedupe, preserve order
     seen, out = set(), []
@@ -489,6 +528,24 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
         print(dim("Try `brain topics`, `brain guide`, or `brain find <keyword>`.")); return 1
     # No keyword — list scope
     if not argv:
+        spec = TOPICS.get(TOPIC_ALIASES.get(topic, topic), {})
+        keywords = spec.get("keywords", [])
+        if keywords:
+            pat = re.compile("|".join(re.escape(k) for k in keywords), re.IGNORECASE)
+            total = 0
+            print(bold(f"Topic: {topic}  ({len(files)} files, keyword hints)"))
+            for p in files:
+                hits = _grep_file(p, pat, code_only=True)
+                if not hits:
+                    continue
+                total += len(hits)
+                print(f"\n{bold(green(relpath(p)))}")
+                for i, line in hits:
+                    highlight = pat.sub(lambda m: yellow(m.group(0)), line)
+                    print(f"  :{i}  {highlight}")
+            if total:
+                print(dim(f"\n{total} topic hint(s). Add a keyword for a narrower search."))
+                return 0
         print(bold(f"Topic: {topic}  ({len(files)} files)"))
         for p in files:
             print(f"  {cyan(relpath(p))}")
@@ -525,7 +582,7 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
 
 def cmd_list(argv: list[str]) -> int:
     which = argv[0] if argv else "all"
-    cats = ("tools", "exploits", "writeups") if which == "all" else (which,)
+    cats = ("tools", "exploits", "payloads", "writeups") if which == "all" else (which,)
     for cat in cats:
         if cat not in DIRS:
             print(red(f"Unknown category: {cat}")); return 2
@@ -587,8 +644,8 @@ def cmd_show(cat: str, argv: list[str]) -> int:
     if not p:
         return 1
     print(read_text(p))
-    # Plus back-references at the bottom for tools/exploits
-    if cat in ("tools", "exploits"):
+    # Plus back-references at the bottom for reusable notes
+    if cat in ("tools", "exploits", "payloads"):
         refs = backrefs(p)
         if refs:
             print(bold(f"\n== Referenced by =="))
@@ -617,9 +674,9 @@ def cmd_backrefs(argv: list[str]) -> int:
     if not argv:
         print(red("usage: brain backrefs <note-name-or-path>")); return 2
     target = argv[0]
-    # Try to resolve by stem across tools/exploits
+    # Try to resolve by stem across reusable notes
     p: Path | None = None
-    for cat in ("tools", "exploits"):
+    for cat in ("tools", "exploits", "payloads"):
         p = _resolve_file(cat, target, quiet=True)
         if p:
             break
@@ -677,6 +734,8 @@ FIXED_COMMANDS = {
     "herramientas": lambda a: cmd_show("tools", a),
     "exploit":  lambda a: cmd_show("exploits", a),
     "exploits": lambda a: cmd_show("exploits", a),
+    "payload":  lambda a: cmd_show("payloads", a),
+    "payloads": lambda a: cmd_show("payloads", a),
     "writeup":  lambda a: cmd_show("writeups", a),
     "writeups": lambda a: cmd_show("writeups", a),
     "used-on":  cmd_used_on,
@@ -706,6 +765,10 @@ def main(argv: list[str]) -> int:
             found = _find_exact("tools", rest[0])
             if found:
                 return cmd_show("tools", rest)
+        if cmd in ("payload", "payloads") and rest:
+            found = _find_exact("payloads", rest[0])
+            if found:
+                return cmd_show("payloads", rest)
         return cmd_topic(key, rest)
     if cmd in FIXED_COMMANDS:
         return FIXED_COMMANDS[cmd](rest) or 0

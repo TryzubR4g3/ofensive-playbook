@@ -122,3 +122,17 @@ Used on: **Recruit** — `config.php` leaked `$HR_PASSWORD = 'hrpassword123'`. Pai
 ```bash
 ffuf -w usernames.txt:W1,/usr/share/wordlists/rockyou.txt:W2 -X POST -d "username=W1&password=W2" -H "Content-Type: application/x-www-form-urlencoded" -u http://10.130.177.138/customers/login -fc 200
 ```
+### WebDAV directory discovery
+```bash
+ffuf -u http://$TARGET/FUZZ \
+  -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
+```
+Used on: **bsidesgtdav** - found `/webdav`, later abused with default credentials and upload.
+
+### Extension fuzzing inside a discovered dev path
+```bash
+ffuf -u http://$TARGET:8080/dev/FUZZ \
+  -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt \
+  -e .php,.txt,.env
+```
+Used on: **coldvvars** - checked for PHP/text/env content below `/dev`.

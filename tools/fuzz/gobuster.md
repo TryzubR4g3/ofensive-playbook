@@ -41,3 +41,11 @@ gobuster vhost -u http://team.thm \
 Used on: **Team**
 
 
+
+### Virtual host enumeration for a newly added host
+```bash
+gobuster vhost -u http://lookup.thm \
+  -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  --append-domain
+```
+Used on: **Lookup**

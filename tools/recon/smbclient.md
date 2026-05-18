@@ -54,3 +54,9 @@ mget *
 Used on: **Skynet** — guest access exposed internal notes and password-related files under the anonymous share.
 
 
+
+### Authenticated access to writable web-backed share
+```bash
+smbclient //$TARGET/SECURED -U 'ArthurMorgan%DeadEye'
+```
+Used on: **coldvvars** - authenticated to the writable share used to place the PHP reverse shell in the web path.

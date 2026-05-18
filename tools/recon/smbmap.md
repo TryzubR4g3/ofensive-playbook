@@ -18,3 +18,12 @@ Used on: **Kenobi** - confirmed the `anonymous` share was readable after Nmap SM
 - [../../exploits/ad/smb-enumeration.md](../../exploits/ad/smb-enumeration.md)
 
 
+
+### Anonymous and authenticated share listing
+
+```bash
+smbmap -H $TARGET -u '' -p ''
+smbmap -H $TARGET -u 'ArthurMorgan' -p 'DeadEye'
+```
+
+Used on: **coldvvars** - anonymous enum found the SMB surface; authenticated enum confirmed access to `SECURED`.

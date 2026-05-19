@@ -4,11 +4,11 @@ MariaDB / MySQL command-line client. Used for authenticated DB enumeration once 
 
 ## Commands Used
 
-### Remote login (blocked on Billing — default bind-address)
+### Remote login (blocked on Billing â€” default bind-address)
 ```bash
 mysql -h $TARGET -u mbillingUser --password=BLOGYwvtJkI7uaX5
 ```
-Used on: **Billing** — confirmed 3306 was filtered / bound to localhost; dropped to local client inside the foothold.
+Used on: **Billing** â€” confirmed 3306 was filtered / bound to localhost; dropped to local client inside the foothold.
 
 ### Local client inside the foothold
 ```bash
@@ -18,16 +18,16 @@ mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5'
 ### One-shot queries (`-e`)
 ```bash
 # Dump a full table
-mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -D mbilling -e "SELECT * FROM pkg_user;" > /tmp/usuarios.txt    # Used — Billing
+mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -D mbilling -e "SELECT * FROM pkg_user;" > /tmp/usuarios.txt    # Used â€” Billing
 
 # Targeted fields (SIP secrets)
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e \
-  "SELECT id, name, secret, host, context FROM mbilling.pkg_sip LIMIT 20;"    # Used — Billing
+  "SELECT id, name, secret, host, context FROM mbilling.pkg_sip LIMIT 20;"    # Used â€” Billing
 ```
 
 ### Full database backup
 ```bash
-mysqldump -u mbillingUser -p'BLOGYwvtJkI7uaX5' mbilling > /tmp/mbilling_backup.sql    # Used — Billing
+mysqldump -u mbillingUser -p'BLOGYwvtJkI7uaX5' mbilling > /tmp/mbilling_backup.sql    # Used â€” Billing
 ```
 Handy when you want to grep the schema offline (transfer with meterpreter `download`, then `grep -Ei 'pass|secret|token' mbilling_backup.sql`).
 
@@ -57,8 +57,8 @@ Billing's Asterisk stack stores everything in the `mbilling` database. These are
 |-------|---------|
 | `pkg_user` | Admin / operator accounts, SHA-1 password hashes |
 | `pkg_servers` | Remote Asterisk servers + credentials |
-| `pkg_sip` | SIP extensions — `secret` column is the SIP auth password |
-| `pkg_iax` | IAX trunks — same format, different protocol |
+| `pkg_sip` | SIP extensions â€” `secret` column is the SIP auth password |
+| `pkg_iax` | IAX trunks â€” same format, different protocol |
 | `pkg_smtp` | Outbound mail server credentials (often reused elsewhere) |
 | `pkg_api` | REST API keys |
 
@@ -71,15 +71,15 @@ The `pkg_user.password` field on MagnusBilling is raw SHA-1 ? `hashcat -m 100`.
 | `-h <host>` | Connect to host (default `localhost`) |
 | `-P <port>` | Port (default 3306) |
 | `-u <user>` | Username |
-| `-p'<pass>'` | Password inline (no space — `-p <pass>` means "use DB named <pass>") |
+| `-p'<pass>'` | Password inline (no space â€” `-p <pass>` means "use DB named <pass>") |
 | `--password=<pass>` | Same, explicit form |
 | `-D <db>` | Default database |
 | `-e "<sql>"` | Execute and exit (one-shot) |
-| `-N` / `--skip-column-names` | Strip headers — useful when piping |
+| `-N` / `--skip-column-names` | Strip headers â€” useful when piping |
 | `-s` / `--silent` | Less-verbose output |
 
 ## Related
-- [hashcat](../creds/hashcat.md) — mode 100 for SHA-1 `pkg_user` hashes
-- [Linux enumeration](../../exploits/enumeration/linux-enumeration.md) — where to grep for connection strings
+- [hashcat](../creds/hashcat.md) â€” mode 100 for SHA-1 `pkg_user` hashes
+- [Linux enumeration](../../playbooks/enumeration/linux.md) â€” where to grep for connection strings
 
 

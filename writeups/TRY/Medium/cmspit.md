@@ -134,7 +134,7 @@ reset
 
 ## 4. Post-Exploitation (`www-data`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md).
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md).
 
 ```bash
 # What it does: searches the filesystem with the specified filters.
@@ -158,7 +158,7 @@ pgrep -a mongod
 
 ## 5. User Â— MongoDB Enumeration
 
-Full technique: [mongodb-enumeration.md](../../../exploits/creds/mongodb-enumeration.md).
+Full technique: [mongodb-enumeration.md](../../../techniques/creds/mongodb-enumeration.md).
 
 ```bash
 # What it does: connect to the MongoDB service.
@@ -197,7 +197,7 @@ Tools: [mongo](../../../tools/database/mongo.md).
 
 ## 6. Root Â— `sudo exiftool` Filename Move
 
-Full technique: [exiftool-sudo-cve-2021-22204.md](../../../exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md).
+Full technique: [exiftool-sudo-cve-2021-22204.md](../../../privesc/linux/exiftool-sudo-cve-2021-22204.md).
 
 ```bash
 # What it does: list sudo privileges for the current user.
@@ -230,7 +230,7 @@ cat /home/stux/root.txt
 
 ## Related Notes
 - [cockpit-cms-rce.md](../../../exploits/web-rce/cockpit-cms-rce.md) Â— initial access
-- [mongodb-enumeration.md](../../../exploits/creds/mongodb-enumeration.md) Â— user pivot
-- [exiftool-sudo-cve-2021-22204.md](../../../exploits/privesc-linux/exiftool-sudo-cve-2021-22204.md) Â— root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— playbook backbone
+- [mongodb-enumeration.md](../../../techniques/creds/mongodb-enumeration.md) Â— user pivot
+- [exiftool-sudo-cve-2021-22204.md](../../../privesc/linux/exiftool-sudo-cve-2021-22204.md) Â— root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [curl](../../../tools/web/curl.md), [searchsploit](../../../tools/recon/searchsploit.md), [netcat](../../../tools/pivot/netcat.md), [mongo](../../../tools/database/mongo.md), [exiftool](../../../tools/web/exiftool.md)

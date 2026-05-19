@@ -70,7 +70,7 @@ ssh -i id_rsa kenobi@$TARGET
 
 ## Privilege Escalation
 
-Full technique: [SUID PATH hijack](../../../exploits/privesc-linux/suid-path-hijack.md).
+Full technique: [SUID PATH hijack](../../../privesc/linux/suid-path-hijack.md).
 
 ```bash
 # What it does: search the filesystem for SUID binaries.
@@ -105,5 +105,5 @@ export PATH=/tmp:$PATH
 - [smbclient](../../../tools/recon/smbclient.md)
 - [ProFTPd mod_copy SSH key loot](../../../exploits/network-services/proftpd-mod-copy-rsa.md)
 - [NFS mounted file loot](../../../exploits/network-services/nfs-mounted-file-loot.md)
-- [SUID PATH hijack](../../../exploits/privesc-linux/suid-path-hijack.md)
-- [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md)
+- [SUID PATH hijack](../../../privesc/linux/suid-path-hijack.md)
+- [Linux enumeration](../../../playbooks/enumeration/linux.md)

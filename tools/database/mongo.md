@@ -1,21 +1,21 @@
 # mongo / mongosh
 
 MongoDB shell. Two binaries to know about:
-- **`mongo`** — legacy shell shipped with `mongodb-org-shell` = 5.x. JS REPL, dies in 6.0+.
-- **`mongosh`** — modern shell, 6.0+ default. Same surface for read queries; some admin commands renamed.
+- **`mongo`** â€” legacy shell shipped with `mongodb-org-shell` = 5.x. JS REPL, dies in 6.0+.
+- **`mongosh`** â€” modern shell, 6.0+ default. Same surface for read queries; some admin commands renamed.
 
 Both speak the wire protocol and default to `mongodb://127.0.0.1:27017`. Use whichever the box has installed; you almost never bring your own.
 
 ## Commands Used
 
-### Connect — default localhost, no auth
+### Connect â€” default localhost, no auth
 ```bash
 mongo
 mongosh
 ```
 Used on: **cmspit**
 
-### Connect — custom host/port/db, optional auth
+### Connect â€” custom host/port/db, optional auth
 ```bash
 mongo --host 127.0.0.1 --port 27017
 mongo --host $TARGET --port 27017 dbname
@@ -31,9 +31,9 @@ mongo dbname --quiet --eval "db.users.find().forEach(printjson)"
 ### List ? walk databases and collections
 ```javascript
 > show dbs
-> use sudousersbak                       // [USED — cmspit]
+> use sudousersbak                       // [USED â€” cmspit]
 > show collections
-> db.user.find()                         // [USED — cmspit, leaked stux:p4ssw0rdhack3d!123]
+> db.user.find()                         // [USED â€” cmspit, leaked stux:p4ssw0rdhack3d!123]
 > db.user.find().pretty()
 > db.flag.find()
 ```
@@ -75,7 +75,7 @@ Tunnel from the foothold:
 ssh -L 27017:127.0.0.1:27017 user@$TARGET
 mongo --host 127.0.0.1 --port 27017
 ```
-See [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md).
+See [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md).
 
 ## When `mongo` is missing on the box
 
@@ -91,9 +91,9 @@ python3 -c "from pymongo import MongoClient; c=MongoClient('mongodb://127.0.0.1'
 - BSON `ObjectId` doesn't print on raw `print(...)` -- use `printjson` or `.toString()`.
 
 ## Related
-- [mongodb-enumeration.md](../../exploits/creds/mongodb-enumeration.md) -- the playbook
+- [mongodb-enumeration.md](../../techniques/creds/mongodb-enumeration.md) -- the playbook
 - [cockpit-cms-rce.md](../../exploits/web-rce/cockpit-cms-rce.md) -- cmspit's foothold that fed into the mongo dump
-- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) -- when mongo is loopback only
-- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) -- spotting mongod in `ss -tlnp` / `ps`
+- [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md) -- when mongo is loopback only
+- [linux-enumeration.md](../../playbooks/enumeration/linux.md) -- spotting mongod in `ss -tlnp` / `ps`
 
 

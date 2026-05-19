@@ -163,7 +163,7 @@ Tools: [ffuf](../../../tools/fuzz/ffuf.md), [curl](../../../tools/web/curl.md).
 
 ## 5. User Pivot â€” Firefox Credential Extraction
 
-Full technique: [firefox-credential-extraction.md](../../../exploits/creds/firefox-credential-extraction.md).
+Full technique: [firefox-credential-extraction.md](../../../techniques/creds/firefox-credential-extraction.md).
 
 ```bash
 # What it does: list users with bash shells.
@@ -216,7 +216,7 @@ Tools: [hashcat](../../../tools/creds/hashcat.md).
 
 ## 6. Privilege Escalation â€” SUID Buffer Overflow
 
-Full technique: [suid-binary-reversing.md](../../../exploits/privesc-linux/suid-binary-reversing.md).
+Full technique: [suid-binary-reversing.md](../../../privesc/linux/suid-binary-reversing.md).
 
 In carlJ's `mailing` directory, a SUID binary `smail` is vulnerable to buffer overflow. `system` and `/bin/sh` addresses from libc were used to build a ret2libc chain.
 
@@ -275,7 +275,7 @@ cd /root/ && cat root.txt
 
 ## Related Notes
 - [git-history-disclosure.md](../../../exploits/web-disclosure/git-history-disclosure.md) â€” API key recovery
-- [firefox-credential-extraction.md](../../../exploits/creds/firefox-credential-extraction.md) â€” user pivot
-- [suid-binary-reversing.md](../../../exploits/privesc-linux/suid-binary-reversing.md) â€” root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) â€” playbook backbone
+- [firefox-credential-extraction.md](../../../techniques/creds/firefox-credential-extraction.md) â€” user pivot
+- [suid-binary-reversing.md](../../../privesc/linux/suid-binary-reversing.md) â€” root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) â€” playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [ffuf](../../../tools/fuzz/ffuf.md), [curl](../../../tools/web/curl.md), [git](../../../tools/devops/git.md), [hashcat](../../../tools/creds/hashcat.md)

@@ -55,6 +55,6 @@ When scanning with Nmap through proxychains, comment out `proxy_dns`; otherwise 
 
 - [chisel](chisel.md)
 - [ssh](ssh.md)
-- [chisel-pivoting.md](../../exploits/pivot/chisel-pivoting.md)
+- [chisel-pivoting.md](../../techniques/pivot/chisel.md)
 
 

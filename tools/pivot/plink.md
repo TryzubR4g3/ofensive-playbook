@@ -32,6 +32,6 @@ Plink expects `.ppk` keys, not standard OpenSSH private keys.
 ## Related
 
 - [ssh](ssh.md)
-- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md)
+- [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md)
 
 

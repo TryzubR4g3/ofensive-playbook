@@ -102,5 +102,5 @@ The `www-data` user can run `cat` as root via sudo — direct arbitrary file rea
 - [curl](../../../tools/web/curl.md)
 - [netcat](../../../tools/pivot/netcat.md)
 - [WebDAV upload to PHP RCE](../../../exploits/network-services/webdav-upload-rce.md)
-- [sudo cat arbitrary file read](../../../exploits/privesc-linux/sudo-cat-file-read.md)
+- [sudo cat arbitrary file read](../../../privesc/linux/sudo-cat-file-read.md)
 - [PHP exec Bash reverse shell](../../../payloads/reverse-shells/php-exec-bash.md)

@@ -121,7 +121,7 @@ uname -a
 
 ## 4. Post-Exploitation Enumeration (`asterisk`)
 
-First pass of the [Linux enumeration playbook](../../../exploits/enumeration/linux-enumeration.md) Â— system context + `sudo -l` + credential hunt.
+First pass of the [Linux enumeration playbook](../../../playbooks/enumeration/linux.md) Â— system context + `sudo -l` + credential hunt.
 
 ### System context & sudo
 ```bash
@@ -236,7 +236,7 @@ meterpreter > download /tmp/mbilling_backup.sql
 
 ## 6. Privilege Escalation Â— `sudo fail2ban-client` ? root
 
-Full technique note: [fail2ban-sudo-privesc.md](../../../exploits/privesc-linux/fail2ban-sudo-privesc.md).
+Full technique note: [fail2ban-sudo-privesc.md](../../../privesc/linux/fail2ban-sudo-privesc.md).
 
 `fail2ban-server` runs as root. `fail2ban-client` (sudo-allowed here) can overwrite the `actionban` shell snippet of an existing jail. Any later ban triggers the snippet **as root**.
 
@@ -289,9 +289,9 @@ cat /root/passwordMysql.log
 
 ## Related Notes
 - [magnusbilling-rce.md](../../../exploits/web-rce/magnusbilling-rce.md) Â— exploit playbook
-- [fail2ban-sudo-privesc.md](../../../exploits/privesc-linux/fail2ban-sudo-privesc.md) Â— privesc playbook
+- [fail2ban-sudo-privesc.md](../../../privesc/linux/fail2ban-sudo-privesc.md) Â— privesc playbook
 - [mysql](../../../tools/database/mysql.md) Â— DB enumeration tool note
 - [metasploit](../../../tools/exploitation/metasploit.md) Â— public-exploit delivery
 - [hashcat](../../../tools/creds/hashcat.md) Â— SHA-1 mode 100
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— post-foothold checklist
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
 - [nmap](../../../tools/recon/nmap.md), [whatweb](../../../tools/recon/whatweb.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) Â— recon

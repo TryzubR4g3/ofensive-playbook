@@ -87,5 +87,5 @@ cat /media/usb/user.txt
 - [wpscan](../../../tools/web/wpscan.md)
 - [metasploit](../../../tools/exploitation/metasploit.md)
 - [WordPress crop-image RCE](../../../exploits/web-rce/wordpress-crop-image-rce.md)
-- [SUID env-var checker privesc](../../../exploits/privesc-linux/suid-env-var-checker.md)
+- [SUID env-var checker privesc](../../../privesc/linux/suid-env-var-checker.md)
 - [Python PTY stabilization](../../../payloads/shell-stabilization/python-pty.md)

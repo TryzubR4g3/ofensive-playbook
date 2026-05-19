@@ -1,6 +1,6 @@
 # getcap
 
-Reads POSIX file capabilities — the per-binary fine-grained replacement for SUID. A binary with `cap_setuid+ep` can change UID; one with `cap_dac_read_search+ep` can read any file; one with `cap_sys_admin+ep` is essentially root. Always run this once you have a shell — capabilities live next to SUID and are missed by tools that only check `find -perm -4000`.
+Reads POSIX file capabilities â€” the per-binary fine-grained replacement for SUID. A binary with `cap_setuid+ep` can change UID; one with `cap_dac_read_search+ep` can read any file; one with `cap_sys_admin+ep` is essentially root. Always run this once you have a shell â€” capabilities live next to SUID and are missed by tools that only check `find -perm -4000`.
 
 ## Commands Used
 
@@ -10,7 +10,7 @@ getcap -r / 2>/dev/null
 ```
 Used on: **ohmyweb**
 
-Result: `/usr/bin/python3.7 = cap_setuid+ep` -> see [linux-capabilities-privesc.md](../../exploits/privesc-linux/linux-capabilities-privesc.md). One line, root.
+Result: `/usr/bin/python3.7 = cap_setuid+ep` -> see [linux-capabilities-privesc.md](../../privesc/linux/linux-capabilities-privesc.md). One line, root.
 
 - `-r` -- recurse into subdirectories.
 - `2>/dev/null` -- silence "Operation not supported" on filesystems that don't carry xattrs (`/proc`, `/sys`).
@@ -49,7 +49,7 @@ setcap -r ./shell               # remove
 - GTFOBins keeps a current list: <https://gtfobins.org/#+capabilities>
 
 ## Related
-- [linux-capabilities-privesc.md](../../exploits/privesc-linux/linux-capabilities-privesc.md) -- exploitation playbook
-- [linux-enumeration.md](../../exploits/enumeration/linux-enumeration.md) -- where this fits in the post-foothold sweep
+- [linux-capabilities-privesc.md](../../privesc/linux/linux-capabilities-privesc.md) -- exploitation playbook
+- [linux-enumeration.md](../../playbooks/enumeration/linux.md) -- where this fits in the post-foothold sweep
 
 

@@ -64,6 +64,9 @@ ROOT = Path(__file__).resolve().parent
 DIRS = {
     "tools":    [ROOT / "tools"],
     "exploits": [ROOT / "exploits"],
+    "privesc":  [ROOT / "privesc"],
+    "playbooks": [ROOT / "playbooks"],
+    "techniques": [ROOT / "techniques"],
     "payloads": [ROOT / "payloads"],
     "writeups": [ROOT / "writeups" / "HTB" / "Easy",
                  ROOT / "writeups" / "HTB" / "Medium",
@@ -328,7 +331,7 @@ def iter_category(cat: str) -> Iterable[Path]:
             yield p
 
 def iter_all() -> Iterable[tuple[str, Path]]:
-    for cat in ("tools", "exploits", "payloads", "writeups"):
+    for cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads", "writeups"):
         for p in iter_category(cat):
             yield cat, p
 
@@ -412,14 +415,16 @@ def topic_files(name: str) -> list[Path]:
             files.append(p)
     # exploits
     if spec.get("all_exploits"):
-        files.extend(iter_category("exploits"))
+        for cat in ("exploits", "privesc", "playbooks", "techniques"):
+            files.extend(iter_category(cat))
     else:
         substrs = [s.lower() for s in spec.get("exploits", [])]
         if substrs:
-            for p in iter_category("exploits"):
-                stem = p.stem.lower()
-                if any(s in stem for s in substrs):
-                    files.append(p)
+            for cat in ("exploits", "privesc", "playbooks", "techniques"):
+                for p in iter_category(cat):
+                    stem = p.stem.lower()
+                    if any(s in stem for s in substrs):
+                        files.append(p)
     if spec.get("all_payloads"):
         files.extend(iter_category("payloads"))
     else:
@@ -452,13 +457,14 @@ def backrefs(target: Path) -> list[tuple[Path, int, str]]:
 # ---- Search primitives ----
 
 def _grep_file(p: Path, pat: re.Pattern, code_only: bool = False) -> list[tuple[int, str]]:
-    hits: list[tuple[int, str]] = []
+    hits: list[tuple[int, str, bool]] = []
     for hit in scan_markdown(p):
         if code_only and not hit.in_code:
             continue
         if pat.search(hit.text):
-            hits.append((hit.lineno, hit.text))
-    return hits
+            hits.append((hit.lineno, hit.text, hit.in_code))
+    hits.sort(key=lambda x: (not x[2], x[0]))
+    return [(h[0], h[1]) for h in hits]
 
 
 def _looks_command_like(query: str) -> bool:
@@ -477,16 +483,34 @@ def _topic_hits(p: Path, pat: re.Pattern, query: str) -> list[tuple[int, str]]:
         return []
 
     code_hits = [(h.lineno, h.text) for h in scanned if h.in_code and pat.search(h.text)]
-    if code_hits:
-        return code_hits
+    prose_hits = [(h.lineno, h.text) for h in scanned if not h.in_code and pat.search(h.text)]
 
     if _looks_command_like(query):
-        return []
+        return code_hits
 
-    return [(h.lineno, h.text) for h in scanned if pat.search(h.text)]
+    return code_hits + prose_hits
 
 
 # ---- Commands ----
+
+
+def cmd_stats(argv: list[str]) -> int:
+    counts = {cat: sum(1 for _ in iter_category(cat)) for cat in DIRS}
+    topics_count = len(TOPICS)
+    machines = set()
+    for cat, p in iter_all():
+        if cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads"):
+            text = read_text(p)
+            for line in text.splitlines():
+                if "Used on:" in line:
+                    import re
+                    m = re.search(r"Used on:\s*\*\*(.*?)\*\*", line, re.IGNORECASE)
+                    if m:
+                        for mac in m.group(1).split(","):
+                            machines.add(mac.strip())
+    print(f"{counts.get('tools',0)} tools · {counts.get('exploits',0)} exploits · {counts.get('privesc',0)} privesc · {counts.get('techniques',0)} techniques · {counts.get('playbooks',0)} playbooks · {counts.get('payloads',0)} payloads · {counts.get('writeups',0)} writeups")
+    print(f"{topics_count} topics · {len(machines)} machines tracked")
+    return 0
 
 def cmd_topics(_: list[str]) -> int:
     print(bold("Topics (usage: brain <topic> [keyword])\n"))
@@ -540,9 +564,15 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
                     continue
                 total += len(hits)
                 print(f"\n{bold(green(relpath(p)))}")
+                shown = 0
                 for i, line in hits:
+                    if shown >= 5:
+                        print(dim(f"  ... (+{len(hits) - 5} more — run: brain open {relpath(p)})"))
+                        break
+                    line = line if len(line) <= 120 else line[:119] + "…"
                     highlight = pat.sub(lambda m: yellow(m.group(0)), line)
                     print(f"  :{i}  {highlight}")
+                    shown += 1
             if total:
                 print(dim(f"\n{total} topic hint(s). Add a keyword for a narrower search."))
                 return 0
@@ -562,9 +592,15 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
             continue
         total += len(hits)
         print(f"\n{bold(green(relpath(p)))}")
+        shown = 0
         for i, line in hits:
+            if shown >= 5:
+                print(dim(f"  ... (+{len(hits) - 5} more — run: brain open {relpath(p)})"))
+                break
+            line = line if len(line) <= 120 else line[:119] + "…"
             highlight = pat.sub(lambda m: yellow(m.group(0)), line)
             print(f"  :{i}  {highlight}")
+            shown += 1
         # Back-references
         refs = backrefs(p)
         if refs:
@@ -582,7 +618,7 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
 
 def cmd_list(argv: list[str]) -> int:
     which = argv[0] if argv else "all"
-    cats = ("tools", "exploits", "payloads", "writeups") if which == "all" else (which,)
+    cats = ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads", "writeups") if which == "all" else (which,)
     for cat in cats:
         if cat not in DIRS:
             print(red(f"Unknown category: {cat}")); return 2
@@ -602,10 +638,16 @@ def cmd_search(argv: list[str], code_only: bool = False) -> int:
         hits = _grep_file(p, pat, code_only=code_only)
         if not hits:
             continue
+        shown = 0
         for i, line in hits:
             total += 1
+            if shown >= 5:
+                print(dim(f"  ... (+{len(hits) - 5} more in {relpath(p)})"))
+                break
+            line = line if len(line) <= 120 else line[:119] + "…"
             highlight = pat.sub(lambda m: yellow(m.group(0)), line)
             print(f"{green(relpath(p))}:{i}  {highlight}")
+            shown += 1
     if total == 0:
         print(dim(f"(no matches for '{query}')"))
     else:
@@ -676,7 +718,7 @@ def cmd_backrefs(argv: list[str]) -> int:
     target = argv[0]
     # Try to resolve by stem across reusable notes
     p: Path | None = None
-    for cat in ("tools", "exploits", "payloads"):
+    for cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads"):
         p = _resolve_file(cat, target, quiet=True)
         if p:
             break
@@ -714,6 +756,7 @@ def cmd_open(argv: list[str]) -> int:
 # ---- Dispatch ----
 
 FIXED_COMMANDS = {
+    "stats":    cmd_stats,
     "topics":   cmd_topics,
     "temas":    cmd_topics,
     "guide":    cmd_guide,
@@ -736,6 +779,10 @@ FIXED_COMMANDS = {
     "exploits": lambda a: cmd_show("exploits", a),
     "payload":  lambda a: cmd_show("payloads", a),
     "payloads": lambda a: cmd_show("payloads", a),
+    "playbook": lambda a: cmd_show("playbooks", a),
+    "playbooks": lambda a: cmd_show("playbooks", a),
+    "technique": lambda a: cmd_show("techniques", a),
+    "techniques": lambda a: cmd_show("techniques", a),
     "writeup":  lambda a: cmd_show("writeups", a),
     "writeups": lambda a: cmd_show("writeups", a),
     "used-on":  cmd_used_on,
@@ -769,6 +816,18 @@ def main(argv: list[str]) -> int:
             found = _find_exact("payloads", rest[0])
             if found:
                 return cmd_show("payloads", rest)
+        if cmd in ("playbook", "playbooks") and rest:
+            found = _find_exact("playbooks", rest[0])
+            if found:
+                return cmd_show("playbooks", rest)
+        if cmd in ("technique", "techniques") and rest:
+            found = _find_exact("techniques", rest[0])
+            if found:
+                return cmd_show("techniques", rest)
+        if cmd in ("privesc",) and rest:
+            found = _find_exact("privesc", rest[0])
+            if found:
+                return cmd_show("privesc", rest)
         return cmd_topic(key, rest)
     if cmd in FIXED_COMMANDS:
         return FIXED_COMMANDS[cmd](rest) or 0

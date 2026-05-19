@@ -121,7 +121,7 @@ reset
 
 ## 4. Foothold (`www-data`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md).
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md).
 
 ```bash
 # SUID sweep Â— empty / nothing pivots
@@ -146,7 +146,7 @@ sudo -l -U bill
 
 ## 5. Privilege Escalation Â— Systemd Unit Drop
 
-Full technique: [systemd-service-privesc.md](../../../exploits/privesc-linux/systemd-service-privesc.md).
+Full technique: [systemd-service-privesc.md](../../../privesc/linux/systemd-service-privesc.md).
 
 ### 5a. Build the unit on the attacker
 
@@ -216,6 +216,6 @@ cat /root/root.txt
 
 ## Related Notes
 - [php-extension-bypass-upload.md](../../../exploits/web-rce/php-extension-bypass-upload.md) Â— initial access
-- [systemd-service-privesc.md](../../../exploits/privesc-linux/systemd-service-privesc.md) Â— root primitive
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— foothold playbook
+- [systemd-service-privesc.md](../../../privesc/linux/systemd-service-privesc.md) Â— root primitive
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— foothold playbook
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [netcat](../../../tools/pivot/netcat.md), [wget](../../../tools/web/wget.md)

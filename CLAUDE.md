@@ -11,12 +11,16 @@ This repo is **tool-, exploit- and technique-centric**, not writeup-centric.
 The writeups in `writeups/HTB/` and `writeups/TRY/` are narratives — they exist so I remember what happened on a specific box. But the reusable value lives in:
 
 - `tools/` — per-tool command notes (every flag I actually used).
-- `exploits/` — per-technique playbooks (recon, enumeration, initial access, privilege escalation, reverse shells, credential hunting, pivoting).
+- `exploits/` — raw exploit playbooks and proofs of concept.
+- `privesc/` — local privilege escalation for Linux and Windows.
+- `techniques/` — theory and methodology (SQLi, XSS, Stego, Crypto).
+- `playbooks/` — checklists and enumeration flows.
+- `payloads/` — reusable payload snippets and webshells.
 
-When a writeup introduces something new (a command pattern, an abuse, a reverse-shell one-liner, a `find` recipe to hunt credentials), **the technique must be extracted into `tools/` or `exploits/` in the same change**. The writeup should be a short summary + chain + links — not a dumping ground for commands.
+When a writeup introduces something new (a command pattern, an abuse, a reverse-shell one-liner, a `find` recipe to hunt credentials), **the technique must be extracted into the appropriate reference directory** in the same change. The writeup should be a short summary + chain + links — not a dumping ground for commands.
 
 ### Why
-I want to search for things from the CLI. "Give me every credential-hunting `find` I have ever used", "show me the reverse-shell one-liner I used on box X", "list every eval-bypass trick I know" — all of that comes from grepping the `tools/` + `exploits/` tree, not from re-reading writeups.
+I want to search for things from the CLI. "Give me every credential-hunting `find` I have ever used", "show me the reverse-shell one-liner I used on box X", "list every eval-bypass trick I know" — all of that comes from querying `brain`, not from re-reading writeups.
 
 ### `brain` CLI
 
@@ -102,9 +106,10 @@ Writeups/
 │       └── Networks/
 ├── tools/
 ├── exploits/
-├── payloads/
-├── playbooks/      # planned: enumeration and methodology checklists
-└── techniques/     # planned: SQLi, XSS, stego and concept notes
+├── privesc/
+├── techniques/
+├── playbooks/
+└── payloads/
 ```
 
 ---
@@ -116,8 +121,10 @@ Writeups/
 | A new HTB machine writeup | `writeups/HTB/<Easy|Medium|Hard>/` based on HTB difficulty | `<Name>.md` (e.g. `Silentium.md`) |
 | A new TryHackMe room writeup | `writeups/TRY/<Easy|Medium|Hard>/` (create on first use) | `<RoomName>.md` |
 | A command-reference for a new tool | `tools/` | lowercase tool name — `<tool>.md` |
-| A new exploit / technique / abuse | `exploits/` | kebab-case descriptive name — `<what>-<how>.md` |
-| A post-exploitation checklist / playbook | `exploits/` | `<os>-enumeration.md`, `<topic>-playbook.md` |
+| A new exploit / abuse | `exploits/` | kebab-case descriptive name — `<what>-<how>.md` |
+| A new technique or theory | `techniques/` | kebab-case descriptive name (e.g. `sqli.md`) |
+| Local privilege escalation | `privesc/` | `<os>/<method>.md` |
+| A post-exploitation checklist / playbook | `playbooks/` | `<topic>-playbook.md` |
 | A bug bounty methodology / flow note | `bugbounty/` (create on first use) | kebab-case — `<phase>-<topic>.md` (e.g. `recon-subdomain-enumeration.md`, `idor-testing-flow.md`) |
 | Per-program bug bounty scratch notes (scope, findings, payloads) | `bugbounty/programs/<program>/` | `<program>.md` plus supporting files; keep private findings out of public commits |
 | External writeups / cheatsheets I only reference | do not commit to the repo |  |

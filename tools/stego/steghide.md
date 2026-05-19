@@ -9,13 +9,13 @@ Used on: **Yueiua**
 ### Probe without a passphrase
 ```bash
 steghide info oneforall.jpg
-# Shows whether data is embedded, the embedded file name, and size —
+# Shows whether data is embedded, the embedded file name, and size â€”
 # without requiring the passphrase. Great sanity check before guessing.
 ```
 
 ### Extract with a known passphrase
 ```bash
-steghide extract -sf oneforall.jpg       # [USED — Yueiua]
+steghide extract -sf oneforall.jpg       # [USED â€” Yueiua]
 # Enter passphrase:
 # wrote extracted data to "creds.txt"
 ```
@@ -30,7 +30,7 @@ steghide extract -sf oneforall.jpg       # [USED — Yueiua]
 steghide extract -sf oneforall.jpg -p 'AllmightForEver!!!' -xf creds.txt
 ```
 
-### Embed (reverse — for planting payloads)
+### Embed (reverse â€” for planting payloads)
 ```bash
 steghide embed -cf cover.jpg -ef secret.txt -p 'hunter2' -sf stego.jpg
 ```
@@ -48,7 +48,7 @@ echo '<base64>' | base64 -d
 
 ## Brute-force with stegseek
 
-`steghide` itself has no brute mode — use **stegseek** (drop-in, 40k+ guesses/sec):
+`steghide` itself has no brute mode â€” use **stegseek** (drop-in, 40k+ guesses/sec):
 
 ```bash
 sudo apt install stegseek   # or download from github.com/RickdeJager/stegseek
@@ -62,15 +62,15 @@ stegseek oneforall.jpg /usr/share/wordlists/rockyou.txt
 | Output | Cause |
 |--------|-------|
 | `steghide: could not extract any data with that passphrase` | Wrong passphrase OR no data embedded |
-| `the format of the file "X" is not supported` | JPEG/BMP/WAV only — PNG needs `zsteg` |
-| `the file format of the file "X" is not supported (maybe it is corrupt)` | Magic bytes wrong — repair with `printf`+`dd` first |
+| `the format of the file "X" is not supported` | JPEG/BMP/WAV only â€” PNG needs `zsteg` |
+| `the file format of the file "X" is not supported (maybe it is corrupt)` | Magic bytes wrong â€” repair with `printf`+`dd` first |
 
 If the file is PNG, pivot to `zsteg`. If it is any other format, pivot to `binwalk -e` or `foremost`.
 
 ## Related
-- [exiftool](../web/exiftool.md) — always run first for cheap metadata wins
-- [strings](../reversing/strings.md) — readable-strings fallback
-- [hashcat](../creds/hashcat.md), [john](../creds/john.md) — alternate brute-force if stegseek finds nothing
-- [steganography-image-loot.md](../../exploits/stego/steganography-image-loot.md) — full chain (magic fix ? exiftool ? steghide)
+- [exiftool](../web/exiftool.md) â€” always run first for cheap metadata wins
+- [strings](../reversing/strings.md) â€” readable-strings fallback
+- [hashcat](../creds/hashcat.md), [john](../creds/john.md) â€” alternate brute-force if stegseek finds nothing
+- [steganography-image-loot.md](../../techniques/stego/steganography-image-loot.md) â€” full chain (magic fix ? exiftool ? steghide)
 
 

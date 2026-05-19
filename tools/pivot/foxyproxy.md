@@ -23,6 +23,6 @@ Use SOCKS4 when the tunnel is `ssh -D` and SOCKS5 when the tunnel is Chisel unle
 
 - [proxychains](proxychains.md)
 - [chisel](chisel.md)
-- [chisel-pivoting.md](../../exploits/pivot/chisel-pivoting.md)
+- [chisel-pivoting.md](../../techniques/pivot/chisel.md)
 
 

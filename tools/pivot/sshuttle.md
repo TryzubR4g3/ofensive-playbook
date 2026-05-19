@@ -34,6 +34,6 @@ sshuttle -r user@PIVOT_HOST -N
 
 - [ssh](ssh.md)
 - [chisel](chisel.md)
-- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md)
+- [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md)
 
 

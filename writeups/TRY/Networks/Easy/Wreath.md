@@ -96,7 +96,7 @@ ssh -i id_rsa root@$TARGET
 
 ## Internal Pivoting
 
-Full technique: [Chisel pivoting](../../../../exploits/pivot/chisel-pivoting.md). Related tool notes: [chisel](../../../../tools/pivot/chisel.md), [proxychains](../../../../tools/pivot/proxychains.md), [FoxyProxy](../../../../tools/pivot/foxyproxy.md), [sshuttle](../../../../tools/pivot/sshuttle.md), [plink](../../../../tools/pivot/plink.md), and [socat](../../../../tools/pivot/socat.md).
+Full technique: [Chisel pivoting](../../../../techniques/pivot/chisel.md). Related tool notes: [chisel](../../../../tools/pivot/chisel.md), [proxychains](../../../../tools/pivot/proxychains.md), [FoxyProxy](../../../../tools/pivot/foxyproxy.md), [sshuttle](../../../../tools/pivot/sshuttle.md), [plink](../../../../tools/pivot/plink.md), and [socat](../../../../tools/pivot/socat.md).
 
 The first pivot exposed the internal network through a reverse SOCKS tunnel:
 
@@ -170,7 +170,7 @@ rlwrap nc -lvnp 4444
 
 ## Windows Stabilization and Credentials
 
-Full techniques: [Windows admin stabilization](../../../../exploits/privesc-windows/windows-admin-stabilization.md), [Mimikatz SAM dump and pass-the-hash](../../../../exploits/creds/mimikatz-sam-pth.md).
+Full techniques: [Windows admin stabilization](../../../../privesc/windows/windows-admin-stabilization.md), [Mimikatz SAM dump and pass-the-hash](../../../../techniques/creds/mimikatz-sam-pth.md).
 
 Once command execution landed as an administrator, a dedicated user was created for WinRM/RDP.
 
@@ -216,7 +216,7 @@ proxychains evil-winrm -u Administrator -H 37db630168e5f82aafa8461e05c6bbd1 -i 1
 
 ## Second Pivot to 10.200.180.100
 
-Full technique: [Chisel pivoting](../../../../exploits/pivot/chisel-pivoting.md).
+Full technique: [Chisel pivoting](../../../../techniques/pivot/chisel.md).
 
 PowerShell Empire port-scanning scripts found ports `80` and `3389` on `10.200.180.100`, but Empire stager generation failed. Chisel was used instead.
 
@@ -290,7 +290,7 @@ http://10.200.180.200:15001/resources/uploads/inocent.jpeg.php?wreath=whoami
 
 ## Privilege Escalation
 
-Full techniques: [Windows unquoted service path](../../../../exploits/privesc-windows/windows-unquoted-service-path.md), [Windows SAM hive dump](../../../../exploits/creds/windows-sam-hive-dump.md). Related playbook: [Windows enumeration](../../../../exploits/enumeration/windows-enumeration.md).
+Full techniques: [Windows unquoted service path](../../../../privesc/windows/windows-unquoted-service-path.md), [Windows SAM hive dump](../../../../techniques/creds/windows-sam-hive-dump.md). Related playbook: [Windows enumeration](../../../../playbooks/enumeration/windows.md).
 
 Manual service enumeration found `SystemExplorerHelpService` with a space-containing unquoted path under a directory writable by `BUILTIN\Users`.
 
@@ -372,12 +372,12 @@ impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ### Exploits / Techniques
 
 - [Webmin 1.890 RCE](../../../../exploits/web-rce/webmin-cve-2019-15107-rce.md)
-- [Chisel pivoting](../../../../exploits/pivot/chisel-pivoting.md)
+- [Chisel pivoting](../../../../techniques/pivot/chisel.md)
 - [GitStack 2.3.10 RCE](../../../../exploits/web-rce/gitstack-rce.md)
-- [Windows admin stabilization](../../../../exploits/privesc-windows/windows-admin-stabilization.md)
-- [Mimikatz SAM dump and pass-the-hash](../../../../exploits/creds/mimikatz-sam-pth.md)
-- [PowerShell Empire hop listener](../../../../exploits/pivot/powershell-empire-hop-listener.md)
+- [Windows admin stabilization](../../../../privesc/windows/windows-admin-stabilization.md)
+- [Mimikatz SAM dump and pass-the-hash](../../../../techniques/creds/mimikatz-sam-pth.md)
+- [PowerShell Empire hop listener](../../../../techniques/pivot/powershell-empire-hop.md)
 - [PHP EXIF metadata webshell upload](../../../../exploits/web-rce/php-exiftool-comment-webshell.md)
-- [Windows unquoted service path](../../../../exploits/privesc-windows/windows-unquoted-service-path.md)
-- [Windows SAM hive dump](../../../../exploits/creds/windows-sam-hive-dump.md)
-- [Windows enumeration](../../../../exploits/enumeration/windows-enumeration.md)
+- [Windows unquoted service path](../../../../privesc/windows/windows-unquoted-service-path.md)
+- [Windows SAM hive dump](../../../../techniques/creds/windows-sam-hive-dump.md)
+- [Windows enumeration](../../../../playbooks/enumeration/windows.md)

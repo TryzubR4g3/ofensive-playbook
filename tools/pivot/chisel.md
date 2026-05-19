@@ -57,6 +57,6 @@ Used on: **Wreath** - the GitStack host could reach the intermediate server but 
 
 - [proxychains](proxychains.md)
 - [foxyproxy](foxyproxy.md)
-- [chisel-pivoting.md](../../exploits/pivot/chisel-pivoting.md)
+- [chisel-pivoting.md](../../techniques/pivot/chisel.md)
 
 

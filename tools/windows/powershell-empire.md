@@ -40,6 +40,6 @@ Used on: **Wreath** - found ports `80` and `3389` on the final internal host.
 
 - [powershell](powershell.md)
 - [evil-winrm](evil-winrm.md)
-- [powershell-empire-hop-listener.md](../../exploits/pivot/powershell-empire-hop-listener.md)
+- [powershell-empire-hop-listener.md](../../techniques/pivot/powershell-empire-hop.md)
 
 

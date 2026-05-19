@@ -129,7 +129,7 @@ python3 -c 'import pty; pty.spawn("/bin/bash")'
 
 ## 4. Post-Exploitation (`www-data`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md).
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md).
 
 ```bash
 # What it does: displays a file in the terminal.
@@ -165,7 +165,7 @@ echo 'QWxsbWlnaHRGb3JFdmVyISEh' | base64 -d
 
 ## 5. User Â— Image Steganography Loot
 
-Full technique: [steganography-image-loot.md](../../../exploits/stego/steganography-image-loot.md).
+Full technique: [steganography-image-loot.md](../../../techniques/stego/steganography-image-loot.md).
 
 ```bash
 # What it does: downloads the specified URL to disk.
@@ -212,7 +212,7 @@ Tools: [exiftool](../../../tools/web/exiftool.md), [steghide](../../../tools/ste
 
 ## 6. Privilege Escalation Â— Bash Eval Filter Bypass
 
-Full technique: [bash-eval-filter-bypass.md](../../../exploits/privesc-linux/bash-eval-filter-bypass.md).
+Full technique: [bash-eval-filter-bypass.md](../../../privesc/linux/bash-eval-filter-bypass.md).
 
 ```bash
 # What it does: lists sudo privileges of the current or specified user.
@@ -277,9 +277,9 @@ cat /root/root.txt
 
 ## Related Notes
 - [url-param-command-injection.md](../../../exploits/web-rce/url-param-command-injection.md) Â— initial RCE
-- [steganography-image-loot.md](../../../exploits/stego/steganography-image-loot.md) Â— user flag chain
-- [bash-eval-filter-bypass.md](../../../exploits/privesc-linux/bash-eval-filter-bypass.md) Â— root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— post-foothold checklist
+- [steganography-image-loot.md](../../../techniques/stego/steganography-image-loot.md) Â— user flag chain
+- [bash-eval-filter-bypass.md](../../../privesc/linux/bash-eval-filter-bypass.md) Â— root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
 - [nmap](../../../tools/recon/nmap.md), [whatweb](../../../tools/recon/whatweb.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) Â— recon
 - [curl](../../../tools/web/curl.md), [netcat](../../../tools/pivot/netcat.md) Â— exploitation
 - [exiftool](../../../tools/web/exiftool.md), [steghide](../../../tools/stego/steghide.md), [wget](../../../tools/web/wget.md) Â— stego loot

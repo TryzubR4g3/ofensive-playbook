@@ -420,5 +420,5 @@ cat /root/root.txt
 - [Redis authenticated enumeration](../../../exploits/network-services/redis-auth-abuse.md)
 - [rsync module read/write abuse](../../../exploits/network-services/rsync-module-abuse.md)
 - [TeamCity super-user token RCE](../../../exploits/ci-cd/teamcity-superuser-token-rce.md)
-- [SSH port forwarding](../../../exploits/pivot/ssh-tunneling.md)
-- [Linux enumeration playbook](../../../exploits/enumeration/linux-enumeration.md)
+- [SSH port forwarding](../../../techniques/pivot/ssh-tunneling.md)
+- [Linux enumeration playbook](../../../playbooks/enumeration/linux.md)

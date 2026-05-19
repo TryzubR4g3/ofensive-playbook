@@ -64,7 +64,7 @@ See [nmap.md](../../../tools/recon/nmap.md).
 
 ## 2. SMB Anonymous Enumeration
 
-Full technique: [smb-anonymous-enum.md](../../../exploits/ad/smb-anonymous-enum.md).
+Full technique: [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md).
 
 ```bash
 # What it does: enumerate SMB shares, users and groups via null session.
@@ -178,7 +178,7 @@ reset
 
 ## 6. Privilege Escalation â€” Tar Wildcard Cron
 
-Full technique: [tar-wildcard-injection.md](../../../exploits/privesc-linux/tar-wildcard-injection.md).
+Full technique: [tar-wildcard-injection.md](../../../privesc/linux/tar-wildcard-injection.md).
 
 A root cron job ran `tar cf ... *` inside `/var/www/html`. The wildcard expansion allows injecting tar flags as filenames.
 
@@ -222,8 +222,8 @@ sudo cat /root/root.txt
 ---
 
 ## Related Notes
-- [smb-anonymous-enum.md](../../../exploits/ad/smb-anonymous-enum.md) â€” initial enumeration
+- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) â€” initial enumeration
 - [cuppa-cms-rfi.md](../../../exploits/web-disclosure/cuppa-cms-alertconfig-lfi-rfi.md) â€” initial access
-- [tar-wildcard-injection.md](../../../exploits/privesc-linux/tar-wildcard-injection.md) â€” privilege escalation
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) â€” playbook backbone
+- [tar-wildcard-injection.md](../../../privesc/linux/tar-wildcard-injection.md) â€” privilege escalation
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) â€” playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [hydra](../../../tools/creds/hydra.md), [smbclient](../../../tools/recon/smbclient.md), [netcat](../../../tools/pivot/netcat.md)

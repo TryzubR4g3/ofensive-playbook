@@ -44,7 +44,7 @@ Used on: **Relevant** — landed `shell.asp` into a share mirrored by IIS at `:4
 ```bash
 smbclient //$TARGET/nt4wrksv -N -c "get passwords.txt"
 ```
-Used on: **Relevant** — `passwords.txt` contained base64-encoded creds (see [base64-encoded-credentials.md](../../exploits/creds/base64-encoded-credentials.md)).
+Used on: **Relevant** — `passwords.txt` contained base64-encoded creds (see [base64-encoded-credentials.md](../../techniques/creds/base64-encoded-credentials.md)).
 
 ### Anonymous share walk with recursive download
 ```bash

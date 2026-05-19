@@ -20,14 +20,14 @@ cd /home
 cd /notread
 cd /etc
 ```
-Used on: **Anonforce (BSides GT)** — exposed full filesystem over anonymous FTP.
+Used on: **Anonforce (BSides GT)** â€” exposed full filesystem over anonymous FTP.
 
 ### Bulk file download
 ```
 mget crontab
 mget private.asc backup_encrypted.pgp
 ```
-Used on: **Anonforce (BSides GT)** — `mget` prompts per file unless `prompt` is toggled off.
+Used on: **Anonforce (BSides GT)** â€” `mget` prompts per file unless `prompt` is toggled off.
 
 ### Disable prompting and pull everything
 ```
@@ -60,6 +60,6 @@ lftp -u anonymous, $TARGET -e "mirror / ./ftp_dump; bye"
 
 ## Related
 - [Anonymous FTP enumeration playbook](../../exploits/network-services/anonymous-ftp-enumeration.md)
-- [PGP key cracking](../../exploits/creds/pgp-key-cracking.md) — typical follow-up after a backup drops
+- [PGP key cracking](../../techniques/creds/pgp-key-cracking.md) â€” typical follow-up after a backup drops
 
 

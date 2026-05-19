@@ -1,78 +1,57 @@
-# Second Brain â€” Offensive-Security Notebook
+# 🧠 brain — Offensive Security Second Brain
 
-Personal, CLI-searchable knowledge base for offensive security work. The repo is **tool- and exploit-centric** ” writeups are just the narrative shell. The real value is in `tools/` + `exploits/`, accessible from the terminal via the `brain` CLI.
+58 tools · 64 exploits · 22 privesc · 31 techniques · 5 playbooks · 5 payloads · 43 writeups
 
-- **`tools/`** ” per-tool command notes (every flag I've actually used, tagged by machine).
-- **`exploits/`** ” per-technique playbooks (prerequisites, step-by-step, defensive notes).
-- **`writeups/HTB/`, `writeups/TRY/`** ” machine writeups that link to the reusable notes above.
-- **`brain` CLI** ” grep / list / recall without leaving the terminal.
+This repository is **tool-, exploit- and technique-centric**. Writeups exist as narratives, but the real value lives in the reusable playbooks and command references, instantly searchable via the `brain` CLI.
 
----
+## Quick Start
 
-## `brain` CLI
-
-Topic-scoped search for tools, exploit playbooks and writeups. Tool notes do not keep writeup backlink lists; writeups link out to the reusable notes, and `brain backrefs` derives backlinks from those writeup links when you need them.
+The `./brain` (or `python brain.py`) CLI is the primary way to interact with this repository.
 
 ```bash
-./brain guide                  # beginner examples: "what should I type?"
-./brain <topic> [keyword]      # grep keyword inside a curated topic scope
-./brain topics                 # list every topic with a one-line description
-
-./brain find    <query>        # easy alias for broad search
-./brain search  <query>        # case-insensitive grep across every .md
-./brain cmd     <query>        # grep inside fenced code blocks only
-./brain tool    [name]         # cat a tool note (or list all)
-./brain exploit [name]         # cat an exploit note (or list all)
-./brain writeup [name]         # cat a writeup (or list all)
-./brain list    [tools|exploits|writeups|all]
-./brain used-on <Machine>      # every note tagged "Used on: <Machine>"
-./brain backrefs <note>        # every writeup that links to <note>
-./brain open    <path>         # open in $EDITOR
+./brain guide                # beginner examples and recipes
+./brain recon nmap           # every nmap command I've ever run
+./brain privesc sudo         # privilege escalation exploits matching "sudo"
+./brain find "bash -i"       # broad text search across the entire repo
+./brain cmd  "find /"        # grep only inside fenced code blocks
+./brain list all             # list all tools, exploits, payloads, writeups
 ```
 
-### Topics
+## Available Topics
 
-| Topic | Covers |
-|-------|--------|
-| `recon` | Port scan, banner grab, directory brute |
-| `enumeration` (`enum`) | Post-foothold system / AD / network enumeration |
-| `fuzz` | Directory / vhost / parameter fuzzing |
-| `exploit` | All exploit playbooks |
-| `privesc` | Local privilege escalation (Linux + Windows) |
-| `shells` | Reverse-shell one-liners and listener patterns |
-| `creds` | Credential hunting, cracking, reuse |
-| `pivot` | Port forwarding and tunnelling |
-| `ad` | Active Directory / Kerberos / SMB / LDAP |
-| `web` | Web / HTTP exploitation |
-| `container` (`docker`) | Container / Docker abuse â€” incl. in-container enumeration |
-| `stego` | Steganography / metadata loot |
-| `reversing` (`re`, `binary`) | SUID / custom binary reverse engineering |
-| `database` (`db`, `mongodb`, `sqlite`, `nosql`) | Backend DB enumeration & abuse (Mongo, SQLite, MySQL, Redis) |
-| `sqli`, `lfi`, `rce` | Exactly what they say |
+Search by topic to limit results to a specific phase or domain (`./brain <topic> <keyword>`).
 
-### Typical flow
+| Topic         | Aliases                          | Description |
+|---------------|----------------------------------|-------------|
+| `recon`       | `reconnaissance`                 | Port scanning, banner grabbing, service discovery |
+| `enumeration` | `enum`, `enumeracion`            | Post-foothold system, AD, and network enumeration |
+| `fuzz`        |                                  | Directory, vhost, and parameter fuzzing |
+| `exploit`     |                                  | Raw exploit playbooks and PoCs |
+| `privesc`     | `escalation`, `privilegios`      | Local privilege escalation (Linux + Windows) |
+| `shells`      | `shell`, `reverse-shell`         | Reverse-shell one-liners and listener setups |
+| `payloads`    | `payload`                        | Reusable payload snippets and shell stabilization |
+| `creds`       | `credentials`, `password`        | Credential hunting, extraction, and cracking |
+| `ad`          | `active-directory`, `kerberos`   | Active Directory, Kerberos, SMB, LDAP |
+| `web`         | `http`                           | Web vulnerability exploitation |
+| `xss`         | `cross-site-scripting`           | Cross-site scripting techniques |
+| `container`   | `docker`, `k8s`                  | Container, Docker, and orchestration abuse |
+| `stego`       | `steganography`                  | Steganography and metadata loot |
+| `sqli`        | `sql`, `inyeccion-sql`           | SQL injection techniques |
+| `lfi`         |                                  | Local File Inclusion and arbitrary read |
+| `rce`         |                                  | Remote Code Execution chains |
+| `reversing`   | `reverse`, `binary`, `re`        | Binary reverse engineering (SUID, custom bins) |
+| `database`    | `db`, `mongodb`, `nosql`         | Backend DB enumeration & abuse |
+| `crypto`      | `padding`, `oracle`              | Token prediction, padding oracles, weak crypto |
+| `pivot`       | `pivoting`, `tunnel`             | Port forwarding, tunnelling, pivots |
 
-```bash
-./brain enumeration find              # every `find` command in enum tools/exploits
-./brain fuzz ffuf                     # every ffuf invocation in fuzz-scoped files
-./brain privesc sudo                  # privesc notes that mention sudo
-./brain creds grep                    # credential-hunting greps
-./brain ad kerberos                   # AD/Kerberos-specific commands
-./brain web curl                      # curl usage in web exploits
-./brain shells                        # all reverse-shell one-liners (scope list)
-./brain used-on Overwatch             # every tool/exploit tagged with that machine
-./brain exploit bash-eval             # exact match on an exploit note name
-```
+## Architecture
 
-Output pattern (example - `brain enumeration find`):
+* **`tools/`**: Command references. "What exact flag did I use?"
+* **`exploits/`**: Real exploitation chains: CVEs, RCEs, auth bypasses.
+* **`privesc/`**: Local privilege escalation for Linux and Windows.
+* **`techniques/`**: Theory and methodology (SQLi, XSS, Stego, Crypto).
+* **`playbooks/`**: Checklists and enumeration flows.
+* **`payloads/`**: Reusable code (webshells, persistence scripts).
+* **`writeups/`**: Machine walkthroughs (`HTB/` and `TRY/`).
 
-```
-exploits\linux-enumeration.md
-  :77  find / -perm -4000 -type f 2>/dev/null      # [USED â€” DevArea]
-  :92  ## Password & Credential Hunting with `find`
-  used by:        # derived from writeup links, not stored in the tool note
-    TRY\Easy\lazyadmin.md:179  Standard [Linux enumeration](exploits/enumeration/linux-enumeration.md)...
-    HTB\Easy\cctv.md:210       [linux-enumeration.md](exploits/enumeration/linux-enumeration.md)
-```
-
----
+Writeups link to the techniques. The CLI reverse-indexes those links to show exactly which boxes a technique was used on.

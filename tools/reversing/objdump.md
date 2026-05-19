@@ -2,7 +2,7 @@
 
 GNU binutils disassembler. Dumps the assembly of a binary's `.text` section so you can read the actual logic when `strings` / `ltrace` come up empty (inline comparisons, XOR obfuscation, magic numbers baked into instructions).
 
-Always reach for this **after** `strings` and `ltrace` — `objdump` is the slowest to read but the only one that sees inline arithmetic.
+Always reach for this **after** `strings` and `ltrace` â€” `objdump` is the slowest to read but the only one that sees inline arithmetic.
 
 ## Commands Used
 
@@ -12,8 +12,8 @@ objdump -d ./try-harder | awk '/^.*<main>:/,/^$/'
 ```
 Used on: **Bookstore**
 
-- `-d` — disassemble executable sections.
-- `awk '/<main>:/,/^$/'` — slice out only the `main` function (from the `<main>:` label to the next blank line). Saves you scrolling through libc stubs.
+- `-d` â€” disassemble executable sections.
+- `awk '/<main>:/,/^$/'` â€” slice out only the `main` function (from the `<main>:` label to the next blank line). Saves you scrolling through libc stubs.
 
 Output that solved Bookstore:
 ```asm
@@ -22,7 +22,7 @@ Output that solved Bookstore:
 804:  xor   %eax, -0xc(%rbp)          ; result XOR mystery
 807:  cmpl  $0x5dcd21f4, -0xc(%rbp)   ; compare with constant
 ```
-That's enough to solve `(input ^ 0x1116) ^ 0x5db3 == 0x5dcd21f4` for the magic number — no debugger needed.
+That's enough to solve `(input ^ 0x1116) ^ 0x5db3 == 0x5dcd21f4` for the magic number â€” no debugger needed.
 
 ## Common Flags
 
@@ -43,14 +43,14 @@ That's enough to solve `(input ^ 0x1116) ^ 0x5db3 == 0x5dcd21f4` for the magic n
 |--------------|---------------|
 | `mov $0x5db3, -0x10(%rbp)` | `local_var = 0x5db3` |
 | `xor %eax, -0xc(%rbp)` | `local ^= eax` |
-| `cmpl $X, %eax` | compare without storing — sets flags for next jump |
+| `cmpl $X, %eax` | compare without storing â€” sets flags for next jump |
 | `je <addr>` / `jne <addr>` | branch on equal / not equal |
 | `call <symbol>` | function call (libc shows up as `<scanf@plt>`) |
 | `leaq <str>(%rip), %rdi` | first arg = string at that address (`-s -j .rodata` to read it) |
 
 ## Related
-- [strings](strings.md) — fast first pass
-- [ltrace](ltrace.md) — runtime libcall tracing (fails on inline comparisons)
-- [suid-binary-reversing.md](../../exploits/privesc-linux/suid-binary-reversing.md) — full reversing playbook
+- [strings](strings.md) â€” fast first pass
+- [ltrace](ltrace.md) â€” runtime libcall tracing (fails on inline comparisons)
+- [suid-binary-reversing.md](../../privesc/linux/suid-binary-reversing.md) â€” full reversing playbook
 
 

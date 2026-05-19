@@ -285,6 +285,6 @@ C:\> type C:\Users\Administrator\Desktop\root.txt
 - [impacket](../../../tools/windows/impacket.md) Â— `GetUserSPNs`, `wmiexec`
 - [hashcat](../../../tools/creds/hashcat.md) Â— `-m 13100` Kerberos TGS RC4
 - [evil-winrm](../../../tools/windows/evil-winrm.md) Â— hash-authenticated WinRM
-- [SMB anonymous enumeration](../../../exploits/ad/smb-anonymous-enum.md)
+- [SMB anonymous enumeration](../../../playbooks/enumeration/smb-anonymous.md)
 - [Password spraying](../../../exploits/ad/password-spraying.md)
 - [AS-REP Roast & Kerberoast](../../../exploits/ad/kerberos-roasting.md)

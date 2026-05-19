@@ -192,7 +192,7 @@ Lands as **`www-data`** on `THM-Chal`.
 
 ## 5. Post-Exploitation (`www-data`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md) pass:
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md) pass:
 
 ```bash
 # What it does: verify the current user identity in the reverse shell.
@@ -252,7 +252,7 @@ ls -la /etc/copy.sh
 # -rwxrwxrwx 1 root root ... /etc/copy.sh
 ```
 
-Full technique: [sudo-script-helper-hijack.md](../../../exploits/privesc-linux/sudo-script-helper-hijack.md).
+Full technique: [sudo-script-helper-hijack.md](../../../privesc/linux/sudo-script-helper-hijack.md).
 
 ```bash
 # 1. Replace the helper with the payload
@@ -304,7 +304,7 @@ cat /root/root.txt
 ## Related Notes
 - [backup-file-exposure.md](../../../exploits/web-disclosure/backup-file-exposure.md) Â— exposed `.sql` / `.db` in webroot
 - [sweetrice-media-center-rce.md](../../../exploits/web-rce/sweetrice-media-center-rce.md) Â— authenticated RCE chain
-- [sudo-script-helper-hijack.md](../../../exploits/privesc-linux/sudo-script-helper-hijack.md) Â— privesc via writable helper
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— post-foothold checklist
+- [sudo-script-helper-hijack.md](../../../privesc/linux/sudo-script-helper-hijack.md) Â— privesc via writable helper
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
 - [searchsploit](../../../tools/recon/searchsploit.md), [wget](../../../tools/web/wget.md), [sqlite3](../../../tools/database/sqlite3.md) Â— tool notes for this chain
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) Â— recon

@@ -103,7 +103,7 @@ Navigate to bill's Desktop to get the user flag.
 
 ## 3. Privilege Escalation â€” Unquoted Service Path
 
-Full technique: [unquoted-service-path.md](../../../exploits/privesc-windows/windows-unquoted-service-path.md).
+Full technique: [unquoted-service-path.md](../../../privesc/windows/windows-unquoted-service-path.md).
 
 ```cmd
 REM What it does: enumerate all installed services and their binary paths.
@@ -163,6 +163,6 @@ type root.txt
 
 ## Related Notes
 - [rejetto-hfs-rce.md](../../../exploits/web-rce/rejetto-hfs-rce.md) â€” initial access
-- [unquoted-service-path.md](../../../exploits/privesc-windows/windows-unquoted-service-path.md) â€” privilege escalation
-- [windows-enumeration.md](../../../exploits/enumeration/windows-enumeration.md) â€” post-foothold playbook
+- [unquoted-service-path.md](../../../privesc/windows/windows-unquoted-service-path.md) â€” privilege escalation
+- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) â€” post-foothold playbook
 - [nmap](../../../tools/recon/nmap.md), [searchsploit](../../../tools/recon/searchsploit.md), [netcat](../../../tools/pivot/netcat.md), [metasploit](../../../tools/exploitation/metasploit.md)

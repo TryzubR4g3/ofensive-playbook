@@ -73,7 +73,7 @@ The recovered API key unlocked `api.php`, which documented token generation.
 
 ## Predictable Token Generation
 
-Full technique: [PHP mt_rand token prediction](../../../exploits/crypto/php-mt-rand-token-prediction.md).
+Full technique: [PHP mt_rand token prediction](../../../techniques/crypto/php-mt-rand-token-prediction.md).
 
 Known pair:
 
@@ -109,7 +109,7 @@ curl -X POST http://$TARGET:1337/index.php \
 
 ## Padding Oracle Command Injection
 
-Full technique: [Padding oracle to command injection](../../../exploits/crypto/padding-oracle-command-injection.md). Tool: [padre](../../../tools/web/padre.md).
+Full technique: [Padding oracle to command injection](../../../techniques/crypto/padding-oracle-command-injection.md). Tool: [padre](../../../tools/web/padre.md).
 
 Decrypt the original value:
 
@@ -153,5 +153,5 @@ echo "OUTPUT_BASE64" | base64 -d
 - [padre](../../../tools/web/padre.md)
 - [Public log invite code disclosure](../../../exploits/web-disclosure/public-log-invite-code-disclosure.md)
 - [JavaScript obfuscated API key disclosure](../../../exploits/web-disclosure/javascript-obfuscated-api-key.md)
-- [PHP mt_rand token prediction](../../../exploits/crypto/php-mt-rand-token-prediction.md)
-- [Padding oracle to command injection](../../../exploits/crypto/padding-oracle-command-injection.md)
+- [PHP mt_rand token prediction](../../../techniques/crypto/php-mt-rand-token-prediction.md)
+- [Padding oracle to command injection](../../../techniques/crypto/padding-oracle-command-injection.md)

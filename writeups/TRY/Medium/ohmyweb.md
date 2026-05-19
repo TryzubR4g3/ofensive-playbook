@@ -142,7 +142,7 @@ reset
 
 ## 4. Post-Exploitation (`daemon`, In Container)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md), with the container-aware checklist in [docker-container-enumeration.md](../../../exploits/container/docker-container-enumeration.md).
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md), with the container-aware checklist in [docker-container-enumeration.md](../../../techniques/container/docker-enumeration.md).
 
 ```bash
 # What it does: display the current system hostname.
@@ -168,7 +168,7 @@ Host LVM device is named Â— confirms we're in a container, host is `ubuntu-vg
 
 ## 5. User Flag Â— Capabilities Privesc Inside Container
 
-Full technique: [linux-capabilities-privesc.md](../../../exploits/privesc-linux/linux-capabilities-privesc.md).
+Full technique: [linux-capabilities-privesc.md](../../../privesc/linux/linux-capabilities-privesc.md).
 
 ```bash
 getcap -r / 2>/dev/null
@@ -258,9 +258,9 @@ python3 /tmp/exploit.py -t 172.17.0.1 \
 ## Related Notes
 - [ds-store-disclosure.md](../../../exploits/web-disclosure/ds-store-disclosure.md) Â— recon
 - [apache-path-traversal-rce.md](../../../exploits/web-rce/apache-path-traversal-rce.md) Â— initial access
-- [docker-container-enumeration.md](../../../exploits/container/docker-container-enumeration.md) Â— in-container post-foothold
-- [linux-capabilities-privesc.md](../../../exploits/privesc-linux/linux-capabilities-privesc.md) Â— user flag (container root)
+- [docker-container-enumeration.md](../../../techniques/container/docker-enumeration.md) Â— in-container post-foothold
+- [linux-capabilities-privesc.md](../../../privesc/linux/linux-capabilities-privesc.md) Â— user flag (container root)
 - [container-network-pivoting.md](../../../exploits/container/container-network-pivoting.md) Â— host pivot
 - [omigod-rce.md](../../../exploits/web-rce/omigod-rce.md) Â— root on host
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— playbook backbone
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [curl](../../../tools/web/curl.md), [wget](../../../tools/web/wget.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [getcap](../../../tools/container/getcap.md) Â— tools

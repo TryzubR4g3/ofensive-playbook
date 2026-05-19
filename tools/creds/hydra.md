@@ -38,7 +38,7 @@ Used on: **Skynet** - password candidates recovered from SMB logs were replayed 
 
 ## Related
 
-- [../../exploits/creds/jenkins-http-form-bruteforce.md](../../exploits/creds/jenkins-http-form-bruteforce.md)
+- [../../techniques/creds/jenkins-http-form-bruteforce.md](../../techniques/creds/jenkins-http-form-bruteforce.md)
 
 
 

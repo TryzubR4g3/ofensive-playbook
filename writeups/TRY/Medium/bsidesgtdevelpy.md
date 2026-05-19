@@ -124,7 +124,7 @@ Tools: [netcat](../../../tools/pivot/netcat.md), [socat](../../../tools/pivot/so
 
 ## 3. Post-Exploitation (`king`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md).
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md).
 
 ```bash
 # What it does: list all files in the current home directory including hidden ones.
@@ -146,7 +146,7 @@ cat user.txt
 
 ## 4. User Flag Â— Piet/npiet Steganography
 
-Full technique: [npiet-piet-stego.md](../../../exploits/stego/npiet-piet-stego.md).
+Full technique: [npiet-piet-stego.md](../../../techniques/stego/npiet-piet-stego.md).
 
 Exfil and triage:
 ```bash
@@ -192,7 +192,7 @@ Tools: [exiftool](../../../tools/web/exiftool.md), [strings](../../../tools/reve
 
 ## 5. Privilege Escalation Â— Wildcard-Glob Cron + SSH Tunnel
 
-Full technique: [cron-script-abuse.md](../../../exploits/privesc-linux/cron-script-abuse.md).
+Full technique: [cron-script-abuse.md](../../../privesc/linux/cron-script-abuse.md).
 
 ```bash
 # What it does: check allowed sudo commands for the current user.
@@ -255,7 +255,7 @@ nc -lvnp 1337
 # whoami ? root
 ```
 
-See [ssh-tunneling.md](../../../exploits/pivot/ssh-tunneling.md) for the SSH forward, and [cron-script-abuse.md](../../../exploits/privesc-linux/cron-script-abuse.md) for the wildcard variant.
+See [ssh-tunneling.md](../../../techniques/pivot/ssh-tunneling.md) for the SSH forward, and [cron-script-abuse.md](../../../privesc/linux/cron-script-abuse.md) for the wildcard variant.
 
 ---
 
@@ -281,9 +281,9 @@ cat /root/root.txt
 
 ## Related Notes
 - [python-input-injection.md](../../../exploits/web-rce/python-input-injection.md) Â— initial access
-- [npiet-piet-stego.md](../../../exploits/stego/npiet-piet-stego.md) Â— user-flag steganography
-- [cron-script-abuse.md](../../../exploits/privesc-linux/cron-script-abuse.md) Â— wildcard-glob privesc variant
-- [ssh-tunneling.md](../../../exploits/pivot/ssh-tunneling.md) Â— internal web pivot
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— playbook backbone
+- [npiet-piet-stego.md](../../../techniques/stego/npiet-piet-stego.md) Â— user-flag steganography
+- [cron-script-abuse.md](../../../privesc/linux/cron-script-abuse.md) Â— wildcard-glob privesc variant
+- [ssh-tunneling.md](../../../techniques/pivot/ssh-tunneling.md) Â— internal web pivot
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [netcat](../../../tools/pivot/netcat.md), [socat](../../../tools/pivot/socat.md), [wget](../../../tools/web/wget.md) Â— recon & delivery
 - [exiftool](../../../tools/web/exiftool.md), [strings](../../../tools/reversing/strings.md) Â— image triage

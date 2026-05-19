@@ -64,7 +64,7 @@ Two IIS instances. The second one (`:49663`) is what eventually executes the web
 
 ## 2. SMB Enumeration Â— Writable Share + Encoded Creds
 
-Full technique: [smb-anonymous-enum.md](../../../exploits/ad/smb-anonymous-enum.md), [base64-encoded-credentials.md](../../../exploits/creds/base64-encoded-credentials.md).
+Full technique: [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md), [base64-encoded-credentials.md](../../../techniques/creds/base64-encoded-credentials.md).
 
 ### 2a. Find the writable share
 
@@ -188,7 +188,7 @@ type C:\Users\Bob\Desktop\user.txt
 
 ## 6. Privilege Escalation â€” winPEAS and PrintSpoofer
 
-Full technique: [printspoofer-seimpersonate.md](../../../exploits/privesc-windows/printspoofer-seimpersonate.md).
+Full technique: [printspoofer-seimpersonate.md](../../../privesc/windows/printspoofer-seimpersonate.md).
 
 ```cmd
 REM What it does: download and run winPEAS to enumerate privilege escalation vectors.
@@ -233,8 +233,8 @@ type C:\Users\Administrator\Desktop\root.txt
 ---
 
 ## Related Notes
-- [smb-anonymous-enum.md](../../../exploits/ad/smb-anonymous-enum.md) Â— finding the share
-- [base64-encoded-credentials.md](../../../exploits/creds/base64-encoded-credentials.md) Â— decoding the credential file
+- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) Â— finding the share
+- [base64-encoded-credentials.md](../../../techniques/creds/base64-encoded-credentials.md) Â— decoding the credential file
 - [smb-write-iis-execution.md](../../../exploits/web-rce/smb-write-iis-execution.md) Â— full ASP/IIS chain
-- [windows-enumeration.md](../../../exploits/enumeration/windows-enumeration.md) Â— what to do once you land the shell
+- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) Â— what to do once you land the shell
 - [nmap](../../../tools/recon/nmap.md), [netexec](../../../tools/recon/netexec.md), [smbclient](../../../tools/recon/smbclient.md), [netcat](../../../tools/pivot/netcat.md), [curl](../../../tools/web/curl.md)

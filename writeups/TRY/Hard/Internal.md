@@ -59,7 +59,7 @@ Edit the theme `404.php` with `PHP_WEBSHELL_PAYLOAD`, then call it with a comman
 
 ## User Pivot
 
-Full technique: [WordPress wp-config.php credential reuse](../../../exploits/creds/wordpress-wp-config-credentials.md).
+Full technique: [WordPress wp-config.php credential reuse](../../../techniques/creds/wordpress-wp-config-credentials.md).
 
 ```bash
 # What it does: extract database and local credentials.
@@ -81,7 +81,7 @@ ssh aubreanna@$TARGET
 
 ## Jenkins Pivot
 
-Full techniques: [Jenkins HTTP form brute force](../../../exploits/creds/jenkins-http-form-bruteforce.md), [Jenkins Script Console RCE](../../../exploits/web-rce/jenkins-script-console-rce.md).
+Full techniques: [Jenkins HTTP form brute force](../../../techniques/creds/jenkins-http-form-bruteforce.md), [Jenkins Script Console RCE](../../../exploits/web-rce/jenkins-script-console-rce.md).
 
 ```bash
 # What it does: establish a local SSH tunnel to the Jenkins container gateway.
@@ -94,7 +94,7 @@ Use `/script` with the Groovy reverse shell from the Jenkins note.
 
 ## Root
 
-Full technique: [Docker container secret hunting](../../../exploits/container/docker-container-secret-hunting.md).
+Full technique: [Docker container secret hunting](../../../techniques/container/docker-secret-hunting.md).
 
 ```bash
 # What it does: check the current system state and identity inside the container.
@@ -132,7 +132,7 @@ ssh root@$TARGET
 - [hydra](../../../tools/creds/hydra.md)
 - [ssh](../../../tools/pivot/ssh.md)
 - [WordPress theme editor webshell](../../../exploits/web-rce/wordpress-theme-editor-webshell.md)
-- [WordPress wp-config.php credential reuse](../../../exploits/creds/wordpress-wp-config-credentials.md)
-- [Jenkins HTTP form brute force](../../../exploits/creds/jenkins-http-form-bruteforce.md)
+- [WordPress wp-config.php credential reuse](../../../techniques/creds/wordpress-wp-config-credentials.md)
+- [Jenkins HTTP form brute force](../../../techniques/creds/jenkins-http-form-bruteforce.md)
 - [Jenkins Script Console RCE](../../../exploits/web-rce/jenkins-script-console-rce.md)
-- [Docker container secret hunting](../../../exploits/container/docker-container-secret-hunting.md)
+- [Docker container secret hunting](../../../techniques/container/docker-secret-hunting.md)

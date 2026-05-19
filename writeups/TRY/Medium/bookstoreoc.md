@@ -161,7 +161,7 @@ Now running as **sid**.
 
 ## 6. Post-Exploitation (`sid`)
 
-Standard [Linux enumeration](../../../exploits/enumeration/linux-enumeration.md). User flag in `/home/sid/user.txt`.
+Standard [Linux enumeration](../../../playbooks/enumeration/linux.md). User flag in `/home/sid/user.txt`.
 
 The two leads that mattered:
 ```bash
@@ -185,7 +185,7 @@ A user-home, root-owned, custom-named SUID is always worth reversing.
 
 ## 7. Privilege Escalation Â— SUID Reversing
 
-Full technique: [suid-binary-reversing.md](../../../exploits/privesc-linux/suid-binary-reversing.md).
+Full technique: [suid-binary-reversing.md](../../../privesc/linux/suid-binary-reversing.md).
 
 The 3-stage funnel:
 
@@ -260,7 +260,7 @@ cat /root/root.txt
 ## Related Notes
 - [hidden-parameter-fuzzing.md](../../../exploits/web-disclosure/hidden-parameter-fuzzing.md) Â— the LFI discovery
 - [werkzeug-debug-rce.md](../../../exploits/web-rce/werkzeug-debug-rce.md) Â— initial RCE
-- [suid-binary-reversing.md](../../../exploits/privesc-linux/suid-binary-reversing.md) Â— root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) Â— post-foothold checklist
+- [suid-binary-reversing.md](../../../privesc/linux/suid-binary-reversing.md) Â— root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [ffuf](../../../tools/fuzz/ffuf.md), [curl](../../../tools/web/curl.md), [netcat](../../../tools/pivot/netcat.md) Â— recon & exploitation
 - [strings](../../../tools/reversing/strings.md), [ltrace](../../../tools/reversing/ltrace.md), [objdump](../../../tools/reversing/objdump.md) Â— SUID reversing

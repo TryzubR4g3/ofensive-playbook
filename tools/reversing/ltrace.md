@@ -5,9 +5,9 @@ Library-call tracer. Intercepts dynamic-library calls a process makes (`scanf`, 
 Use when:
 - A binary asks for a "magic number / password" and you want to watch the comparison live.
 - You want to know which file / env var the binary is reading.
-- The binary is stripped — `ltrace` still resolves library calls because they go through the dynamic linker.
+- The binary is stripped â€” `ltrace` still resolves library calls because they go through the dynamic linker.
 
-`ltrace` only sees **library** calls. If the comparison is implemented inline (e.g. `xor` + `cmp` in user code), nothing shows up — fall back to `objdump`.
+`ltrace` only sees **library** calls. If the comparison is implemented inline (e.g. `xor` + `cmp` in user code), nothing shows up â€” fall back to `objdump`.
 
 ## Commands Used
 
@@ -17,7 +17,7 @@ ltrace ./try-harder
 ```
 Used on: **Bookstore**
 
-Result on Bookstore: `ltrace` printed `__isoc99_scanf("%d", ...)` but **no `strcmp` / `memcmp`** — the comparison was inline assembly (`xor` + `cmpl`), invisible to `ltrace`. Pivoted to `objdump` next.
+Result on Bookstore: `ltrace` printed `__isoc99_scanf("%d", ...)` but **no `strcmp` / `memcmp`** â€” the comparison was inline assembly (`xor` + `cmpl`), invisible to `ltrace`. Pivoted to `objdump` next.
 
 - Run as the user that owns the SUID bit (or the binary may abort early when EUID ? UID is unsafe).
 - Combine with `-f` to follow forks, `-e <pattern>` to filter (e.g. `ltrace -e 'scanf*+strcmp'`).
@@ -34,7 +34,7 @@ Result on Bookstore: `ltrace` printed `__isoc99_scanf("%d", ...)` but **no `strc
 | `-p PID` | Attach to a running process |
 
 ## Related
-- [strings](strings.md) — first-pass string extraction
-- [suid-binary-reversing.md](../../exploits/privesc-linux/suid-binary-reversing.md) — full reversing playbook
+- [strings](strings.md) â€” first-pass string extraction
+- [suid-binary-reversing.md](../../privesc/linux/suid-binary-reversing.md) â€” full reversing playbook
 
 

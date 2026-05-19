@@ -236,5 +236,5 @@ cat /root/root.txt
 - [ftp](../../../tools/recon/ftp.md) Â— anonymous login + `mget`
 - [gpg](../../../tools/creds/gpg.md) Â— key import + decrypt
 - [john](../../../tools/creds/john.md) Â— offline cracking (PGP + shadow)
-- [PGP key cracking playbook](../../../exploits/creds/pgp-key-cracking.md)
+- [PGP key cracking playbook](../../../techniques/creds/pgp-key-cracking.md)
 - [Anonymous FTP enumeration](../../../exploits/network-services/anonymous-ftp-enumeration.md)

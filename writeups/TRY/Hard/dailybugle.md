@@ -195,7 +195,7 @@ sudo -l
 
 ## 6. Privilege Escalation -- sudo yum Plugin Injection
 
-Full technique: [yum-sudo-plugin-injection.md](../../../exploits/privesc-linux/yum-sudo-plugin-injection.md).
+Full technique: [yum-sudo-plugin-injection.md](../../../privesc/linux/yum-sudo-plugin-injection.md).
 
 `yum` is a Python script that loads plugins from configured directories. A malicious plugin that runs `/bin/sh` inherits root privileges.
 
@@ -252,6 +252,6 @@ cat /root/root.txt
 ## Related Notes
 - [joomla-com-fields-sqli.md](../../../exploits/web-rce/joomla-com-fields-sqli.md) -- initial access
 - [joomla-template-editor-webshell.md](../../../exploits/web-rce/joomla-template-editor-webshell.md) -- RCE chain
-- [yum-sudo-plugin-injection.md](../../../exploits/privesc-linux/yum-sudo-plugin-injection.md) -- root privesc
-- [linux-enumeration.md](../../../exploits/enumeration/linux-enumeration.md) -- playbook backbone
+- [yum-sudo-plugin-injection.md](../../../privesc/linux/yum-sudo-plugin-injection.md) -- root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) -- playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [curl](../../../tools/web/curl.md), [hashcat](../../../tools/creds/hashcat.md)

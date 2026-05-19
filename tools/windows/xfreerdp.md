@@ -37,6 +37,6 @@ Used on: **Wreath** - mounted Kali's Windows tooling at `\\tsclient\share`.
 ## Related
 
 - [mimikatz](mimikatz.md)
-- [windows-admin-stabilization.md](../../exploits/privesc-windows/windows-admin-stabilization.md)
+- [windows-admin-stabilization.md](../../privesc/windows/windows-admin-stabilization.md)
 
 

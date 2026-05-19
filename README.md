@@ -1,11 +1,11 @@
 # Second Brain â€” Offensive-Security Notebook
 
-Personal, CLI-searchable knowledge base for offensive security work. The repo is **tool- and exploit-centric** â€” writeups are just the narrative shell. The real value is in `tools/` + `exploits/`, accessible from the terminal via the `brain` CLI.
+Personal, CLI-searchable knowledge base for offensive security work. The repo is **tool- and exploit-centric** ” writeups are just the narrative shell. The real value is in `tools/` + `exploits/`, accessible from the terminal via the `brain` CLI.
 
-- **`tools/`** â€” per-tool command notes (every flag I've actually used, tagged by machine).
-- **`exploits/`** â€” per-technique playbooks (prerequisites, step-by-step, defensive notes).
-- **`writeups/HTB/`, `writeups/TRY/`** â€” machine writeups that link to the reusable notes above.
-- **`brain` CLI** â€” grep / list / recall without leaving the terminal.
+- **`tools/`** ” per-tool command notes (every flag I've actually used, tagged by machine).
+- **`exploits/`** ” per-technique playbooks (prerequisites, step-by-step, defensive notes).
+- **`writeups/HTB/`, `writeups/TRY/`** ” machine writeups that link to the reusable notes above.
+- **`brain` CLI** ” grep / list / recall without leaving the terminal.
 
 ---
 

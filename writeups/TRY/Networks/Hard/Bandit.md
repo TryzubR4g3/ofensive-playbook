@@ -20,6 +20,7 @@ nmap -sVC -p 135,139,445,3389,5985,47001,49664,49665,49666,49669,49670,49672,496
 
 **Output**
 ```
+10.200.30.101
 PORT     STATE SERVICE            VERSION
 22/tcp   open  ssh                OpenSSH 8.2p1 Ubuntu 4ubuntu0.5 (Ubuntu Linux; protocol 2.0)
 80/tcp   open  http-proxy         Apache Traffic Server 7.1.1
@@ -29,6 +30,8 @@ PORT     STATE SERVICE            VERSION
 |_http-server-header: CUPS/2.4 IPP/2.1
 |_http-title: Forbidden - CUPS v2.4.5
 8002/tcp open  hadoop-tasktracker Apache Hadoop
+
+10.200.30.10
 ______________________________________________
 PORT      STATE SERVICE       VERSION
 135/tcp   open  msrpc         Microsoft Windows RPC

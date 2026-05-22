@@ -70,3 +70,19 @@ feroxbuster -u http://$TARGET:8080 -w /usr/share/seclists/Discovery/Web-Content/
 feroxbuster -u http://$TARGET:8082 -w /usr/share/seclists/Discovery/Web-Content/big.txt
 ```
 Used on: **coldvvars** - mapped the web apps on both non-standard ports before deeper `/dev` fuzzing.
+
+### Multi-extension sweep on a non-standard port with status-code allowlist
+```bash
+feroxbuster -u http://10.200.30.101:8002 \
+  -w /usr/share/wordlists/dirb/common.txt \
+  -x php,js,env,conf,txt,html,json,config,bak,sql,db \
+  -t 50 \
+  -d 3 \
+  --status-codes 200,201,301,302,403,405,500 \
+  -o ferox-8002.txt
+```
+Used on: **Bandit** - enumerated the Hadoop service on port 8002; `-x` sweep catches config and backup leaks; `--status-codes` allowlist surfaces 403/500 that indicate interesting paths even when access is denied.
+
+- `--status-codes` — emit only these codes (allowlist, opposite of `-C`/`--filter-status`)
+- `-d 3` — recurse three levels to catch nested API routes
+- `-o` — persist output for later grep/review

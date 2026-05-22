@@ -6,8 +6,14 @@ Used on: **bsidesgtthompson**, **blog**, **coldvvars**
 
 ## Commands
 
+Stabilise:
 ```bash
+# What it does: spawn an interactive bash shell using Python.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+# Ctrl+Z
+stty raw -echo; fg
+reset
 ```
 
 Optional terminal-side cleanup when the shell supports it:

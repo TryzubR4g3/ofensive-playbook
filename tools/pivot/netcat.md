@@ -76,3 +76,12 @@ nc -lvpn 4444
 nc -nlvp 4545
 ```
 Used on: **bsidesgtdav**, **bsidesgtthompson**, **coldvvars** - listeners for PHP WebDAV shell, JSP WAR shell, uploaded PHP shell, and the secondary `:!bash` shell.
+
+### Connect to a network appliance VTY line
+```bash
+nc -v $TARGET 2623
+```
+Used on: **OperationTakeover** - opened the FRRouting VTY console to fingerprint the banner, authenticate, and trigger the `banner motd file` read primitive on reconnect.
+
+- `-v` — verbose; shows the connect banner (FRR version string, password prompt)
+- Port `2623` is FRR's default VTY; classic IOS uses `23` (telnet)

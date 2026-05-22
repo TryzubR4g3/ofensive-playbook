@@ -118,11 +118,12 @@ banner motd file /etc/frr/mgmt_debug.log
 - Network appliance VTY lines with single-password auth are trivially brute-forced â€” Hydra's `cisco` module handles this natively.
 - FRRouting's `banner motd file` is a local file read primitive when you have `configure terminal` access. It is the equivalent of `LOAD_FILE()` in MySQL.
 - `mgmt load-config <path> merge` can force file content into the management debug log, creating a second exfiltration path.
-- Always test for Cisco-style `enable` password reuse â€” the same password often works for both the VTY line and the enable prompt.
+- Always test for Cisco-style `enable` password reuse — the same password often works for both the VTY line and the enable prompt.
 
 ---
 
 ## Related Notes
-- [hydra](../../../tools/creds/hydra.md) â€” VTY brute force
-- [netcat](../../../tools/pivot/netcat.md) â€” console access
-- [nmap](../../../tools/recon/nmap.md) â€” initial port discovery
+- [hydra](../../../tools/creds/hydra.md) — VTY brute force
+- [netcat](../../../tools/pivot/netcat.md) — console access
+- [nmap](../../../tools/recon/nmap.md) — initial port discovery
+- [frrouting-vty-banner-file-read](../../../exploits/network-services/frrouting-vty-banner-file-read.md) — full technique note

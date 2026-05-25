@@ -1,6 +1,6 @@
 # Docker Group → Root
 
-Used on: **Kobold**
+Used on: **Kobold, marketplace**
 
 Membership in the `docker` group is equivalent to root on the host, because any user who can talk to the Docker daemon can run a privileged container that bind-mounts `/`.
 

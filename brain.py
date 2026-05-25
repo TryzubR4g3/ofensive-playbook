@@ -151,7 +151,7 @@ TOPICS: dict[str, dict] = {
     },
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
-        "tools": ["netcat", "socat", "ssh", "evil-winrm", "impacket", "metasploit", "msfvenom",
+        "tools": ["netcat", "socat", "ssh", "sshpass", "evil-winrm", "impacket", "metasploit", "msfvenom",
                   "chisel", "plink"],
         "exploits": [],
         "all_payloads": True,

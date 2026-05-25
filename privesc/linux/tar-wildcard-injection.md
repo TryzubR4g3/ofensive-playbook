@@ -2,7 +2,7 @@
 
 Privilege escalation through a privileged `tar` job that expands attacker-controlled filenames as command-line options.
 
-Used on: **Skynet**
+Used on: **Skynet, marketplace**
 
 ## Why It Works
 

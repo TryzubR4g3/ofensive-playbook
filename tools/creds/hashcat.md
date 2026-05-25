@@ -20,7 +20,7 @@ hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt --force --show
 ```bash
 hashcat -m 3200 hash.txt /usr/share/wordlists/rockyou.txt
 ```
-Used on: **CCTV** (alternative to John).
+Used on: **CCTV, marketplace** (alternative to John).
 
 ### Crack raw SHA-1 (mode 100)
 ```bash

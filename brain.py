@@ -107,7 +107,8 @@ TOPICS: dict[str, dict] = {
                   "gobuster", "wget", "proxychains", "foxyproxy", "ldap-utils",
                   "onesixtyone", "snmpwalk", "snmpset"],
         "exploits": ["smb-anonymous-enum", "anonymous-ftp-enumeration",
-                     "smb-enumeration", "rid-brute-enumeration", "snmp"],
+                     "smb-enumeration", "rid-brute-enumeration", "snmp",
+                     "web-discovery", "file-transfers"],
     },
     "enumeration": {
         "desc": "Post-foothold system / AD / network enumeration",
@@ -301,7 +302,7 @@ TOPICS: dict[str, dict] = {
         "tools": ["ssh", "nmap", "chisel", "proxychains", "foxyproxy", "plink",
                   "sshuttle", "socat"],
         "exploits": ["ssh-tunneling", "container-network-pivoting",
-                     "chisel-pivoting", "powershell-empire-hop-listener"],
+                     "chisel-pivoting", "powershell-empire-hop-listener", "pivoting-tunnelling"],
     },
 }
 

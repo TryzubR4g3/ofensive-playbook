@@ -635,11 +635,37 @@ def cmd_list(argv: list[str]) -> int:
 
 def cmd_search(argv: list[str], code_only: bool = False) -> int:
     if not argv:
-        print(red("usage: brain search <query>")); return 2
+        print(red("usage: brain search [category|commands] <query>")); return 2
+    
+    target_cat = None
+    cat_aliases = {
+        "tools": "tools", "tool": "tools", "herramientas": "tools", "herramienta": "tools",
+        "exploits": "exploits", "exploit": "exploits",
+        "privesc": "privesc", "escalation": "privesc", "privilegios": "privesc",
+        "playbooks": "playbooks", "playbook": "playbooks",
+        "techniques": "techniques", "technique": "techniques",
+        "payloads": "payloads", "payload": "payloads",
+        "writeups": "writeups", "writeup": "writeups",
+    }
+    cmd_aliases = {"commands", "command", "cmd", "comandos", "comando"}
+    
+    while argv and len(argv) > 1:
+        first = argv[0].lower()
+        if first in cmd_aliases:
+            code_only = True
+            argv = argv[1:]
+        elif first in cat_aliases:
+            target_cat = cat_aliases[first]
+            argv = argv[1:]
+        else:
+            break
+            
     query = " ".join(argv)
     pat = re.compile(re.escape(query), re.IGNORECASE)
     total = 0
     for cat, p in iter_all():
+        if target_cat and cat != target_cat:
+            continue
         hits = _grep_file(p, pat, code_only=code_only)
         if not hits:
             continue
@@ -654,7 +680,9 @@ def cmd_search(argv: list[str], code_only: bool = False) -> int:
             print(f"{green(relpath(p))}:{i}  {highlight}")
             shown += 1
     if total == 0:
-        print(dim(f"(no matches for '{query}')"))
+        scope = target_cat if target_cat else "all files"
+        kind = "commands" if code_only else "text"
+        print(dim(f"(no {kind} matches for '{query}' in {scope})"))
     else:
         print(dim(f"\n{total} match(es)"))
     return 0

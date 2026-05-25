@@ -137,7 +137,7 @@ TOPICS: dict[str, dict] = {
     },
     "privesc": {
         "desc": "Local privilege escalation (Linux + Windows)",
-        "tools": ["getcap"],
+        "tools": ["getcap", "runas"],
         "exploits": ["sudo-", "docker-group-escape", "pkexec", "fail2ban",
                      "cron-script-abuse", "gogs-symlink-attack", "nfs-share-abuse",
                      "rsync-module-abuse", "nssm-service-abuse", "bash-eval-filter",
@@ -182,7 +182,7 @@ TOPICS: dict[str, dict] = {
         "desc": "Active Directory / Kerberos / SMB / LDAP",
         "tools": ["netexec", "impacket", "kerbrute", "smbclient", "evil-winrm",
                   "dnstool", "responder", "bloodhound", "mimikatz", "xfreerdp",
-                  "hydra", "ldap-utils"],
+                  "hydra", "ldap-utils", "runas"],
         "exploits": ["adidns-poisoning", "kerberos-roasting", "password-spraying",
                      "smb-anonymous-enum", "smb-enumeration", "shadow-credentials",
                      "rid-brute-enumeration", "mssql-", "ntlm-capture-crack",

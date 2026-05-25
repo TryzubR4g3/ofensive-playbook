@@ -122,7 +122,7 @@ TOPICS: dict[str, dict] = {
                      "env-variable-enum", "docker-container-enumeration",
                      "mongodb-enumeration", "windows-sam-hive-dump",
                      "nfs-mounted-file-loot", "docker-container-secret-hunting",
-                     "snmp"],
+                     "nfs-uid-hijack", "snmp"],
     },
     "fuzz": {
         "desc": "Directory / vhost / parameter fuzzing",
@@ -145,6 +145,7 @@ TOPICS: dict[str, dict] = {
                      "suid-binary-reversing", "exiftool-sudo",
                      "systemd-service-privesc", "windows-unquoted-service-path",
                      "suid-path-hijack", "tar-wildcard-injection",
+                     "python-library-hijack", "suid-python",
                      "yum-sudo-plugin-injection", "printspoofer-seimpersonate"],
     },
     "shells": {
@@ -209,6 +210,7 @@ TOPICS: dict[str, dict] = {
                      "cuppa-cms-alertconfig-lfi-rfi",
                      "php-extension-bypass-upload", "smb-write-iis-execution",
                      "webmin-cve-2019-15107-rce", "gitstack-rce",
+                     "ssrf-internal-port-scan", "cookie-base64-md5-forgery",
                      "php-exiftool-comment-webshell", "wordpress-theme-editor-webshell",
                      "jenkins-script-console-rce", "public-log-invite-code-disclosure",
                      "javascript-obfuscated-api-key", "php-mt-rand-token-prediction",

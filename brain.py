@@ -294,7 +294,7 @@ TOPICS: dict[str, dict] = {
     },
     "crypto": {
         "desc": "Token prediction, padding oracles, weak crypto",
-        "tools": ["padre"],
+        "tools": ["padre", "padbuster"],
         "exploits": ["php-mt-rand-token-prediction", "padding-oracle-command-injection"],
     },
     "pivot": {

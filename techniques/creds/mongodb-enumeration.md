@@ -2,21 +2,21 @@
 
 Used on: **cmspit**
 
-You landed a shell on a box that runs MongoDB locally — it's the storage tier for the web app you just compromised. Mongo's default auth posture is "no auth", and even when an app has hard-coded creds in its config, the localhost client almost never asks for them. List the databases, list the collections, dump the user / config collections, and you usually walk away with a second-stage credential the web app didn't reveal.
+You landed a shell on a box that runs MongoDB locally â€” it's the storage tier for the web app you just compromised. Mongo's default auth posture is "no auth", and even when an app has hard-coded creds in its config, the localhost client almost never asks for them. List the databases, list the collections, dump the user / config collections, and you usually walk away with a second-stage credential the web app didn't reveal.
 
 ## Prerequisites
 - Shell on a host running `mongod` (any uid). Confirm with `ss -tlnp | grep 27017` or `pgrep mongod`.
-- `mongo` (legacy 4.x shell) **or** `mongosh` (6.x+) on the box. If neither, scp / curl one in or use `nc 127.0.0.1 27017` against the wire protocol (fiddly — usually faster to install).
+- `mongo` (legacy 4.x shell) **or** `mongosh` (6.x+) on the box. If neither, scp / curl one in or use `nc 127.0.0.1 27017` against the wire protocol (fiddly â€” usually faster to install).
 - No auth, OR creds you've already harvested (env vars, app config files like `cockpit/config.yaml`, `.env`, `wp-config.php`-style settings).
 
 ## How It Works
 
-`mongod` listens on `127.0.0.1:27017` by default. The `mongo` shell speaks the binary wire protocol, returns BSON, and is essentially a JS REPL. Apps that bind their own DB usually ship with `auth=false` "for now" — this never gets switched on.
+`mongod` listens on `127.0.0.1:27017` by default. The `mongo` shell speaks the binary wire protocol, returns BSON, and is essentially a JS REPL. Apps that bind their own DB usually ship with `auth=false` "for now" â€” this never gets switched on.
 
 The two collections worth checking on every CMS / app DB:
-1. `users` (or `user`) — names, password hashes, sometimes plain.
-2. `flag` / `secrets` / `config` — direct loot, especially in CTFs.
-3. `<app>db` / `<app>backup` / `<appname>_old` — stale data the dev forgot to drop.
+1. `users` (or `user`) â€” names, password hashes, sometimes plain.
+2. `flag` / `secrets` / `config` â€” direct loot, especially in CTFs.
+3. `<app>db` / `<app>backup` / `<appname>_old` â€” stale data the dev forgot to drop.
 
 ## Steps
 
@@ -36,7 +36,7 @@ admin     0.000GB
 cockpitdb 0.012GB
 config    0.000GB
 local     0.000GB
-sudousersbak 0.000GB        ? unusual name, prime suspect
+sudousersbak 0.000GB         unusual name, prime suspect
 ```
 
 ### 3. Walk the suspect DB

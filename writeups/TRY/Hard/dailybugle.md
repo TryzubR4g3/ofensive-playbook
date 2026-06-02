@@ -118,7 +118,7 @@ def query(sql):
     )
     params = {**BASE_PARAMS, "list[fullordering]": payload}
     r = requests.get(BASE_URL, params=params)
-    match = re.search(r"qqvpq(.*?)qjpvq", r.text)
+    match = re.search(r"qqvpq(.*)qjpvq", r.text)
     if match:
         return match.group(1)
     return None

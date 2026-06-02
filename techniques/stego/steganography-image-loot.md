@@ -1,13 +1,13 @@
-# Steganography — Hidden Data in Images
+# Steganography â€” Hidden Data in Images
 
 Used on: **Yueiua**
 
 Assets folder on a web server exposes images that look ordinary. Two failure modes hide credentials or keys inside them:
 
-1. **Metadata** — `exiftool` reads EXIF / PNG / XMP comments; authors often stash hints or passphrases there.
-2. **Payload body** — `steghide` / `stegseek` / `zsteg` extract files embedded in JPEG / BMP / WAV. Most CTF variants need a passphrase, found elsewhere on the box (plaintext, base64, comment).
+1. **Metadata** â€” `exiftool` reads EXIF / PNG / XMP comments; authors often stash hints or passphrases there.
+2. **Payload body** â€” `steghide` / `stegseek` / `zsteg` extract files embedded in JPEG / BMP / WAV. Most CTF variants need a passphrase, found elsewhere on the box (plaintext, base64, comment).
 
-Twist on Yueiua: the file was served as `.jpg` but had PNG bytes, then those PNG bytes were themselves corrupted by flipping the magic bytes to invalid hex. `exiftool` flagged `Warning: PNG image did not start with IHDR` — the fix is to restore the correct magic.
+Twist on Yueiua: the file was served as `.jpg` but had PNG bytes, then those PNG bytes were themselves corrupted by flipping the magic bytes to invalid hex. `exiftool` flagged `Warning: PNG image did not start with IHDR` â€” the fix is to restore the correct magic.
 
 ## Prerequisites
 - A writable directory on the attacker's side to download and edit the file.
@@ -41,15 +41,15 @@ exiftool oneforall.jpg
 
 ### 4. Fix a corrupted magic (Yueiua pattern)
 ```bash
-# Case A — file claims to be .jpg but shows PNG headers.
+# Case A â€” file claims to be .jpg but shows PNG headers.
 # Fake JPEG magic so JPEG-only tools accept it:
 printf '\xFF\xD8' | dd of=oneforall.jpg bs=1 count=2 conv=notrunc
 
-# Case B — genuine PNG with trashed magic.
+# Case B â€” genuine PNG with trashed magic.
 # Restore proper PNG magic:
 printf '\x89PNG\r\n\x1a\n' | dd of=oneforall.jpg bs=1 count=8 conv=notrunc
 ```
-`conv=notrunc` keeps the rest of the file — only the first N bytes change.
+`conv=notrunc` keeps the rest of the file â€” only the first N bytes change.
 
 Common magic bytes cheatsheet:
 
@@ -75,7 +75,7 @@ Yueiua example: `/Hidden_Content/passphrase.txt` contained a base64 string decod
 ### 6. Extract with steghide
 ```bash
 steghide info oneforall.jpg
-# Runs even without the passphrase — shows whether data is embedded and size.
+# Runs even without the passphrase â€” shows whether data is embedded and size.
 
 steghide extract -sf oneforall.jpg
 # Enter passphrase: AllmightForEver!!!
@@ -85,7 +85,7 @@ cat creds.txt          # SSH creds, users, flags, etc.
 ```
 `-xf out.txt` forces the output filename.
 
-### 7. No passphrase? Brute-force with stegseek
+### 7. No passphrase Brute-force with stegseek
 ```bash
 stegseek oneforall.jpg /usr/share/wordlists/rockyou.txt
 # Thousands of guesses per second; hits typical CTF passwords in seconds.
@@ -102,9 +102,9 @@ stegseek oneforall.jpg /usr/share/wordlists/rockyou.txt
 | `foremost -i <file>` | Carve embedded files by signature |
 
 ## Related
-- [exiftool](../../tools/web/exiftool.md) — metadata extraction
-- [steghide](../../tools/stego/steghide.md) — embedded-data extraction
-- [strings](../../tools/reversing/strings.md) — readable-string fallback
-- [pgp-key-cracking.md](../creds/pgp-key-cracking.md) — different loot format, same "find passphrase on the box" pattern
+- [exiftool](../../tools/web/exiftool.md) â€” metadata extraction
+- [steghide](../../tools/stego/steghide.md) â€” embedded-data extraction
+- [strings](../../tools/reversing/strings.md) â€” readable-string fallback
+- [pgp-key-cracking.md](../creds/pgp-key-cracking.md) â€” different loot format, same "find passphrase on the box" pattern
 
 

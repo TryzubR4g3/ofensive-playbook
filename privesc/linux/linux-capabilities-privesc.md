@@ -2,7 +2,7 @@
 
 Used on: **ohmyweb**
 
-POSIX capabilities are the per-binary fine-grained replacement for SUID. A binary with the right `+ep` capability bits behaves as if it were SUID **only for that subset of root powers** — but in practice "the right subset" is often a one-line jump to a root shell.
+POSIX capabilities are the per-binary fine-grained replacement for SUID. A binary with the right `+ep` capability bits behaves as if it were SUID **only for that subset of root powers** â€” but in practice "the right subset" is often a one-line jump to a root shell.
 
 The dangerous one is `cap_setuid+ep` on any scripting interpreter: Python, Perl, Ruby, Node, even `awk` in some distros. Once you can `setuid(0)` from a high-level language, exec a shell and you're root.
 

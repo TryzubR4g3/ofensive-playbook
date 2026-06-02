@@ -19,7 +19,7 @@ Used on: **cmspit**
 ```bash
 mongo --host 127.0.0.1 --port 27017
 mongo --host $TARGET --port 27017 dbname
-mongo "mongodb://user:pass@127.0.0.1:27017/dbname?authSource=admin"
+mongo "mongodb://user:pass@127.0.0.1:27017/dbnameauthSource=admin"
 ```
 
 ### Quick non-interactive query (one-shot, useful in scripts)
@@ -28,7 +28,7 @@ mongo --quiet --eval "db.adminCommand('listDatabases').databases.forEach(d=>prin
 mongo dbname --quiet --eval "db.users.find().forEach(printjson)"
 ```
 
-### List ? walk databases and collections
+### List  walk databases and collections
 ```javascript
 > show dbs
 > use sudousersbak                       // [USED — cmspit]
@@ -95,5 +95,20 @@ python3 -c "from pymongo import MongoClient; c=MongoClient('mongodb://127.0.0.1'
 - [cockpit-cms-rce.md](../../exploits/web-rce/cockpit-cms-rce.md) -- cmspit's foothold that fed into the mongo dump
 - [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md) -- when mongo is loopback only
 - [linux-enumeration.md](../../playbooks/enumeration/linux.md) -- spotting mongod in `ss -tlnp` / `ps`
+
+## Additional Commands Used
+
+### Enumerate application collections
+```javascript
+mongo
+show dbs
+use daves-blog
+show collections
+db.users.find().pretty()
+db.posts.find().pretty()
+db.whatcouldthisbes.find().pretty()
+db.users.find().forEach(printjson)
+```
+Used on: **davesblog** - recovered the admin password and hidden document from MongoDB.
 
 

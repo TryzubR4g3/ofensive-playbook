@@ -28,14 +28,8 @@ echo "$TARGET lookup.thm" | sudo tee -a /etc/hosts
 ### Subdomain fuzzing
 ```bash
 gobuster vhost -u http://lookup.thm \  
-  -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-20000.txt \
   --append-domain
-```
-**Output**
-```
-#www.lookup.thm Status: 400 [Size: 336]
-#mail.lookup.thm Status: 400 [Size: 336]
-#smtp.lookup.thm Status: 400 [Size: 336]
 ```
 
 

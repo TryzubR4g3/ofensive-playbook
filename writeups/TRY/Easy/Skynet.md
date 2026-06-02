@@ -1,31 +1,31 @@
-# Skynet â€” TryHackMe Writeup
+# Skynet — TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.130.137.2 at time of solve)
 **OS:** Linux (Ubuntu)
 **Difficulty:** Easy
 **Tech stack:** Apache 2.4.18, SquirrelMail, Samba 4.3.11, Cuppa CMS
-**Exploit chain:** SMB anonymous â†’ user `milesdyson` + password list â†’ Hydra brute-force SquirrelMail â†’ email leaks new SMB password â†’ hidden CMS path in notes share â†’ Cuppa CMS LFI/RFI (CVE-2022-25486) â†’ RFI webshell â†’ `www-data` shell â†’ tar wildcard cron â†’ root
+**Exploit chain:** SMB anonymous → user `milesdyson` + password list → Hydra brute-force SquirrelMail → email leaks new SMB password → hidden CMS path in notes share → Cuppa CMS LFI/RFI (CVE-2022-25486) → RFI webshell → `www-data` shell → tar wildcard cron → root
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap â†’ 22, 80, 110, 139, 143, 445
-    â†’
-enum4linux â†’ anonymous SMB share â†’ user milesdyson + log1.txt password list
-    â†’
-feroxbuster â†’ /squirrelmail
-    â†’
-Hydra brute-force â†’ milesdyson:cyborg007haloterminator
-    â†’
-SquirrelMail email â†’ new SMB password )s{A&2Z=F^n_E.B`
-    â†’
-smbclient milesdyson â†’ notes/important.txt â†’ /45kra24zxs28v3yd/
-    â†’
-Cuppa CMS LFI/RFI (alertConfigField.php?urlConfig=) â†’ RFI webshell â†’ www-data
-    â†’
-tar wildcard cron in /var/www/html â†’ checkpoint injection â†’ sudoers append â†’ root
+nmap → 22, 80, 110, 139, 143, 445
+    →
+enum4linux → anonymous SMB share → user milesdyson + log1.txt password list
+    →
+feroxbuster → /squirrelmail
+    →
+Hydra brute-force → milesdyson:cyborg007haloterminator
+    →
+SquirrelMail email → new SMB password )s{A&2Z=F^n_E.B`
+    →
+smbclient milesdyson → notes/important.txt → /45kra24zxs28v3yd/
+    →
+Cuppa CMS LFI/RFI (alertConfigField.php?urlConfig=) → RFI webshell → www-data
+    →
+tar wildcard cron in /var/www/html → checkpoint injection → sudoers append → root
 ```
 
 ---
@@ -34,9 +34,9 @@ tar wildcard cron in /var/www/html â†’ checkpoint injection â†’ sudoer
 1. [Reconnaissance](#1-reconnaissance)
 2. [SMB Anonymous Enumeration](#2-smb-anonymous-enumeration)
 3. [SquirrelMail Brute Force](#3-squirrelmail-brute-force)
-4. [SMB Pivot â€” New Credentials from Email](#4-smb-pivot--new-credentials-from-email)
-5. [Initial Access â€” Cuppa CMS RFI](#5-initial-access--cuppa-cms-rfi)
-6. [Privilege Escalation â€” Tar Wildcard Cron](#6-privilege-escalation--tar-wildcard-cron)
+4. [SMB Pivot — New Credentials from Email](#4-smb-pivot--new-credentials-from-email)
+5. [Initial Access — Cuppa CMS RFI](#5-initial-access--cuppa-cms-rfi)
+6. [Privilege Escalation — Tar Wildcard Cron](#6-privilege-escalation--tar-wildcard-cron)
 7. [Key Takeaways](#7-key-takeaways)
 
 ---
@@ -103,7 +103,7 @@ Tools: [feroxbuster](../../../tools/fuzz/feroxbuster.md), [hydra](../../../tools
 
 ---
 
-## 4. SMB Pivot â€” New Credentials from Email
+## 4. SMB Pivot — New Credentials from Email
 
 Inside SquirrelMail, a system email disclosed a new SMB password. With the new password, milesdyson's personal share was accessible, and `important.txt` revealed a hidden web directory.
 
@@ -115,12 +115,12 @@ Password: )s{A&2Z=F^n_E.B`
 # What it does: connect to milesdyson's personal SMB share.
 # Why here: access private notes using the credentials recovered from the email.
 smbclient //$TARGET/milesdyson -U milesdyson%)s{A\&2Z=F^n_E.B\`
-# â†’ notes/important.txt â†’ reveals /45kra24zxs28v3yd/
+# → notes/important.txt → reveals /45kra24zxs28v3yd/
 ```
 
 ---
 
-## 5. Initial Access â€” Cuppa CMS RFI
+## 5. Initial Access — Cuppa CMS RFI
 
 Full technique: [cuppa-cms-rfi.md](../../../exploits/web-disclosure/cuppa-cms-alertconfig-lfi-rfi.md).
 
@@ -176,7 +176,7 @@ reset
 
 ---
 
-## 6. Privilege Escalation â€” Tar Wildcard Cron
+## 6. Privilege Escalation — Tar Wildcard Cron
 
 Full technique: [tar-wildcard-injection.md](../../../privesc/linux/tar-wildcard-injection.md).
 
@@ -213,17 +213,17 @@ sudo cat /root/root.txt
 
 ## 7. Key Takeaways
 
-- Anonymous SMB shares are not just for files â€” they leak usernames via RID cycling (`enum4linux -r`).
+- Anonymous SMB shares are not just for files — they leak usernames via RID cycling (`enum4linux -r`).
 - Webmail (SquirrelMail, Roundcube) frequently stores new credentials in emails. Always read the inbox after brute-forcing.
-- Cuppa CMS `alertConfigField.php?urlConfig=` is a textbook LFI â†’ RFI chain. The `urlConfig` parameter accepts both `file://` and `http://` schemes.
+- Cuppa CMS `alertConfigField.php?urlConfig=` is a textbook LFI → RFI chain. The `urlConfig` parameter accepts both `file://` and `http://` schemes.
 - `tar cf ... *` with attacker-writable directories is exploitable via `--checkpoint-action=exec=`. The filenames are expanded as tar flags.
-- Password lists from SMB shares are first-class brute-force material â€” always check for credential files before running generic wordlists.
+- Password lists from SMB shares are first-class brute-force material — always check for credential files before running generic wordlists.
 
 ---
 
 ## Related Notes
-- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) â€” initial enumeration
-- [cuppa-cms-rfi.md](../../../exploits/web-disclosure/cuppa-cms-alertconfig-lfi-rfi.md) â€” initial access
-- [tar-wildcard-injection.md](../../../privesc/linux/tar-wildcard-injection.md) â€” privilege escalation
-- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) â€” playbook backbone
+- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) — initial enumeration
+- [cuppa-cms-rfi.md](../../../exploits/web-disclosure/cuppa-cms-alertconfig-lfi-rfi.md) — initial access
+- [tar-wildcard-injection.md](../../../privesc/linux/tar-wildcard-injection.md) — privilege escalation
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) — playbook backbone
 - [nmap](../../../tools/recon/nmap.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md), [hydra](../../../tools/creds/hydra.md), [smbclient](../../../tools/recon/smbclient.md), [netcat](../../../tools/pivot/netcat.md)

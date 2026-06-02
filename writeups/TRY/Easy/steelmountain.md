@@ -1,28 +1,28 @@
-# Steel Mountain â€” TryHackMe Writeup
+# Steel Mountain — TryHackMe Writeup
 
 **Target:** `TARGET_IP`
 **OS:** Windows Server
 **Difficulty:** Easy
 **Tech stack:** IIS 8.5, Rejetto HTTP File Server 2.3 (port 8080), SMB, RDP
-**Exploit chain:** Rejetto HFS CVE-2014-6287 â†’ reverse shell as `bill` â†’ winPEAS â†’ unquoted service path in `AdvancedSystemCareService9` â†’ msfvenom service binary â†’ SYSTEM
+**Exploit chain:** Rejetto HFS CVE-2014-6287 → reverse shell as `bill` → winPEAS → unquoted service path in `AdvancedSystemCareService9` → msfvenom service binary → SYSTEM
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap â†’ 80, 135, 139, 445, 3389, 5985, 8080 + high RPC ports
-    â†’
-port 8080 â†’ Rejetto HTTP File Server 2.3 â†’ CVE-2014-6287
-    â†’
-searchsploit â†’ 39161.py (HFS RCE)
-    â†’
-Stage nc.exe via HTTP â†’ reverse shell as bill
-    â†’
-winPEAS â†’ AdvancedSystemCareService9 unquoted path + writable dir
-    â†’
-msfvenom exe-service â†’ replace ASCService.exe â†’ sc stop/start â†’ SYSTEM
-    â†’
+nmap → 80, 135, 139, 445, 3389, 5985, 8080 + high RPC ports
+    →
+port 8080 → Rejetto HTTP File Server 2.3 → CVE-2014-6287
+    →
+searchsploit → 39161.py (HFS RCE)
+    →
+Stage nc.exe via HTTP → reverse shell as bill
+    →
+winPEAS → AdvancedSystemCareService9 unquoted path + writable dir
+    →
+msfvenom exe-service → replace ASCService.exe → sc stop/start → SYSTEM
+    →
 root.txt
 ```
 
@@ -30,8 +30,8 @@ root.txt
 
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
-2. [Initial Access â€” Rejetto HFS RCE](#2-initial-access--rejetto-hfs-rce)
-3. [Privilege Escalation â€” Unquoted Service Path](#3-privilege-escalation--unquoted-service-path)
+2. [Initial Access — Rejetto HFS RCE](#2-initial-access--rejetto-hfs-rce)
+3. [Privilege Escalation — Unquoted Service Path](#3-privilege-escalation--unquoted-service-path)
 4. [Key Takeaways](#4-key-takeaways)
 
 ---
@@ -54,7 +54,7 @@ See [nmap.md](../../../tools/recon/nmap.md).
 
 ---
 
-## 2. Initial Access â€” Rejetto HFS RCE
+## 2. Initial Access — Rejetto HFS RCE
 
 Full technique: [rejetto-hfs-rce.md](../../../exploits/web-rce/rejetto-hfs-rce.md).
 
@@ -101,7 +101,7 @@ Navigate to bill's Desktop to get the user flag.
 
 ---
 
-## 3. Privilege Escalation â€” Unquoted Service Path
+## 3. Privilege Escalation — Unquoted Service Path
 
 Full technique: [unquoted-service-path.md](../../../privesc/windows/windows-unquoted-service-path.md).
 
@@ -153,16 +153,16 @@ type root.txt
 
 ## 4. Key Takeaways
 
-- Rejetto HTTP File Server 2.3 is a classic CVE-2014-6287 target â€” version fingerprinting the HFS banner on any non-standard HTTP port is always worth trying.
+- Rejetto HTTP File Server 2.3 is a classic CVE-2014-6287 target — version fingerprinting the HFS banner on any non-standard HTTP port is always worth trying.
 - `searchsploit -m` copies the PoC locally for editing; always update `ip_addr` and `local_port` before running.
-- Unquoted service paths in Windows are exploitable when you can write to an intermediate directory â€” `wmic service get pathname` is the discovery command.
+- Unquoted service paths in Windows are exploitable when you can write to an intermediate directory — `wmic service get pathname` is the discovery command.
 - `msfvenom -f exe-service` generates a binary that implements the Windows service API, which is required for `sc start` to execute it.
-- Always `sc stop` the target service first â€” you cannot overwrite a running service binary.
+- Always `sc stop` the target service first — you cannot overwrite a running service binary.
 
 ---
 
 ## Related Notes
-- [rejetto-hfs-rce.md](../../../exploits/web-rce/rejetto-hfs-rce.md) â€” initial access
-- [unquoted-service-path.md](../../../privesc/windows/windows-unquoted-service-path.md) â€” privilege escalation
-- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) â€” post-foothold playbook
+- [rejetto-hfs-rce.md](../../../exploits/web-rce/rejetto-hfs-rce.md) — initial access
+- [unquoted-service-path.md](../../../privesc/windows/windows-unquoted-service-path.md) — privilege escalation
+- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) — post-foothold playbook
 - [nmap](../../../tools/recon/nmap.md), [searchsploit](../../../tools/recon/searchsploit.md), [netcat](../../../tools/pivot/netcat.md), [metasploit](../../../tools/exploitation/metasploit.md)

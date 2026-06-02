@@ -62,7 +62,7 @@ Billing's Asterisk stack stores everything in the `mbilling` database. These are
 | `pkg_smtp` | Outbound mail server credentials (often reused elsewhere) |
 | `pkg_api` | REST API keys |
 
-The `pkg_user.password` field on MagnusBilling is raw SHA-1 ? `hashcat -m 100`.
+The `pkg_user.password` field on MagnusBilling is raw SHA-1  `hashcat -m 100`.
 
 ## Flag Cheatsheet
 

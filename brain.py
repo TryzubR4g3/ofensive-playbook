@@ -27,6 +27,9 @@ Usage
   brain backrefs <note>          Every writeup that links to <note>.
   brain open    <path>           Open in $EDITOR (falls back to cat).
 
+  brain --color=always <cmd>      Force ANSI color output.
+  brain --color=never <cmd>       Disable ANSI color output.
+
 Tool notes do not store writeup backlink lists. Writeups link to notes, and
 `brain backrefs <note>` derives backlinks from those writeup links when you
 need to see where a technique was used.
@@ -71,16 +74,58 @@ DIRS = {
     "writeups": [ROOT / "writeups" / "HTB" / "Easy",
                  ROOT / "writeups" / "HTB" / "Medium",
                  ROOT / "writeups" / "HTB" / "Hard",
+                 ROOT / "writeups" / "HTB" / "ProLabs",
+                 ROOT / "writeups" / "OffSec" / "Easy",
+                 ROOT / "writeups" / "OffSec" / "Medium",
+                 ROOT / "writeups" / "OffSec" / "Hard",
                  ROOT / "writeups" / "TRY" / "Easy",
                  ROOT / "writeups" / "TRY" / "Medium",
                  ROOT / "writeups" / "TRY" / "Hard",
                  ROOT / "writeups" / "TRY" / "Networks" / "Easy",
                  ROOT / "writeups" / "TRY" / "Networks" / "Medium",
-                 ROOT / "writeups" / "TRY" / "Networks" / "Hard"],
+                 ROOT / "writeups" / "TRY" / "Networks" / "Hard",
+                 ROOT / "writeups" / "Webverselabs" / "Challenges",
+                 ROOT / "writeups" / "Webverselabs" / "Labs" / "Easy"],
 }
 
 # ---- ANSI colors ----
-_USE_COLOR = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+_COLOR_MODE = os.environ.get("BRAIN_COLOR", "auto").lower()
+_USE_COLOR = (
+    os.environ.get("NO_COLOR") is None
+    and _COLOR_MODE != "never"
+    and (_COLOR_MODE == "always" or sys.stdout.isatty())
+)
+
+if sys.platform == "win32" and _USE_COLOR:
+    os.system("")
+
+
+def configure_color(argv: list[str]) -> list[str]:
+    global _USE_COLOR, _COLOR_MODE
+    cleaned: list[str] = []
+    for arg in argv:
+        if arg == "--color":
+            _COLOR_MODE = "always"
+        elif arg == "--no-color":
+            _COLOR_MODE = "never"
+        elif arg.startswith("--color="):
+            _COLOR_MODE = arg.split("=", 1)[1].lower()
+        else:
+            cleaned.append(arg)
+            continue
+
+        if _COLOR_MODE not in {"auto", "always", "never"}:
+            print("usage: brain [--color=auto|always|never] <command> [args]", file=sys.stderr)
+            sys.exit(2)
+
+        _USE_COLOR = (
+            os.environ.get("NO_COLOR") is None
+            and _COLOR_MODE != "never"
+            and (_COLOR_MODE == "always" or sys.stdout.isatty())
+        )
+    return cleaned
+
+
 def _c(text: str, code: str) -> str:
     return f"\x1b[{code}m{text}\x1b[0m" if _USE_COLOR else text
 def bold(s):   return _c(s, "1")
@@ -102,10 +147,10 @@ def blue(s):   return _c(s, "34")
 TOPICS: dict[str, dict] = {
     "recon": {
         "desc": "Port scan, banner grab, directory brute, service banners",
-        "tools": ["nmap", "whatweb", "searchsploit", "enum4linux", "showmount", "ftp",
+        "tools": ["nmap", "silent-scan", "whatweb", "searchsploit", "enum4linux", "showmount", "ftp",
                   "smbclient", "smbmap", "nuclei", "feroxbuster", "ffuf",
                   "gobuster", "wget", "proxychains", "foxyproxy", "ldap-utils",
-                  "onesixtyone", "snmpwalk", "snmpset"],
+                  "onesixtyone", "snmpwalk", "snmpset", "nikto"],
         "exploits": ["smb-anonymous-enum", "anonymous-ftp-enumeration",
                      "smb-enumeration", "rid-brute-enumeration", "snmp",
                      "web-discovery", "file-transfers"],
@@ -123,7 +168,7 @@ TOPICS: dict[str, dict] = {
                      "env-variable-enum", "docker-container-enumeration",
                      "mongodb-enumeration", "windows-sam-hive-dump",
                      "nfs-mounted-file-loot", "docker-container-secret-hunting",
-                     "nfs-uid-hijack", "snmp"],
+                     "nfs-uid-hijack", "snmp", "asterisk-ami", "nosql-where-injection"],
     },
     "fuzz": {
         "desc": "Directory / vhost / parameter fuzzing",
@@ -147,7 +192,8 @@ TOPICS: dict[str, dict] = {
                      "systemd-service-privesc", "windows-unquoted-service-path",
                      "suid-path-hijack", "tar-wildcard-injection",
                      "python-library-hijack", "suid-python",
-                     "yum-sudo-plugin-injection", "printspoofer-seimpersonate"],
+                     "yum-sudo-plugin-injection", "printspoofer-seimpersonate", "nodejs-inspector",
+                     "gdb-suid-privesc", "java-cron-symlink", "sudo-binary-rop-gets"],
     },
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
@@ -176,7 +222,8 @@ TOPICS: dict[str, dict] = {
                      "base64-encoded-credentials", "mimikatz-sam-pth",
                      "windows-sam-hive-dump", "wordpress-wp-config-credentials",
                      "firefox-credential-extraction",
-                     "jenkins-http-form-bruteforce", "ldap-passback-attack"],
+                     "jenkins-http-form-bruteforce", "ldap-passback-attack", "asreproast",
+                     "nosql-json-login-bypass", "nosql-where-injection"],
     },
     "ad": {
         "desc": "Active Directory / Kerberos / SMB / LDAP",
@@ -189,13 +236,13 @@ TOPICS: dict[str, dict] = {
                      "windows-enumeration", "smb-write-iis-execution",
                      "base64-encoded-credentials", "mimikatz-sam-pth",
                      "windows-admin-stabilization", "windows-sam-hive-dump",
-                     "ldap-passback-attack"],
+                     "ldap-passback-attack", "asreproast"],
     },
     "web": {
         "desc": "Web / HTTP exploitation",
         "tools": ["curl", "sqlmap", "ffuf", "gobuster", "feroxbuster", "wget",
                   "whatweb", "exiftool", "gittools", "wpscan", "nuclei", "padre",
-                  "metasploit", "msfvenom"],
+                  "metasploit", "msfvenom", "nikto"],
         "exploits": ["sweetrice-media-center-rce", "magnusbilling-rce",
                      "cacti-rce", "apache-cxf-xop-lfi", "oscommerce-installer-rce",
                      "zoneminder-sqli", "backup-file-exposure", "lfi-php-parameter",
@@ -221,12 +268,14 @@ TOPICS: dict[str, dict] = {
                      "smb-write-webroot-php-execution",
                      "git-history-disclosure", "rejetto-hfs-rce",
                      "joomla-com-fields-sqli", "joomla-template-editor-webshell",
-                     "sql-injection", "sqli", "blind-sql", "time-based", "in-band"],
+                     "sql-injection", "sqli", "blind-sql", "time-based", "in-band",
+                     "nosql-json-login-bypass"],
     },
     "xss": {
         "desc": "Cross-site scripting payloads and XSS note types",
         "tools": [],
         "exploits": ["xss", "stored-xss", "reflected-xss", "dom-based-xss", "blind-xss"],
+        "payloads": ["xss"],
     },
     "container": {
         "desc": "Container / Docker abuse",
@@ -277,12 +326,13 @@ TOPICS: dict[str, dict] = {
                      "webdav-upload-rce", "tomcat-manager-war-upload",
                      "wordpress-crop-image-rce", "smb-write-webroot-php-execution",
                      "rejetto-hfs-rce", "joomla-com-fields-sqli",
-                     "joomla-template-editor-webshell"],
+                     "joomla-template-editor-webshell", "react2shell", "nodejs-eval-rce",
+                     "asterisk-ami-command-execution"],
     },
     "reversing": {
         "desc": "Binary reverse engineering (SUID, custom binaries)",
-        "tools": ["strings", "ltrace", "objdump"],
-        "exploits": ["suid-binary-reversing"],
+        "tools": ["strings", "ltrace", "objdump", "pycdc"],
+        "exploits": ["suid-binary-reversing", "sudo-binary-rop-gets"],
     },
     "database": {
         "desc": "Backend DB enumeration & abuse (Mongo, SQLite, MySQL, Redis)",
@@ -290,7 +340,7 @@ TOPICS: dict[str, dict] = {
         "exploits": ["mongodb-enumeration", "mssql-enumeration",
                      "mssql-linked-server", "redis-auth-abuse",
                      "zoneminder-sqli", "lfi-php-parameter",
-                     "sql-union-injection"],
+                     "sql-union-injection", "nosql-json-login-bypass", "nosql-where-injection"],
     },
     "crypto": {
         "desc": "Token prediction, padding oracles, weak crypto",
@@ -365,26 +415,26 @@ def read_text(p: Path) -> str:
 
 def _repair_text(text: str) -> str:
     replacements = {
-        "â€”": "—",
-        "â†’": "→",
-        "â‰¤": "≤",
-        "â‰¥": "≥",
-        "â€˜": "'",
-        "â€™": "'",
-        "â€œ": '"',
-        "â€": '"',
-        "â€¢": "•",
-        "Ã¢â‚¬â€": "—",
-        "Ã¢â€ â€™": "→",
-        "Ã¢â‚¬Ëœ": "'",
-        "Ã¢â‚¬â„¢": "'",
-        "Ã¢â‚¬Å“": '"',
-        "Ã¢â‚¬ï¿½": '"',
+        "\u00e2\u20ac\u201d": "\u2014",
+        "\u00e2\u20ac\u201c": "\u2013",
+        "\u00e2\u20ac\u2019": "'",
+        "\u00e2\u20ac\u02dc": "'",
+        "\u00e2\u20ac\u0153": '"',
+        "\u00e2\u20ac\u009d": '"',
+        "\u00e2\u20ac\u00a2": "\u2022",
+        "\u00e2\u20ac\u00a6": "\u2026",
+        "\u00e2\u20ac\u00a6": "\u2026",
+        "\u00e2\u2020\u2019": "\u2192",
+        "\u00e2\u2030\u00a4": "\u2264",
+        "\u00e2\u2030\u00a5": "\u2265",
+        "\u00c2\u00a0": " ",
+        "\u00c2\u00a7": "\u00a7",
+        "\u00c2\u00b7": "\u00b7",
+        "\u00c3\u2014": "\u00d7",
     }
     for bad, good in replacements.items():
         text = text.replace(bad, good)
     return text
-
 
 class LineHit(NamedTuple):
     lineno: int
@@ -510,7 +560,7 @@ def cmd_stats(argv: list[str]) -> int:
             for line in text.splitlines():
                 if "Used on:" in line:
                     import re
-                    m = re.search(r"Used on:\s*\*\*(.*?)\*\*", line, re.IGNORECASE)
+                    m = re.search(r"Used on:\s*\*\*(.*)\*\*", line, re.IGNORECASE)
                     if m:
                         for mac in m.group(1).split(","):
                             machines.add(mac.strip())
@@ -829,6 +879,7 @@ FIXED_COMMANDS = {
 
 
 def main(argv: list[str]) -> int:
+    argv = configure_color(argv)
     if not argv:
         print(__doc__); return 0
     cmd, rest = argv[0], argv[1:]

@@ -1,17 +1,17 @@
-﻿# VariaType Â— HackTheBox Writeup ?? WIP
+﻿# VariaType — HackTheBox Writeup  WIP
 
 **Target:** `variatype.htb`
 **OS:** Linux (Debian 12)
 **Difficulty:** Medium
 **Tech stack:** OpenSSH 9.2p1, nginx 1.22.1
-**Status:** ?? *Recon stage only Â— initial access not yet documented.*
+**Status:**  *Recon stage only — initial access not yet documented.*
 
 ---
 
 ## 1. Reconnaissance
 
 ```bash
-ping $TARGET -c1            # ttl=63 ? Linux
+ping $TARGET -c1            # ttl=63  Linux
 # What it does: execute a stealthy SYN scan for all TCP ports.
 # Why here: map the initial attack surface of the VariaType host to identify web and management services.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
@@ -21,7 +21,7 @@ nmap -sVC -p22,80 $TARGET -oN service
 | Port | Service |
 |------|---------|
 | 22/tcp | OpenSSH 9.2p1 (Debian 12) |
-| 80/tcp | nginx 1.22.1 Â— redirects to `http://variatype.htb/` |
+| 80/tcp | nginx 1.22.1 — redirects to `http://variatype.htb/` |
 
 Add `variatype.htb` to `/etc/hosts`.
 
@@ -39,7 +39,7 @@ ffuf -u "http://variatype.htb/FUZZ" \
 gobuster vhost -u http://variatype.htb \
   -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain
-# portal.variatype.htb  Status: 200 [Size: 2494]   ? admin portal
+# portal.variatype.htb  Status: 200 [Size: 2494]    admin portal
 ```
 
 Add `portal.variatype.htb` to `/etc/hosts`.
@@ -59,7 +59,7 @@ feroxbuster \
   -o ferox_completo.txt
 ```
 
-The `.designspace` / `.ttf` extension hint suggests this is a font-management application Â— mass-fuzz for those plus standard web extensions.
+The `.designspace` / `.ttf` extension hint suggests this is a font-management application — mass-fuzz for those plus standard web extensions.
 
 ---
 
@@ -67,7 +67,7 @@ The `.designspace` / `.ttf` extension hint suggests this is a font-management ap
 
 - [ ] Document the initial-access primitive once the portal entry point is identified.
 - [ ] Extract whatever foothold technique pays off into `exploits/`.
-- [ ] User ? root chain.
+- [ ] User  root chain.
 
 ---
 

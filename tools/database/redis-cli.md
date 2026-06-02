@@ -11,10 +11,10 @@ redis-cli -h $TARGET -a 'B65Hx562F@ggAZ@F'
 Used on: **VulnNet: Internal**
 
 Flags:
-- `-h` — remote host
-- `-a` — password (triggers `AUTH` on connect; prints a warning about `ps` exposure)
-- `-n <db>` — select DB (0 by default)
-- `--no-auth-warning` — silence the `-a` warning in scripts
+- `-h` â€” remote host
+- `-a` â€” password (triggers `AUTH` on connect; prints a warning about `ps` exposure)
+- `-n <db>` â€” select DB (0 by default)
+- `--no-auth-warning` â€” silence the `-a` warning in scripts
 
 ### Basic orientation (inside client)
 ```
@@ -30,7 +30,7 @@ Used on: **VulnNet: Internal**
 ```
 KEYS *
 ```
-Used on: **VulnNet: Internal** — enumerated every key in the default DB.
+Used on: **VulnNet: Internal** â€” enumerated every key in the default DB.
 
 Safer alternative on production (paginated):
 ```
@@ -41,13 +41,13 @@ SCAN 0 COUNT 1000
 ```
 GET "internal flag"
 ```
-Used on: **VulnNet: Internal** — returned the `internal` flag.
+Used on: **VulnNet: Internal** â€” returned the `internal` flag.
 
 ### Read a list key
 ```
 LRANGE "authlist" 0 -1
 ```
-Used on: **VulnNet: Internal** — returned a base64 blob ? rsync credentials.
+Used on: **VulnNet: Internal** â€” returned a base64 blob  rsync credentials.
 
 ## Typed reads cheat sheet
 

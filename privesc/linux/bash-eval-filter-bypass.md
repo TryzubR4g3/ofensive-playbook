@@ -16,11 +16,11 @@ A sudo-allowed bash script pipes user input through a character blacklist and th
 read feedback
 if [[ "$feedback" != *"\`"* && "$feedback" != *")"* && "$feedback" != *"\$("* \
     && "$feedback" != *"|"* && "$feedback" != *"&"* && "$feedback" != *";"* \
-    && "$feedback" != *"?"* && "$feedback" != *"!"* && "$feedback" != *"\\"* ]]; then
+    && "$feedback" != *""* && "$feedback" != *"!"* && "$feedback" != *"\\"* ]]; then
     eval "echo $feedback"    # <-- redirection metacharacters still win
 fi
 ```
-Blacklisted: `` ` ``, `)`, `$(`, `|`, `&`, `;`, `?`, `!`, `\`.
+Blacklisted: `` ` ``, `)`, `$(`, `|`, `&`, `;`, ``, `!`, `\`.
 **Missing**: `>`, `<`, `>>`, `(` (alone), `$VAR`, globs.
 
 ## Steps

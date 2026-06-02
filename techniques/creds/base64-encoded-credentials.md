@@ -2,11 +2,11 @@
 
 Used on: **Relevant**
 
-Operators love to "obfuscate" credentials by base64-encoding them and dropping the result inside a file shared with the team. It's reversible by anyone who finds the file — and any file ending in `passwords.txt`, `creds.txt`, `secrets.bak`, `notes.docx` should be assumed to contain encoded creds rather than missing them.
+Operators love to "obfuscate" credentials by base64-encoding them and dropping the result inside a file shared with the team. It's reversible by anyone who finds the file â€” and any file ending in `passwords.txt`, `creds.txt`, `secrets.bak`, `notes.docx` should be assumed to contain encoded creds rather than missing them.
 
 ## How It Works
 
-Pure base64 (RFC 4648) is a 1:1 reversible encoding. A value like `Qm9iIC0gIVBAJCRXMHJEITEyMw==` decodes to literally `Bob - !P@$$W0rD!123`. No key, no salt, no entropy — running `base64 -d` is the entire attack.
+Pure base64 (RFC 4648) is a 1:1 reversible encoding. A value like `Qm9iIC0gIVBAJCRXMHJEITEyMw==` decodes to literally `Bob - !P@$$W0rD!123`. No key, no salt, no entropy â€” running `base64 -d` is the entire attack.
 
 A surprisingly large fraction of "encrypted" credentials in the wild are this. Always try base64 (and its sibling encodings) **first**.
 
@@ -14,7 +14,7 @@ A surprisingly large fraction of "encrypted" credentials in the wild are this. A
 
 ### 1. Spot the file
 
-`passwords.txt` style — long base64 strings, often `==` or `=` padded, fixed line widths:
+`passwords.txt` style â€” long base64 strings, often `==` or `=` padded, fixed line widths:
 
 ```
 [User Passwords - Encoded]
@@ -99,9 +99,9 @@ See [password-spraying.md](../ad/password-spraying.md).
 
 ## Related
 
-- [smb-anonymous-enum.md](../ad/smb-anonymous-enum.md) — getting access to the share that holds the file
-- [smb-write-iis-execution.md](../web-rce/smb-write-iis-execution.md) — Relevant chain: encoded creds gave write access, then RCE
-- [password-spraying.md](../ad/password-spraying.md) — what to do once you've decoded a list
-- [bash-history-credentials.md](bash-history-credentials.md) — sibling: `.bash_history` style cred discovery
+- [smb-anonymous-enum.md](../ad/smb-anonymous-enum.md) â€” getting access to the share that holds the file
+- [smb-write-iis-execution.md](../web-rce/smb-write-iis-execution.md) â€” Relevant chain: encoded creds gave write access, then RCE
+- [password-spraying.md](../ad/password-spraying.md) â€” what to do once you've decoded a list
+- [bash-history-credentials.md](bash-history-credentials.md) â€” sibling: `.bash_history` style cred discovery
 
 

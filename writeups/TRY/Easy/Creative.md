@@ -188,7 +188,7 @@ Two dangerous configurations in `/etc/sudoers`:
 
 ### LD_PRELOAD Privilege Escalation
 
-**Why does it work?**
+**Why does it work**
 
 `LD_PRELOAD` allows loading a `.so` library before any other when executing a program. Normally, sudo strips it, but here it is explicitly kept (`env_keep`). When running ping as root, our library is loaded with root privileges before ping starts, granting us a shell.
 

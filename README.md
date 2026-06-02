@@ -1,6 +1,6 @@
 # 🧠 brain — Offensive Security Second Brain
 
-62 tools · 73 exploits · 29 privesc · 31 techniques · 6 playbooks · 5 payloads · 51 writeups
+69 tools · 80 exploits · 33 privesc · 30 techniques · 9 playbooks · 8 payloads · 65 writeups
 
 This repository is **tool-, exploit- and technique-centric**. Writeups exist as narratives, but the real value lives in the reusable playbooks and command references, instantly searchable via the `brain` CLI.
 
@@ -46,7 +46,7 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 
 ## Architecture
 
-* **`tools/`**: Command references. "What exact flag did I use?"
+* **`tools/`**: Command references. "What exact flag did I use"
 * **`exploits/`**: Real exploitation chains: CVEs, RCEs, auth bypasses.
 * **`privesc/`**: Local privilege escalation for Linux and Windows.
 * **`techniques/`**: Theory and methodology (SQLi, XSS, Stego, Crypto).
@@ -55,3 +55,8 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 * **`writeups/`**: Machine walkthroughs (`HTB/` and `TRY/`).
 
 Writeups link to the techniques. The CLI reverse-indexes those links to show exactly which boxes a technique was used on.
+
+## Latest Extracted Notes
+
+* [silent-scan](tools/recon/silent-scan.md)
+* [NoSQL `$where` injection probe](exploits/web-disclosure/nosql-where-injection.md)

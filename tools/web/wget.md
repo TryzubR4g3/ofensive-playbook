@@ -42,7 +42,7 @@ wget -O shell.php http://$TARGET/path/to/remote.php
 ### Preserve full directory layout
 ```bash
 wget -x http://$TARGET/content/inc/cache/cache.db
-# ? creates ./<TARGET>/content/inc/cache/cache.db
+#  creates ./<TARGET>/content/inc/cache/cache.db
 ```
 
 ### Recursive mirror (when feroxbuster gave a tree)

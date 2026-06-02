@@ -49,3 +49,20 @@ gobuster vhost -u http://lookup.thm \
   --append-domain
 ```
 Used on: **Lookup**
+
+### Directory brute-force with extension sweep
+```bash
+gobuster dir -u http://$TARGET \
+  -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt \
+  -x php,txt,html,bak,old,git \
+  -o gobuster.txt
+```
+Used on: **Gaara** - checked for common web paths and backup/source extensions before moving to SSH brute force.
+
+### Vhost enumeration against base domain
+```bash
+gobuster vhost -u http://gridmark.io \
+  -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
+  --append-domain
+```
+Used on: **Parcel** - checked for additional Gridmark virtual hosts after discovering `app.gridmark.io`.

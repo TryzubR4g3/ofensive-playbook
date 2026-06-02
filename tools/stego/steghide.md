@@ -71,6 +71,6 @@ If the file is PNG, pivot to `zsteg`. If it is any other format, pivot to `binwa
 - [exiftool](../web/exiftool.md) — always run first for cheap metadata wins
 - [strings](../reversing/strings.md) — readable-strings fallback
 - [hashcat](../creds/hashcat.md), [john](../creds/john.md) — alternate brute-force if stegseek finds nothing
-- [steganography-image-loot.md](../../techniques/stego/steganography-image-loot.md) — full chain (magic fix ? exiftool ? steghide)
+- [steganography-image-loot.md](../../techniques/stego/steganography-image-loot.md) — full chain (magic fix  exiftool  steghide)
 
 

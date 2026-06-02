@@ -2,9 +2,9 @@
 
 Used on: **bsidesgtdevelpy**
 
-A `.png` you found on the box (or downloaded from the web) is **not** a normal photo — it's a [Piet](http://www.dangermouse.net/esoteric/piet.html) program. Piet is an esoteric programming language whose source code is an image; pixel colours are the opcodes. Run the image through a Piet interpreter (`npiet`) and it executes — usually printing the secret you want.
+A `.png` you found on the box (or downloaded from the web) is **not** a normal photo â€” it's a [Piet](http://www.dangermouse.net/esoteric/piet.html) program. Piet is an esoteric programming language whose source code is an image; pixel colours are the opcodes. Run the image through a Piet interpreter (`npiet`) and it executes â€” usually printing the secret you want.
 
-When a recon image looks like Mondrian (blocks of saturated primary / secondary colours, 20×20 grid), assume Piet first.
+When a recon image looks like Mondrian (blocks of saturated primary / secondary colours, 20Ã—20 grid), assume Piet first.
 
 ## Prerequisites
 - The candidate image (PNG/GIF/BMP). On bsidesgtdevelpy it was `credentials.png` left in the user's home.
@@ -72,7 +72,7 @@ The output is usually a password. On bsidesgtdevelpy: `c00ffe123!` -> `ssh king@
 
 - Image files under unusual names in user homes (`credentials.png`, `flag.bmp`, `hint.gif`).
 - Mondrian-like images on a CTF box (saturated red/yellow/blue blocks, low resolution).
-- `file <image>` says PNG/GIF/BMP, `strings` is empty, `exiftool` has no useful tags, `binwalk` finds nothing -- last resort is "is this Piet?"
+- `file <image>` says PNG/GIF/BMP, `strings` is empty, `exiftool` has no useful tags, `binwalk` finds nothing -- last resort is "is this Piet"
 
 ## Defensive Note
 

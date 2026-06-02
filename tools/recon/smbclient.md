@@ -53,6 +53,12 @@ mget *
 ```
 Used on: **Skynet** — guest access exposed internal notes and password-related files under the anonymous share.
 
+### Authenticated interactive login
+```bash
+smbclient //$TARGET/backup -U svc-admin%management2005
+```
+Used on: **AttacktiveDirectory** - connected to backup share to read files.
+
 
 
 ### Authenticated access to writable web-backed share

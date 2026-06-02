@@ -13,7 +13,7 @@ Boolean-based blind SQLi extracts data from a true/false signal. The page might 
 ## Example Context
 
 ```text
-https://website.thm/checkuser?username=admin
+https://website.thm/checkuserusername=admin
 ```
 
 Observed true/false response:

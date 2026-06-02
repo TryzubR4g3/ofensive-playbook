@@ -167,7 +167,7 @@ curl -X POST http://staging.silentium.htb/api/v1/auth/login \
 
 ## Flowise RCE
 
-### What is Flowise?
+### What is Flowise
 
 Flowise is an open-source **low-code/no-code platform for building AI agents and workflows**. It allows users to create "agent flows" using a drag-and-drop interface. The platform supports custom tools, including MCP (Model Context Protocol) tools that can execute arbitrary commands.
 
@@ -349,7 +349,7 @@ ps aux | grep -i gogs
 root  1528  /opt/gogs/gogs/gogs web
 ```
 
-### What is Gogs?
+### What is Gogs
 
 Gogs is a self-hosted Git service similar to GitHub. It provides web-based repository management, user authentication, and API access. Running Gogs as root is a **misconfiguration** that can be exploited for privilege escalation.
 

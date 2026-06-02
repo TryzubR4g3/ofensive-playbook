@@ -19,7 +19,7 @@ Used on: **Bookstore**
 
 Result on Bookstore: `ltrace` printed `__isoc99_scanf("%d", ...)` but **no `strcmp` / `memcmp`** — the comparison was inline assembly (`xor` + `cmpl`), invisible to `ltrace`. Pivoted to `objdump` next.
 
-- Run as the user that owns the SUID bit (or the binary may abort early when EUID ? UID is unsafe).
+- Run as the user that owns the SUID bit (or the binary may abort early when EUID  UID is unsafe).
 - Combine with `-f` to follow forks, `-e <pattern>` to filter (e.g. `ltrace -e 'scanf*+strcmp'`).
 
 ## Common Flags

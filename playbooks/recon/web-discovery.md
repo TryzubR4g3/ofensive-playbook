@@ -66,7 +66,7 @@ ffuf -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u ht
 | **WordPress** | `wpscan --url http://$TARGET -e u,vp,vt --api-token $TOKEN` |
 | **Apache Tomcat** | Try default credentials (`tomcat:tomcat`, `tomcat:s3cret`, `admin:admin`) at `/manager/html` |
 | **Jenkins** | Look for Script Console (`/script`) to execute Groovy payloads. |
-| **PHP** | Look for LFI `?page=../../../etc/passwd` or command injection. |
+| **PHP** | Look for LFI `page=../../../etc/passwd` or command injection. |
 | **API/JSON** | Fuzz for IDORs, map out the API endpoints using Postman or Burp. |
 
 ## 6. Known Exploits (CVEs)

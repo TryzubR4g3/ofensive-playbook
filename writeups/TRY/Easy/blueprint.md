@@ -11,19 +11,19 @@
 
 ```
 Port Discovery (80, 443, 445, 3306, 8080, 49152+)
-    ?
-HTTPS on 443 ? XAMPP ? osCommerce 2.3.4
-    ?
+    
+HTTPS on 443  XAMPP  osCommerce 2.3.4
+    
 Unauthenticated /install/ directory accessible
-    ?
-Metasploit: exploit/multi/http/oscommerce_installer_unauth_code_exec ? SYSTEM (unstable)
-    ?
-msfvenom reverse_tcp shell ? upload + execute ? stable Meterpreter
-    ?
-hashdump ? Administrator NTLM
-    ?
-Crackstation ? cleartext password
-    ?
+    
+Metasploit: exploit/multi/http/oscommerce_installer_unauth_code_exec  SYSTEM (unstable)
+    
+msfvenom reverse_tcp shell  upload + execute  stable Meterpreter
+    
+hashdump  Administrator NTLM
+    
+Crackstation  cleartext password
+    
 Root Flag (C:\Users\Administrator\Desktop\)
 ```
 
@@ -87,7 +87,7 @@ Key indicator: osCommerce 2.3.4 is known to be vulnerable when the `/install/` d
 https://blueprint.thm/oscommerce-2.3.4/catalog/install/index.php
 ```
 
-The install wizard is publicly reachable â€” unauthenticated RCE is in play via the installer's configuration write step.
+The install wizard is publicly reachable — unauthenticated RCE is in play via the installer's configuration write step.
 
 ---
 
@@ -159,7 +159,7 @@ meterpreter > getuid
 Server username: NT AUTHORITY\SYSTEM
 ```
 
-Drop to a Windows shell only when needed (`shell`) â€” staying in Meterpreter gives us the built-in `hashdump`.
+Drop to a Windows shell only when needed (`shell`) — staying in Meterpreter gives us the built-in `hashdump`.
 
 ---
 
@@ -192,7 +192,7 @@ Submit the NT hash to [crackstation.net](https://crackstation.net) or run it loc
 hashcat -m 1000 -a 0 hashes.txt /usr/share/wordlists/rockyou.txt
 ```
 
-The password cracks quickly â€” it is a rockyou-range password.
+The password cracks quickly — it is a rockyou-range password.
 
 ---
 
@@ -216,15 +216,15 @@ Or from the recovered cleartext password, authenticate cleanly via RDP / WinRM /
 | **Initial Access** | Metasploit `oscommerce_installer_unauth_code_exec` | Unauth RCE via installer config-write |
 | **Shell Stabilization** | `msfvenom` + `multi/handler` + `upload`/`execute` | Escape the fragile web-shell wrapper |
 | **Credential Dump** | Meterpreter `hashdump` | SAM hashes extracted as SYSTEM |
-| **Password Recovery** | Crackstation / hashcat `-m 1000` | NT hash ? cleartext |
+| **Password Recovery** | Crackstation / hashcat `-m 1000` | NT hash  cleartext |
 
 ### Security Lessons
 
-1. **Never leave installer directories on production** â€” osCommerce, phpMyAdmin, phpBB all ship install wizards that must be removed post-deploy.
-2. **Patch legacy CMS versions** â€” osCommerce 2.3.4 is end-of-life; public Metasploit modules exist.
-3. **Isolate XAMPP from production** â€” default XAMPP on Windows runs everything as SYSTEM, turning web RCE into a full host compromise.
-4. **Enforce strong Administrator passwords** â€” once SAM hashes are dumped, weak passwords fall in seconds.
+1. **Never leave installer directories on production** — osCommerce, phpMyAdmin, phpBB all ship install wizards that must be removed post-deploy.
+2. **Patch legacy CMS versions** — osCommerce 2.3.4 is end-of-life; public Metasploit modules exist.
+3. **Isolate XAMPP from production** — default XAMPP on Windows runs everything as SYSTEM, turning web RCE into a full host compromise.
+4. **Enforce strong Administrator passwords** — once SAM hashes are dumped, weak passwords fall in seconds.
 
 ### Related Notes
-- [metasploit](../../../tools/exploitation/metasploit.md) â€” module delivery
-- [hashcat](../../../tools/creds/hashcat.md) â€” NTLM cracking mode `-m 1000`
+- [metasploit](../../../tools/exploitation/metasploit.md) — module delivery
+- [hashcat](../../../tools/creds/hashcat.md) — NTLM cracking mode `-m 1000`

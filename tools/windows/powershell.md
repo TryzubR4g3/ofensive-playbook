@@ -51,7 +51,7 @@ Used on: **Overwatch**
 ### Build and send a SOAP request from PowerShell
 ```powershell
 $killSoap = @"
-<?xml version="1.0" encoding="utf-8"?>
+<xml version="1.0" encoding="utf-8">
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <soap:Body>
         <KillProcess xmlns="http://tempuri.org/">

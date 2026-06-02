@@ -36,7 +36,7 @@ ______________________________________________
 PORT      STATE SERVICE       VERSION
 135/tcp   open  msrpc         Microsoft Windows RPC
 139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
-445/tcp   open  microsoft-ds?
+445/tcp   open  microsoft-ds
 3389/tcp  open  ms-wbt-server Microsoft Terminal Services
 5985/tcp  open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
 |_http-title: Not Found

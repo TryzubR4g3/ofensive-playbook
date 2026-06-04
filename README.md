@@ -1,6 +1,6 @@
 # 🧠 brain — Offensive Security Second Brain
 
-69 tools · 80 exploits · 33 privesc · 30 techniques · 9 playbooks · 8 payloads · 65 writeups
+69 tools · 81 exploits · 33 privesc · 30 techniques · 9 playbooks · 8 payloads · 65 writeups
 
 This repository is **tool-, exploit- and technique-centric**. Writeups exist as narratives, but the real value lives in the reusable playbooks and command references, instantly searchable via the `brain` CLI.
 
@@ -24,10 +24,10 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 | Topic         | Aliases                          | Description |
 |---------------|----------------------------------|-------------|
 | `recon`       | `reconnaissance`                 | Port scanning, banner grabbing, service discovery |
-| `enumeration` | `enum`, `enumeracion`            | Post-foothold system, AD, and network enumeration |
+| `enumeration` | `enum`                           | Post-foothold system, AD, and network enumeration |
 | `fuzz`        |                                  | Directory, vhost, and parameter fuzzing |
 | `exploit`     |                                  | Raw exploit playbooks and PoCs |
-| `privesc`     | `escalation`, `privilegios`      | Local privilege escalation (Linux + Windows) |
+| `privesc`     | `escalation`                     | Local privilege escalation (Linux + Windows) |
 | `shells`      | `shell`, `reverse-shell`         | Reverse-shell one-liners and listener setups |
 | `payloads`    | `payload`                        | Reusable payload snippets and shell stabilization |
 | `creds`       | `credentials`, `password`        | Credential hunting, extraction, and cracking |
@@ -36,7 +36,7 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 | `xss`         | `cross-site-scripting`           | Cross-site scripting techniques |
 | `container`   | `docker`, `k8s`                  | Container, Docker, and orchestration abuse |
 | `stego`       | `steganography`                  | Steganography and metadata loot |
-| `sqli`        | `sql`, `inyeccion-sql`           | SQL injection techniques |
+| `sqli`        | `sql`                            | SQL injection techniques |
 | `lfi`         |                                  | Local File Inclusion and arbitrary read |
 | `rce`         |                                  | Remote Code Execution chains |
 | `reversing`   | `reverse`, `binary`, `re`        | Binary reverse engineering (SUID, custom bins) |
@@ -60,3 +60,4 @@ Writeups link to the techniques. The CLI reverse-indexes those links to show exa
 
 * [silent-scan](tools/recon/silent-scan.md)
 * [NoSQL `$where` injection probe](exploits/web-disclosure/nosql-where-injection.md)
+* [MCP admin dump credential leak](exploits/web-disclosure/mcp-admin-dump-credential-leak.md)

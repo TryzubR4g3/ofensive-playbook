@@ -17,7 +17,7 @@ docker run --rm -it --privileged -v /:/hostfs --user root \
 ```
 Used on: **Kobold**
 
-- `--privileged` — full capability set
+`--privileged` — full capability set
 - `-v /:/hostfs` — mount host `/` at `/hostfs` inside the container
 - `--entrypoint sh` — override entrypoint to get a shell
 

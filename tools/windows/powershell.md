@@ -1,16 +1,15 @@
 # PowerShell (post-exploitation)
 
-## Wreath Commands
+Once inside a Windows box via WinRM / evil-winrm, PowerShell is the native interface for enumeration and for interacting with local services. These are the specific cmdlets used across the Windows writeups.
 
+## Commands Used
+
+### Internal network port scan
 ```powershell
 Get-Help Invoke-Portscan
 Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50
 ```
-Used on: **Wreath** - scanned the final internal host from the compromised Windows server.
-
-Once inside a Windows box via WinRM / evil-winrm, PowerShell is the native interface for enumeration and for interacting with local services. These are the specific cmdlets used across the Windows writeups.
-
-## Commands Used
+Used on: **Wreath**
 
 ### Registry-based service enumeration (when `Get-Service` is restricted)
 ```powershell

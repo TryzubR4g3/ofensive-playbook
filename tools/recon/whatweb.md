@@ -8,7 +8,9 @@ Passive / active HTTP fingerprinter. One HTTP request (or a few) identifies the 
 ```bash
 whatweb http://$TARGET/
 ```
-Used on: **Billing** — flagged `Apache[2.4.62]`, `HTTPServer[Debian Linux]`, `RedirectLocation[./mbilling]` — immediately pointed at the MagnusBilling app root.
+Used on: **Billing**
+
+flagged `Apache[2.4.62]`, `HTTPServer[Debian Linux]`, `RedirectLocation[./mbilling]` — immediately pointed at the MagnusBilling app root.
 
 ### Aggression levels
 ```bash

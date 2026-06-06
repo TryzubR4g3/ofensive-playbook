@@ -11,7 +11,9 @@ bloodhound-python \
   -d logging.htb -dc DC01.logging.htb \
   -ns $TARGET -c All --zip
 ```
-Used on: **Logging** — collected All  revealed `svc_recovery  GenericWrite  MSA_HEALTH$`.
+Used on: **Logging**
+
+collected All  revealed `svc_recovery  GenericWrite  MSA_HEALTH$`.
 
 Flags:
 - `-u` / `-p` — domain creds
@@ -54,5 +56,6 @@ bloodhound-python -k --no-pass -u <USER> -d <DOMAIN> -dc <DC> -ns <DC_IP> -c All
 ## Related
 - [Shadow Credentials playbook](../../exploits/ad/shadow-credentials.md)
 - [impacket](../windows/impacket.md) — TGT handling after BloodHound picks a target
+- [SharpHound + BloodHound GUI (Windows collector)](../ad/bloodhound.md)
 
 

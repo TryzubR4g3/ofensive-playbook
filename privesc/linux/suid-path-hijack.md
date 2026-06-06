@@ -1,6 +1,6 @@
 # SUID PATH Hijack
 
-Used on: **Kenobi**
+Used on: **Binex, Kenobi**
 
 If a SUID binary calls external commands without absolute paths, control of `PATH` lets an attacker run a malicious replacement as the SUID user.
 

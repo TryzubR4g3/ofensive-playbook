@@ -12,7 +12,7 @@ gobuster vhost -u https://kobold.htb \
 ```
 Used on: **Kobold**
 
-- `vhost` — virtual host brute-force mode
+`vhost` — virtual host brute-force mode
 - `--append-domain` — append the base domain to each word
 - `-k` — skip TLS certificate validation
 
@@ -57,7 +57,9 @@ gobuster dir -u http://$TARGET \
   -x php,txt,html,bak,old,git \
   -o gobuster.txt
 ```
-Used on: **Gaara** - checked for common web paths and backup/source extensions before moving to SSH brute force.
+Used on: **Gaara**
+
+checked for common web paths and backup/source extensions before moving to SSH brute force.
 
 ### Vhost enumeration against base domain
 ```bash
@@ -65,4 +67,6 @@ gobuster vhost -u http://gridmark.io \
   -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt \
   --append-domain
 ```
-Used on: **Parcel** - checked for additional Gridmark virtual hosts after discovering `app.gridmark.io`.
+Used on: **Parcel**
+
+checked for additional Gridmark virtual hosts after discovering `app.gridmark.io`.

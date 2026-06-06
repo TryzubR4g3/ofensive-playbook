@@ -4,6 +4,13 @@ Used on: **cmspit**
 
 You landed a shell on a box that runs MongoDB locally — it's the storage tier for the web app you just compromised. Mongo's default auth posture is "no auth", and even when an app has hard-coded creds in its config, the localhost client almost never asks for them. List the databases, list the collections, dump the user / config collections, and you usually walk away with a second-stage credential the web app didn't reveal.
 
+## When to Use
+
+- Shell access is gained on a host where `ss -tlnp` or `pgrep` shows `mongod` listening on port `27017`
+- The MongoDB instance allows connections without authentication
+- App configuration files (`cockpit/config.yaml`, `.env`) reveal MongoDB credentials
+- The database contains collections named `users`, `flag`, `secrets`, or `config`
+
 ## Prerequisites
 - Shell on a host running `mongod` (any uid). Confirm with `ss -tlnp | grep 27017` or `pgrep mongod`.
 - `mongo` (legacy 4.x shell) **or** `mongosh` (6.x+) on the box. If neither, scp / curl one in or use `nc 127.0.0.1 27017` against the wire protocol (fiddly — usually faster to install).

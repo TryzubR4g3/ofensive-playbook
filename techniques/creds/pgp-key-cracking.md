@@ -4,6 +4,12 @@
 
 A password-protected PGP private key is a cracked passphrase away from being fully usable. `gpg2john` converts the key into a john-compatible hash; `john` with a wordlist then recovers the passphrase. Once the key is imported and the passphrase known, any ciphertext encrypted against the public half decrypts — typically revealing backups, credentials, or further keys.
 
+## When to Use
+
+- A PGP private key file (`*.asc`, `*.pgp`, `secring.gpg`, or `*.gpg`) is discovered
+- The discovered key requires a passphrase to unlock
+- Encrypted blobs (`backup.pgp`, `.gpg`) are found that require decryption
+
 ---
 
 ## Prerequisites

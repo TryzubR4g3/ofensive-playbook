@@ -373,3 +373,10 @@ docker run --rm -i --privileged -v /:/hostfs --user root alpine -c "cat /hostfs/
 ```
 
 
+
+## Related Notes
+
+- [mcp-api-injection.md](../../../exploits/web-rce/mcp-api-injection.md)
+- [docker-group-escape.md](../../../privesc/linux/docker-group-escape.md)
+- [nmap.md](../../../tools/recon/nmap.md)
+- [gobuster.md](../../../tools/fuzz/gobuster.md)

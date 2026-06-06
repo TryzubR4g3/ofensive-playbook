@@ -4,6 +4,12 @@ Used on: **SQL Injection Fundamentals**
 
 Boolean-based blind SQLi extracts data from a true/false signal. The page might only return `true` or `false`, but that single bit is enough to enumerate databases, tables, columns and values character by character.
 
+## When to Use
+
+- The application does not return query output or database errors.
+- Appending a true condition yields a different response than a false condition.
+- The attacker can iterate payloads without being blocked by rate limits.
+
 ## Prerequisites
 
 - A vulnerable parameter affects a SQL query.

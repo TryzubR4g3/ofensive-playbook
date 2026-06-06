@@ -54,4 +54,6 @@ Used on: **Overwatch**
 ```bash
 netexec smb 10.130.191.119 -u users.txt -p passwords.txt --continue-on-success
 ```
-Used on: **coldvvars** - validated SMB credentials extracted from the web login/XPath path.
+Used on: **coldvvars**
+
+validated SMB credentials extracted from the web login/XPath path.

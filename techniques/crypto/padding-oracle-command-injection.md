@@ -4,6 +4,12 @@ Used on: **Decryptify**
 
 When an encrypted CBC parameter has a padding oracle and the decrypted value is executed as a shell command, the attacker can both decrypt existing values and encrypt chosen commands.
 
+## When to Use
+
+- A URL parameter or cookie contains a base64-encoded encrypted string.
+- Modifying the ciphertext causes distinguishable padding errors.
+- The application executes the decrypted parameter as a shell command.
+
 ## Prerequisites
 
 - CBC-encrypted parameter reflected into an endpoint.

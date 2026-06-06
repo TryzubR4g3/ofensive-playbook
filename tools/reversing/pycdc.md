@@ -10,7 +10,9 @@ Python bytecode decompiler used to recover readable Python source from `.pyc` fi
 ./pycdc /output.pyc
 ```
 
-Used on: **Aster** - recovered obfuscated Python that decoded hex strings into useful hints.
+Used on: **Aster**
+
+recovered obfuscated Python that decoded hex strings into useful hints.
 
 ## Notes
 

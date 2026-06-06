@@ -10,7 +10,9 @@ SMB share enumeration tool that quickly lists readable and writable shares with 
 smbmap -H $TARGET -u '' -p ''
 ```
 
-Used on: **Kenobi** - confirmed the `anonymous` share was readable after Nmap SMB scripts returned nothing useful.
+Used on: **Kenobi**
+
+confirmed the `anonymous` share was readable after Nmap SMB scripts returned nothing useful.
 
 ## Related
 
@@ -26,4 +28,6 @@ smbmap -H $TARGET -u '' -p ''
 smbmap -H $TARGET -u 'ArthurMorgan' -p 'DeadEye'
 ```
 
-Used on: **coldvvars** - anonymous enum found the SMB surface; authenticated enum confirmed access to `SECURED`.
+Used on: **coldvvars**
+
+anonymous enum found the SMB surface; authenticated enum confirmed access to `SECURED`.

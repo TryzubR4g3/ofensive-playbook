@@ -12,7 +12,7 @@ objdump -d ./try-harder | awk '/^.*<main>:/,/^$/'
 ```
 Used on: **Bookstore**
 
-- `-d` — disassemble executable sections.
+`-d` — disassemble executable sections.
 - `awk '/<main>:/,/^$/'` — slice out only the `main` function (from the `<main>:` label to the next blank line). Saves you scrolling through libc stubs.
 
 Output that solved Bookstore:

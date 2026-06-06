@@ -9,7 +9,9 @@ Offline password cracker. Used to crack extracted password hashes (bcrypt in thi
 echo '$2y$10$prZGnazejKcuTv5bKNexXOgLyQaok0hq07LW7AJ/QNqZolbXKfFG.' > mark.hash
 john mark.hash --wordlist=/usr/share/wordlists/rockyou.txt
 ```
-Used on: **CCTV** — produced `mark:opensesame`.
+Used on: **CCTV**
+
+produced `mark:opensesame`.
 
 ### Generic template
 ```bash

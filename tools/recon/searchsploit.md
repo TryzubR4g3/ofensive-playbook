@@ -6,7 +6,9 @@
 searchsploit gitstack
 searchsploit -m 43777
 ```
-Used on: **Wreath** - found and copied the GitStack 2.3.10 RCE exploit.
+Used on: **Wreath**
+
+found and copied the GitStack 2.3.10 RCE exploit.
 
 Offline CLI for the Exploit-DB database. Given a product + version, returns every public exploit cached locally on Kali / ParrotSec. First-pass reflex after `nmap -sV` or `whatweb` flags a specific version.
 
@@ -17,20 +19,26 @@ Offline CLI for the Exploit-DB database. Given a product + version, returns ever
 searchsploit Fuel
 searchsploit -m linux/webapps/47138.py
 ```
-Used on: **Vulnerability Capstone** - found and copied the Fuel CMS 1.4 RCE PoC before editing the target URL.
+Used on: **Vulnerability Capstone**
+
+found and copied the Fuel CMS 1.4 RCE PoC before editing the target URL.
 
 ### Search by vulnerable parameter or file name
 ```bash
 searchsploit alertConfigField
 ```
-Used on: **Skynet** - identified the public Cuppa CMS `alertConfigField.php` LFI/RFI path.
+Used on: **Skynet**
+
+identified the public Cuppa CMS `alertConfigField.php` LFI/RFI path.
 
 ### Version-string search
 ```bash
 searchsploit OpenSSH 7.2p2
 # OpenSSH 7.2p2 - Username Enumeration   | linux/remote/40136.py
 ```
-Used on: **LazyAdmin** — flagged CVE-2016-6210 (username enumeration on OpenSSH = 7.2p2). Not exploited in the end, but noted as a viable pivot if brute-forceable.
+Used on: **LazyAdmin**
+
+flagged CVE-2016-6210 (username enumeration on OpenSSH = 7.2p2). Not exploited in the end, but noted as a viable pivot if brute-forceable.
 
 ### General product lookup
 ```bash

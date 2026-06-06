@@ -11,7 +11,7 @@ dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
 ```
 Used on: **Overwatch**
 
-- `--action add` — create a new DNS record
+`--action add` — create a new DNS record
 - `--record SQL07` — record name (no trailing dot, implicitly inside the zone)
 - `--data` — target of the A record (attacker IP)
 - Final argument — the domain controller IP

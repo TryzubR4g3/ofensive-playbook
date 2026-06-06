@@ -11,7 +11,9 @@ sudo apt install powershell-empire starkiller
 sudo powershell-empire server
 ```
 
-Used on: **Wreath** - tested as a C2 option before falling back to Chisel for the later pivot.
+Used on: **Wreath**
+
+tested as a C2 option before falling back to Chisel for the later pivot.
 
 ### Connect the client
 
@@ -27,14 +29,18 @@ Used on: **Wreath**.
 proxychains evil-winrm -u Administrator -H NTLM_HASH -i 10.200.180.150 -s /usr/share/powershell-empire/empire/server/data/module_source/situational_awareness/network
 ```
 
-Used on: **Wreath** - loaded `Invoke-Portscan` helpers into the Evil-WinRM session.
+Used on: **Wreath**
+
+loaded `Invoke-Portscan` helpers into the Evil-WinRM session.
 
 ```powershell
 Get-Help Invoke-Portscan
 Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50
 ```
 
-Used on: **Wreath** - found ports `80` and `3389` on the final internal host.
+Used on: **Wreath**
+
+found ports `80` and `3389` on the final internal host.
 
 ## Related
 

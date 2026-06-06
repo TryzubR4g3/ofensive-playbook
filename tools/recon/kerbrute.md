@@ -16,7 +16,7 @@ kerbrute userenum  --dc $TARGET -d spookysec.local /usr/share/wordlists/users-TR
 ```
 Used on: **AttacktiveDirectory**
 
-- `passwordspray` — one password across many users
+`passwordspray` — one password across many users
 - `--dc` — domain controller
 - `users.txt` — username list
 - Last argument — the password to spray

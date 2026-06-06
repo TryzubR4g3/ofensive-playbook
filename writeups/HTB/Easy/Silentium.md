@@ -640,3 +640,11 @@ curl -X PUT "http://GOGS_HOST/api/v1/repos/USER/REPO/contents/path_in_repo" \
 | `/etc/sudoers` | Sudo permission escalation |
 
 
+
+## Related Notes
+
+- [mailhog-password-reset.md](../../../exploits/web-disclosure/mailhog-password-reset.md)
+- [flowise-mcp-rce.md](../../../exploits/web-rce/flowise-mcp-rce.md)
+- [gogs-symlink-attack.md](../../../exploits/web-rce/gogs-symlink-attack.md)
+- [gobuster.md](../../../tools/fuzz/gobuster.md)
+- [ffuf.md](../../../tools/fuzz/ffuf.md)

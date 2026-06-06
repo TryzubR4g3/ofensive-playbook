@@ -4,6 +4,12 @@ Used on: **Internal**
 
 When Jenkins is only reachable through a local port forward and no lockout is present, Hydra can brute-force the login form with the Jenkins `j_acegi_security_check` endpoint.
 
+## When to Use
+
+- A Jenkins instance is reachable locally or through a port forward
+- The login form authenticates via the `j_acegi_security_check` endpoint
+- Multiple login attempts do not trigger an account lockout or rate limit
+
 ## Prerequisites
 
 - Jenkins reachable locally or through a tunnel.

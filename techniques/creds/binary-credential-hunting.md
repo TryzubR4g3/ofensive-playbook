@@ -4,6 +4,12 @@ Used on: **Overwatch**
 
 Binaries dropped in SMB shares or file servers often ship with their config baked in or shipping an `.exe.config` alongside. Hunting for connection strings and passwords with `strings` + `grep` is almost always worth the five minutes.
 
+## When to Use
+
+- `.exe`, `.dll`, `.pdb`, or `.resources` files are discovered in SMB shares or file servers
+- An `.exe.config` file is found alongside a binary
+- Running `strings` against a binary reveals `password`, `user`, `sql`, or `connection` keywords
+
 ## Key Points
 
 - .NET binaries store string literals as **UTF-16LE**. Default `strings` looks at ASCII only → you miss half the data. Use `-e l`.

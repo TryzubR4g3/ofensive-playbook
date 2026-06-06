@@ -4,6 +4,12 @@ Used on: **IDE**
 
 Users frequently type credentials directly on the command line (database logins, API calls, password flags), and those commands are saved verbatim in `~/.bash_history`. Reading this file from a compromised account or via path traversal can yield reusable passwords.
 
+## When to Use
+
+- Shell access is gained as a user that can read home directories
+- A `~/.bash_history` file is discovered to be readable
+- Command patterns like `mysql -u`, `curl -u`, `export PASS=`, or `sshpass -p` appear in history logs
+
 ## Prerequisites
 
 - Shell access as any user that can read the target's home directory

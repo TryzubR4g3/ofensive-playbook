@@ -4,6 +4,12 @@ Used on: **SQL Injection Fundamentals**
 
 Time-based blind SQLi is used when there is no visible true/false difference in the response. The signal becomes response time: if the condition is true, the database sleeps before returning.
 
+## When to Use
+
+- The application response does not visibly change when true or false conditions are injected.
+- Injecting a delay function (e.g., `SLEEP(5)`) causes the HTTP response to take noticeably longer.
+- Network latency is stable enough to reliably distinguish between normal and delayed responses.
+
 ## Prerequisites
 
 - A vulnerable parameter affects a SQL query.

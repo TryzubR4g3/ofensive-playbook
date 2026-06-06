@@ -11,7 +11,9 @@ git clone https://github.com/internetwache/GitTools
 /home/kali/Desktop/tools/GitTools/Extractor/extractor.sh . Website_extracted
 ```
 
-Used on: **Wreath** - extracted `Website.git` from `C:\GitStack\repositories` to inspect historical source snapshots.
+Used on: **Wreath**
+
+extracted `Website.git` from `C:\GitStack\repositories` to inspect historical source snapshots.
 
 ### Print commit metadata from extracted snapshots
 
@@ -19,7 +21,9 @@ Used on: **Wreath** - extracted `Website.git` from `C:\GitStack\repositories` to
 separator="======================================="; for i in $(ls); do printf "\n\n$separator\n\033[4;1m$i\033[0m\n$(cat $i/commit-meta.txt)\n"; done; printf "\n\n$separator\n\n\n"
 ```
 
-Used on: **Wreath** - reconstructed commit order before reviewing the latest PHP upload logic.
+Used on: **Wreath**
+
+reconstructed commit order before reviewing the latest PHP upload logic.
 
 ## Related
 

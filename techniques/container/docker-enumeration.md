@@ -186,11 +186,12 @@ mount -t cgroup -o memory cgroup /tmp/cgrp 2>/dev/null && echo "cgroups v1 mount
 | Sibling container with the bug | [container-network-pivoting.md](container-network-pivoting.md) |
 | Privileged service on `172.17.0.1` | OMIGOD ([omigod-rce.md](../web-rce/omigod-rce.md)), Docker API, etc. |
 
-## How to Find It
+## When to Use
 
-- The container detection block is the first thing in any Linux post-foothold ([linux-enumeration.md](../enumeration/linux-enumeration.md)).
-- "Random hexadecimal hostname" is almost always Docker.
-- A web app that runs as `daemon` (uid 1) instead of `www-data` is a smell of a stripped Apache container image.
+- You have a shell and the hostname looks like a short hex string (e.g. `4a70924bafa0`) — almost always a Docker container ID.
+- `ls /.dockerenv` succeeds, or `/proc/1/cgroup` contains `docker`, `kubepods`, or `lxc`.
+- A web app runs as `daemon` (uid 1) instead of `www-data` — typical of stripped Apache container images.
+- You see `overlay` or `aufs` filesystems in `mount` output.
 
 ## Defensive Note
 

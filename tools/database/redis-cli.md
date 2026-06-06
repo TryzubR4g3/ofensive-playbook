@@ -30,7 +30,9 @@ Used on: **VulnNet: Internal**
 ```
 KEYS *
 ```
-Used on: **VulnNet: Internal** — enumerated every key in the default DB.
+Used on: **VulnNet: Internal**
+
+enumerated every key in the default DB.
 
 Safer alternative on production (paginated):
 ```
@@ -41,13 +43,17 @@ SCAN 0 COUNT 1000
 ```
 GET "internal flag"
 ```
-Used on: **VulnNet: Internal** — returned the `internal` flag.
+Used on: **VulnNet: Internal**
+
+returned the `internal` flag.
 
 ### Read a list key
 ```
 LRANGE "authlist" 0 -1
 ```
-Used on: **VulnNet: Internal** — returned a base64 blob  rsync credentials.
+Used on: **VulnNet: Internal**
+
+returned a base64 blob  rsync credentials.
 
 ## Typed reads cheat sheet
 

@@ -4,6 +4,12 @@ Used on: **Internal**
 
 WordPress database credentials in `wp-config.php` are often useful for local database access and sometimes lead to reused system credentials elsewhere on the host.
 
+## When to Use
+
+- File read access is obtained as the web server user or a higher privileged account
+- A WordPress installation directory is discovered
+- A `wp-config.php` file is accessible and readable
+
 ## Prerequisites
 
 - File read access as the web server user or better.

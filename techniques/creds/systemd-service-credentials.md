@@ -4,6 +4,12 @@ Used on: **DevArea**
 
 Systemd unit files (`.service`) live under `/etc/systemd/system/`, `/lib/systemd/system/`, or `/run/systemd/system/`. The `ExecStart=` line is often built lazily — developers pass flags like `--password <cleartext>` directly on the command line. These files are usually **world-readable**, so anyone with shell (or an arbitrary file read primitive like an LFI) can grab the secrets.
 
+## When to Use
+
+- An arbitrary file read (LFI) or shell access is obtained on a Linux system
+- Systemd unit files (`.service`) are world-readable under `/etc/systemd/system/` or `/lib/systemd/system/`
+- The `ExecStart=` or `Environment=` lines contain plain-text `--password` flags, tokens, or secrets
+
 ## Read via LFI (Apache CXF XOP)
 
 DevArea did not have a shell yet — the service file was pulled through the XOP Include LFI:

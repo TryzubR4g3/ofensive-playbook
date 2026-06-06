@@ -10,4 +10,6 @@ Web server scanner for common misconfigurations, risky files, and known web serv
 nikto -h http://$TARGET
 ```
 
-Used on: **Gaara** - run alongside Nuclei after initial web discovery returned little.
+Used on: **Gaara**
+
+run alongside Nuclei after initial web discovery returned little.

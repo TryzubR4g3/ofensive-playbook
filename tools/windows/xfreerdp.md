@@ -10,7 +10,9 @@ FreeRDP client for interactive RDP sessions, clipboard sharing, dynamic resoluti
 xfreerdp /v:IP /u:USERNAME /p:PASSWORD
 ```
 
-Used on: **Wreath** - stabilized GUI access after creating a local Windows admin.
+Used on: **Wreath**
+
+stabilized GUI access after creating a local Windows admin.
 
 ### RDP through proxychains with shared tools
 
@@ -22,7 +24,9 @@ proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' \
   /sec:tls
 ```
 
-Used on: **Wreath** - mounted Kali's Windows tooling at `\\tsclient\share`.
+Used on: **Wreath**
+
+mounted Kali's Windows tooling at `\\tsclient\share`.
 
 ## Flag Notes
 

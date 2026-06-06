@@ -1,6 +1,6 @@
 # 🧠 brain — Offensive Security Second Brain
 
-69 tools · 81 exploits · 33 privesc · 30 techniques · 9 playbooks · 8 payloads · 65 writeups
+71 tools · 81 exploits · 34 privesc · 31 techniques · 9 playbooks · 8 payloads · 66 writeups
 
 This repository is **tool-, exploit- and technique-centric**. Writeups exist as narratives, but the real value lives in the reusable playbooks and command references, instantly searchable via the `brain` CLI.
 
@@ -12,7 +12,7 @@ The `./brain` (or `python brain.py`) CLI is the primary way to interact with thi
 ./brain guide                # beginner examples and recipes
 ./brain recon nmap           # every nmap command I've ever run
 ./brain privesc sudo         # privilege escalation exploits matching "sudo"
-./brain find "bash -i"       # broad text search across the entire repo
+./brain search "bash -i"     # broad text search across the entire repo
 ./brain cmd  "find /"        # grep only inside fenced code blocks
 ./brain list all             # list all tools, exploits, payloads, writeups
 ```
@@ -52,12 +52,8 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 * **`techniques/`**: Theory and methodology (SQLi, XSS, Stego, Crypto).
 * **`playbooks/`**: Checklists and enumeration flows.
 * **`payloads/`**: Reusable code (webshells, persistence scripts).
-* **`writeups/`**: Machine walkthroughs (`HTB/` and `TRY/`).
+* **`writeups/`**: Machine walkthroughs (`HTB/`, `TRY/`, `OffSec/`, `Webverselabs/`).
 
 Writeups link to the techniques. The CLI reverse-indexes those links to show exactly which boxes a technique was used on.
 
-## Latest Extracted Notes
 
-* [silent-scan](tools/recon/silent-scan.md)
-* [NoSQL `$where` injection probe](exploits/web-disclosure/nosql-where-injection.md)
-* [MCP admin dump credential leak](exploits/web-disclosure/mcp-admin-dump-credential-leak.md)

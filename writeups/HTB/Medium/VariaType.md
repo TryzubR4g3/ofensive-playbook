@@ -1,4 +1,4 @@
-﻿# VariaType — HackTheBox Writeup  WIP
+# VariaType — HackTheBox Writeup  WIP
 
 **Target:** `variatype.htb`
 **OS:** Linux (Debian 12)
@@ -12,8 +12,6 @@
 
 ```bash
 ping $TARGET -c1            # ttl=63  Linux
-# What it does: execute a stealthy SYN scan for all TCP ports.
-# Why here: map the initial attack surface of the VariaType host to identify web and management services.
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
 nmap -sVC -p22,80 $TARGET -oN service
 ```
@@ -30,8 +28,6 @@ Add `variatype.htb` to `/etc/hosts`.
 ## 2. Web + VHost Enumeration
 
 ```bash
-# What it does: fuzz the primary vhost for hidden directories and files.
-# Why here: identify application structure and potential entry points like the /portal directory.
 ffuf -u "http://variatype.htb/FUZZ" \
      -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt \
      -recursion -recursion-depth 3
@@ -47,8 +43,6 @@ Add `portal.variatype.htb` to `/etc/hosts`.
 ### Deep recursive sweep (file extensions + recursion)
 
 ```bash
-# What it does: perform a deep recursive web discovery scan across multiple file extensions.
-# Why here: find sensitive files such as .designspace or .git that might leak application source code or configuration.
 feroxbuster \
   -u http://variatype.htb \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-directories-lowercase.txt \

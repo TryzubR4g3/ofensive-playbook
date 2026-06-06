@@ -4,6 +4,12 @@ Used on: **Wreath**
 
 With local administrator rights, Mimikatz can dump local SAM hashes. If a password cannot be cracked, the NTLM hash can still be reused directly against WinRM with pass-the-hash.
 
+## When to Use
+
+- Local administrator or equivalent privileges are obtained on a Windows host
+- An NTLM hash is recovered from the SAM but cannot be cracked
+- WinRM is reachable on the target network for authentication
+
 ## Prerequisites
 
 - Local administrator or equivalent privileges.

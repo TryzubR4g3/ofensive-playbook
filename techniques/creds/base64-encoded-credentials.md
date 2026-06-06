@@ -4,6 +4,13 @@ Used on: **Relevant**
 
 Operators love to "obfuscate" credentials by base64-encoding them and dropping the result inside a file shared with the team. It's reversible by anyone who finds the file — and any file ending in `passwords.txt`, `creds.txt`, `secrets.bak`, `notes.docx` should be assumed to contain encoded creds rather than missing them.
 
+## When to Use
+
+- A file ending in `passwords.txt`, `creds.txt`, `secrets.bak`, or `notes.docx` is discovered
+- A file contains long strings with `==` or `=` padding
+- Text alphabet is limited to `[A-Za-z0-9+/=]` and lines are multiples of 4 bytes
+- Web app config files (`appsettings.json`, `web.config`) or email metadata contain encoded blobs
+
 ## How It Works
 
 Pure base64 (RFC 4648) is a 1:1 reversible encoding. A value like `Qm9iIC0gIVBAJCRXMHJEITEyMw==` decodes to literally `Bob - !P@$$W0rD!123`. No key, no salt, no entropy — running `base64 -d` is the entire attack.

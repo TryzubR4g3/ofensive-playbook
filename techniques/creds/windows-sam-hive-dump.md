@@ -4,6 +4,12 @@ Used on: **Wreath**
 
 With sufficient privileges, save the local SAM and SYSTEM registry hives, transfer them to the attacker host, and extract NTLM hashes offline with Impacket.
 
+## When to Use
+
+- Local administrator or backup-style privileges are obtained on a Windows host
+- The ability to write files to a temporary directory exists
+- A file transfer path is available back to the attacker host
+
 ## Prerequisites
 
 - Local administrator or backup-style privileges.

@@ -4,6 +4,12 @@ Used on: **Silentium**, **CCTV**
 
 Services often bind to `127.0.0.1` and are unreachable from the attacker box. Once SSH access to the target exists, local port forwarding (`-L`) exposes them without needing extra tunneling tools.
 
+## When to Use
+
+- Enumeration reveals services bound only to `127.0.0.1` (localhost) on the target.
+- Valid SSH credentials or keys have been obtained.
+- Inbound firewalls block access to specific ports that the target can still reach internally.
+
 ## Local Forwarding (most common)
 
 ```bash

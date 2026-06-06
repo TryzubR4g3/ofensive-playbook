@@ -10,13 +10,17 @@ Template-based scanner for quick checks against known exposures, CVEs, and commo
 nuclei -target http://internal.thm/
 ```
 
-Used on: **Internal** - identified WordPress, XML-RPC exposure, a user enumeration finding, and an SSH Terrapin finding.
+Used on: **Internal**
+
+identified WordPress, XML-RPC exposure, a user enumeration finding, and an SSH Terrapin finding.
 
 ```bash
 nuclei -target http://$TARGET
 ```
 
-Used on: **Gaara** - quick web scan after directory brute forcing returned no useful application paths.
+Used on: **Gaara**
+
+quick web scan after directory brute forcing returned no useful application paths.
 
 ## Related
 

@@ -4,6 +4,12 @@ Recover saved Firefox credentials from a user's profile after obtaining local fi
 
 Used on: **chronicle**
 
+## When to Use
+
+- Local file access is obtained to a user's home directory
+- A Firefox profile directory is discovered
+- Files named `logins.json` and `key4.db` (or `key3.db`) are found on the filesystem
+
 ## Prerequisites
 
 - Access to a Firefox profile directory.

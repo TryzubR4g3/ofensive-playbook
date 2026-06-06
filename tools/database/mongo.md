@@ -109,6 +109,8 @@ db.posts.find().pretty()
 db.whatcouldthisbes.find().pretty()
 db.users.find().forEach(printjson)
 ```
-Used on: **davesblog** - recovered the admin password and hidden document from MongoDB.
+Used on: **davesblog**
+
+recovered the admin password and hidden document from MongoDB.
 
 

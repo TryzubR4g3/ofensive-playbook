@@ -20,14 +20,18 @@ cd /home
 cd /notread
 cd /etc
 ```
-Used on: **Anonforce (BSides GT)** — exposed full filesystem over anonymous FTP.
+Used on: **Anonforce (BSides GT)**
+
+exposed full filesystem over anonymous FTP.
 
 ### Bulk file download
 ```
 mget crontab
 mget private.asc backup_encrypted.pgp
 ```
-Used on: **Anonforce (BSides GT)** — `mget` prompts per file unless `prompt` is toggled off.
+Used on: **Anonforce (BSides GT)**
+
+`mget` prompts per file unless `prompt` is toggled off.
 
 ### Disable prompting and pull everything
 ```

@@ -4,6 +4,12 @@ Used on: **Silentium**
 
 Every process on Linux exposes its environment block at `/proc/<pid>/environ`, null-separated. For containerized workloads the entrypoint is usually PID 1, and `docker-compose` / Kubernetes happily inject secrets directly into the process environment.
 
+## When to Use
+
+- Shell access is gained inside a containerized workload (like Docker or Kubernetes)
+- The `/proc/1/environ` or `/proc/<pid>/environ` file is readable
+- `ps auxe` output is accessible and reveals environment variables with names like `PASS`, `TOKEN`, `SECRET`, or `DB_`
+
 ## Dump PID 1 env (container entrypoint)
 
 ```bash

@@ -8,13 +8,17 @@ LLMNR/NBT-NS/mDNS poisoner and rogue SMB/HTTP server. Used to capture NetNTLM(v1
 ```bash
 sudo responder -I breachad
 ```
-Used on: **Breaching Active Directory** - captured a NetNTLMv2 challenge for `ZA\svcFileCopy`.
+Used on: **Breaching Active Directory**
+
+captured a NetNTLMv2 challenge for `ZA\svcFileCopy`.
 
 ### Start Responder on the VPN interface
 ```bash
 sudo responder -I tun0
 ```
-Used on: **Overwatch** — combined with a rogue A-record (see `dnstool.md`) to force `SQL07` → attacker IP. When SQL Server tries to reach the linked server, it sends NTLMv2 to our listener.
+Used on: **Overwatch**
+
+combined with a rogue A-record (see `dnstool.md`) to force `SQL07` → attacker IP. When SQL Server tries to reach the linked server, it sends NTLMv2 to our listener.
 
 ## Typical Flow (Overwatch)
 

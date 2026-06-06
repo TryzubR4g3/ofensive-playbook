@@ -9,6 +9,12 @@ Assets folder on a web server exposes images that look ordinary. Two failure mod
 
 Twist on Yueiua: the file was served as `.jpg` but had PNG bytes, then those PNG bytes were themselves corrupted by flipping the magic bytes to invalid hex. `exiftool` flagged `Warning: PNG image did not start with IHDR` — the fix is to restore the correct magic.
 
+## When to Use
+
+- Ordinary-looking images are exposed on a web server or file share.
+- `file` command reveals file type mismatches or corrupted magic bytes.
+- A passphrase or base64 blob is recovered elsewhere on the target.
+
 ## Prerequisites
 - A writable directory on the attacker's side to download and edit the file.
 - `exiftool`, `file`, `dd` / `printf`, `steghide` installed. On Kali: `sudo apt install exiftool steghide`.

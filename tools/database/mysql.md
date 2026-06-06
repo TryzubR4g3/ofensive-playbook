@@ -8,7 +8,9 @@ MariaDB / MySQL command-line client. Used for authenticated DB enumeration once 
 ```bash
 mysql -h $TARGET -u mbillingUser --password=BLOGYwvtJkI7uaX5
 ```
-Used on: **Billing** — confirmed 3306 was filtered / bound to localhost; dropped to local client inside the foothold.
+Used on: **Billing**
+
+confirmed 3306 was filtered / bound to localhost; dropped to local client inside the foothold.
 
 ### Local client inside the foothold
 ```bash

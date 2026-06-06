@@ -6,6 +6,12 @@ A `.png` you found on the box (or downloaded from the web) is **not** a normal p
 
 When a recon image looks like Mondrian (blocks of saturated primary / secondary colours, 20×20 grid), assume Piet first.
 
+## When to Use
+
+- The image is a blocky grid of saturated primary and secondary colours.
+- `file` command reports it as a valid PNG/GIF/BMP but it has no photographic content.
+- `exiftool`, `strings`, and `binwalk` find no readable strings or embedded files.
+
 ## Prerequisites
 - The candidate image (PNG/GIF/BMP). On bsidesgtdevelpy it was `credentials.png` left in the user's home.
 - `npiet` interpreter (or the in-browser version).

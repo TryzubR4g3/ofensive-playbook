@@ -4,6 +4,12 @@ Used on: **Wreath**
 
 Empire hop listeners proxy agent traffic through an intermediate web server when the final victim cannot reach the main Empire listener directly.
 
+## When to Use
+
+- The target victim cannot reach the main attacker listener due to network segmentation.
+- An intermediate pivot host can reach both the attacker and the victim.
+- The intermediate pivot host can serve HTTP/PHP traffic.
+
 ## Prerequisites
 
 - PowerShell Empire and Starkiller installed.

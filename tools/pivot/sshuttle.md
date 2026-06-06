@@ -10,7 +10,9 @@ Transparent subnet tunneling over SSH. It behaves like a lightweight VPN when yo
 sshuttle -r user@PIVOT_HOST 172.16.0.0/24
 ```
 
-Used on: **Wreath** - documented as an alternative to Chisel/SSH SOCKS for routing internal networks.
+Used on: **Wreath**
+
+documented as an alternative to Chisel/SSH SOCKS for routing internal networks.
 
 ### Use a private key
 

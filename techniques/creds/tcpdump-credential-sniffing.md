@@ -4,6 +4,12 @@ Used on: **CCTV**
 
 Some scheduled tasks / cron jobs reach out to internal services with credentials baked into the connection string. If the protocol is cleartext (HTTP Basic, FTP, SMTP without TLS, old MSSQL, some custom binary protocols), a local shell with `CAP_NET_RAW` can capture them.
 
+## When to Use
+
+- A local shell with `CAP_NET_RAW` or root privileges is obtained
+- The `/usr/bin/tcpdump` command is executable by the current user
+- Scheduled tasks or cron jobs are observed communicating over cleartext protocols
+
 ## Command Used
 
 ```bash

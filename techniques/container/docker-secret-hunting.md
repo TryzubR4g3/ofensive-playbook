@@ -4,6 +4,11 @@ Used on: **Internal**
 
 After landing in a container, basic container checks plus filesystem sweeps can reveal host credentials, application notes, mounted secrets, or service tokens.
 
+## When to Use
+
+- You have successfully established a shell inside a container environment.
+- Initial container confirmation checks (`/proc/self/status` capabilities, hex hostnames, or `overlay` mounts) are positive.
+- You have read access to application paths like `/opt` or standard linux directories.
 ## Prerequisites
 
 - Shell inside a container.

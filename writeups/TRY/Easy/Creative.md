@@ -269,5 +269,5 @@ cat /root/root.txt
 - [feroxbuster](../../../tools/fuzz/feroxbuster.md)
 - [gobuster](../../../tools/fuzz/gobuster.md)
 - [john](../../../tools/creds/john.md)
-- [ssrf-internal-port-scan](../../../exploits/web/ssrf-internal-port-scan.md)
+- [ssrf-internal-port-scan](../../../exploits/web-disclosure/ssrf-internal-port-scan.md)
 - [sudo-ld-preload](../../../privesc/linux/sudo-ld-preload.md)

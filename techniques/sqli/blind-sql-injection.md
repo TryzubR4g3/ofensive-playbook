@@ -4,6 +4,12 @@ Used on: **SQL Injection Fundamentals**
 
 Blind SQL injection still works even when query results and database errors are not shown. For login bypasses, the goal is not to know a valid password; it is to make the authentication predicate evaluate to true.
 
+## When to Use
+
+- Application does not display database errors or query output on the page.
+- Submitting an SQL comment (`' OR 1=1;--`) into a login field grants access.
+- Valid authentication is determined solely by the query returning one or more rows.
+
 ## Prerequisites
 
 - A login query concatenates user-controlled input into SQL.

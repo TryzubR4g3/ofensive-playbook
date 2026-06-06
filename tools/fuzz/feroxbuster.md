@@ -6,7 +6,9 @@
 feroxbuster -u http://internal.thm -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
 feroxbuster -u http://$TARGET:1337 -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt --dont-scan locale
 ```
-Used on: **Internal**, **Decryptify** - discovered WordPress content and exposed Decryptify web paths.
+Used on: **Internal**, **Decryptify**
+
+discovered WordPress content and exposed Decryptify web paths.
 
 Fast, recursive web content discovery tool written in Rust. Used for directory and file brute-forcing against HTTP targets, including multi-port web applications.
 
@@ -26,7 +28,7 @@ feroxbuster -u http://TARGET_IP:62337/ \
 ```
 Used on: **IDE**
 
-- Non-standard ports (e.g. `62337`) must be included explicitly in the URL
+Non-standard ports (e.g. `62337`) must be included explicitly in the URL
 
 ### Recursive deep enumeration with extension sweep
 ```bash
@@ -43,7 +45,7 @@ feroxbuster \
 ```
 Used on: **VariaType**
 
-- `-x` — comma-separated extensions appended to each word
+`-x` — comma-separated extensions appended to each word
 - `-d 4` — recurse 4 levels deep
 - `-C 404,403` — collect-and-skip these codes (filter)
 - `-s 200,...` — only emit these status codes
@@ -54,13 +56,17 @@ Used on: **VariaType**
 ```bash
 feroxbuster -u http://$TARGET:3333 -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
 ```
-Used on: **vulnversity** — found `internal/uploads/` upload directory.
+Used on: **vulnversity**
+
+found `internal/uploads/` upload directory.
 
 ### Brute-force IIS root with Recruit-style wordlist
 ```bash
 feroxbuster -u http://$TARGET -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-big.txt
 ```
-Used on: **Recruit** — discovered `/phpmyadmin/` plus the entry-point `file.php`.
+Used on: **Recruit**
+
+discovered `/phpmyadmin/` plus the entry-point `file.php`.
 
 
 
@@ -69,7 +75,9 @@ Used on: **Recruit** — discovered `/phpmyadmin/` plus the entry-point `file.ph
 feroxbuster -u http://$TARGET:8080 -w /usr/share/seclists/Discovery/Web-Content/big.txt
 feroxbuster -u http://$TARGET:8082 -w /usr/share/seclists/Discovery/Web-Content/big.txt
 ```
-Used on: **coldvvars** - mapped the web apps on both non-standard ports before deeper `/dev` fuzzing.
+Used on: **coldvvars**
+
+mapped the web apps on both non-standard ports before deeper `/dev` fuzzing.
 
 ### Multi-extension sweep on a non-standard port with status-code allowlist
 ```bash
@@ -81,7 +89,9 @@ feroxbuster -u http://10.200.30.101:8002 \
   --status-codes 200,201,301,302,403,405,500 \
   -o ferox-8002.txt
 ```
-Used on: **Bandit** - enumerated the Hadoop service on port 8002; `-x` sweep catches config and backup leaks; `--status-codes` allowlist surfaces 403/500 that indicate interesting paths even when access is denied.
+Used on: **Bandit**
+
+enumerated the Hadoop service on port 8002; `-x` sweep catches config and backup leaks; `--status-codes` allowlist surfaces 403/500 that indicate interesting paths even when access is denied.
 
 - `--status-codes` — emit only these codes (allowlist, opposite of `-C`/`--filter-status`)
 - `-d 3` — recurse three levels to catch nested API routes
@@ -93,7 +103,9 @@ feroxbuster -u http://$TARGET:3000 \
   -w /usr/share/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt \
   --status-codes 200 301
 ```
-Used on: **Reactor** - filtered status codes to bypass Next.js 400 responses on unknown endpoints.
+Used on: **Reactor**
+
+filtered status codes to bypass Next.js 400 responses on unknown endpoints.
 
 ### Deep web fuzzing with extensions
 ```bash
@@ -102,4 +114,6 @@ feroxbuster -u http://flower.shop \
   -x js,html,php \
   -d 5
 ```
-Used on: **flower** - enumerated web content before testing the search endpoint for SQL injection.
+Used on: **flower**
+
+enumerated web content before testing the search endpoint for SQL injection.

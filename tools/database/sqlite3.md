@@ -11,7 +11,9 @@ file cache.db
 #   OR
 # cache.db: Berkeley DB (Hash, version 9, native byte-order)
 ```
-Used on: **LazyAdmin** — `cache.db` from `/content/inc/cache/cache.db` was Berkeley DB, not SQLite.
+Used on: **LazyAdmin**
+
+`cache.db` from `/content/inc/cache/cache.db` was Berkeley DB, not SQLite.
 
 ### SQLite 3
 ```bash
@@ -61,4 +63,6 @@ sqlite3 cache.db '.dump' | grep -Ei 'pass|hash|user|token'
 ``bash
 sqlite3 reactor.db "SELECT * FROM users;"
 ``
-Used on: **Reactor** - Exfiltrated reactor.db and dumped users table to find MD5 hashes.
+Used on: **Reactor**
+
+Exfiltrated reactor.db and dumped users table to find MD5 hashes.

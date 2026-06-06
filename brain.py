@@ -150,7 +150,7 @@ TOPICS: dict[str, dict] = {
         "tools": ["nmap", "silent-scan", "whatweb", "searchsploit", "enum4linux", "showmount", "ftp",
                   "smbclient", "smbmap", "nuclei", "feroxbuster", "ffuf",
                   "gobuster", "wget", "proxychains", "foxyproxy", "ldap-utils",
-                  "onesixtyone", "snmpwalk", "snmpset", "nikto"],
+                  "onesixtyone", "snmpwalk", "snmpset", "nikto", "bloodhound", "find", "grep"],
         "exploits": ["smb-anonymous-enum", "anonymous-ftp-enumeration",
                      "smb-enumeration", "rid-brute-enumeration", "snmp",
                      "web-discovery", "file-transfers"],
@@ -161,7 +161,7 @@ TOPICS: dict[str, dict] = {
                   "bloodhound", "showmount", "ftp", "redis-cli", "rsync", "mysql",
                   "mongo", "sqlite3", "ffuf", "gobuster", "feroxbuster", "getcap",
                   "proxychains", "powershell-empire", "smbmap", "nuclei", "ldap-utils",
-                  "onesixtyone", "snmpwalk", "snmpset"],
+                  "onesixtyone", "snmpwalk", "snmpset", "find", "grep"],
         "exploits": ["enum", "linux-enumeration", "windows-enumeration",
                      "smb-enumeration", "smb-anonymous-enum", "mssql-enumeration",
                      "rid-brute-enumeration", "anonymous-ftp-enumeration",
@@ -193,7 +193,8 @@ TOPICS: dict[str, dict] = {
                      "suid-path-hijack", "tar-wildcard-injection",
                      "python-library-hijack", "suid-python",
                      "yum-sudo-plugin-injection", "printspoofer-seimpersonate", "nodejs-inspector",
-                     "gdb-suid-privesc", "java-cron-symlink", "sudo-binary-rop-gets"],
+                     "gdb-suid-privesc", "java-cron-symlink", "sudo-binary-rop-gets",
+                     "suid-find-escape"],
     },
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
@@ -298,6 +299,7 @@ TOPICS: dict[str, dict] = {
         "exploits": ["zoneminder-sqli", "lfi-php-parameter", "backup-file-exposure",
                      "sql-union-injection", "sql-injection", "sqli", "blind-sql",
                      "time-based", "in-band"],
+        "payloads": ["nosql", "mongodb", "xpath", "sql"],
     },
     "lfi": {
         "desc": "Local File Inclusion / arbitrary read",
@@ -333,7 +335,7 @@ TOPICS: dict[str, dict] = {
     "reversing": {
         "desc": "Binary reverse engineering (SUID, custom binaries)",
         "tools": ["strings", "ltrace", "objdump", "pycdc"],
-        "exploits": ["suid-binary-reversing", "sudo-binary-rop-gets"],
+        "exploits": ["suid-binary-reversing", "sudo-binary-rop-gets", "buffer-overflow-ret2shellcode"],
     },
     "database": {
         "desc": "Backend DB enumeration & abuse (Mongo, SQLite, MySQL, Redis)",
@@ -342,6 +344,7 @@ TOPICS: dict[str, dict] = {
                      "mssql-linked-server", "redis-auth-abuse",
                      "zoneminder-sqli", "lfi-php-parameter",
                      "sql-union-injection", "nosql-json-login-bypass", "nosql-where-injection"],
+        "payloads": ["mongodb", "nosql", "sql"],
     },
     "crypto": {
         "desc": "Token prediction, padding oracles, weak crypto",
@@ -384,8 +387,13 @@ def iter_category(cat: str) -> Iterable[Path]:
     for d in DIRS[cat]:
         if not d.is_dir():
             continue
-        for p in sorted(d.rglob("*.md")):
-            yield p
+        patterns = ["*.md", "*.txt"] if cat == "payloads" else ["*.md"]
+        seen: set[Path] = set()
+        for pattern in patterns:
+            for p in sorted(d.rglob(pattern)):
+                if p not in seen:
+                    seen.add(p)
+                    yield p
 
 def iter_all() -> Iterable[tuple[str, Path]]:
     for cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads", "writeups"):
@@ -514,6 +522,14 @@ def backrefs(target: Path) -> list[tuple[Path, int, str]]:
 # ---- Search primitives ----
 
 def _grep_file(p: Path, pat: re.Pattern, code_only: bool = False) -> list[tuple[int, str]]:
+    # Plain-text payload lists: every line is a payload — treat as code-only content
+    if p.suffix == ".txt":
+        hits = []
+        for i, line in enumerate(read_text(p).splitlines(), 1):
+            line = line.rstrip()
+            if line and pat.search(line):
+                hits.append((i, line))
+        return hits
     hits: list[tuple[int, str, bool]] = []
     for hit in scan_markdown(p):
         if code_only and not hit.in_code:

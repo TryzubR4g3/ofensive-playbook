@@ -8,7 +8,9 @@ RPC-based NFS export lister. Queries the mount daemon to list which directories 
 ```bash
 showmount -e $TARGET
 ```
-Used on: **VulnNet: Internal** — revealed `/opt/conf *` (world-mountable).
+Used on: **VulnNet: Internal**
+
+revealed `/opt/conf *` (world-mountable).
 
 ### Useful variations
 ```bash

@@ -15,19 +15,25 @@ Used on: **Anonforce (BSides GT)**
 john --wordlist=/usr/share/wordlists/rockyou.txt pgp_hash.txt
 john --show pgp_hash.txt
 ```
-Used on: **Anonforce (BSides GT)** — passphrase cracked to `xbox360`.
+Used on: **Anonforce (BSides GT)**
+
+passphrase cracked to `xbox360`.
 
 ### Import the private key into the keyring
 ```bash
 gpg --import private.asc
 ```
-Used on: **Anonforce (BSides GT)** — prompts for passphrase on first use.
+Used on: **Anonforce (BSides GT)**
+
+prompts for passphrase on first use.
 
 ### Decrypt a file with the imported key
 ```bash
 gpg --decrypt backup_encrypted.pgp > backup_decrypted.txt
 ```
-Used on: **Anonforce (BSides GT)** — revealed `/etc/shadow` hashes.
+Used on: **Anonforce (BSides GT)**
+
+revealed `/etc/shadow` hashes.
 
 ## Useful extras (not used in the writeups yet)
 

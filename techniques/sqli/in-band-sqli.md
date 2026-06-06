@@ -4,6 +4,12 @@ Used on: **SQL Injection Fundamentals**
 
 In-band SQL injection returns extracted data in the same HTTP response used to send the payload. Error-based and UNION-based SQLi are the two common patterns: either the database error leaks structure, or `UNION SELECT` adds attacker-chosen rows to the original query output.
 
+## When to Use
+
+- Injecting a quote character into a parameter causes a visible database syntax error.
+- The application reflects the output of the database query directly on the page.
+- Appending a `UNION SELECT` statement successfully injects custom rows into the response.
+
 ## Prerequisites
 
 - A parameter reaches a SQL query without safe parameterization.

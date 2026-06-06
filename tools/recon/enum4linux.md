@@ -8,8 +8,12 @@ Wrapper around the Samba suite (`smbclient`, `rpcclient`, `net`, `nmblookup`) th
 ```bash
 enum4linux -a $TARGET
 ```
-Used on: **VulnNet: Internal** — revealed the readable `\shares` SMB share and rpcbind / NFS visibility.
-Used on: **SoupedeCode 01** — returned RID ranges `500–550` and `1000–1050`, confirming guest LSA access.
+Used on: **VulnNet: Internal**
+
+revealed the readable `\shares` SMB share and rpcbind / NFS visibility.
+Used on: **SoupedeCode 01**
+
+returned RID ranges `500–550` and `1000–1050`, confirming guest LSA access.
 
 `-a` runs all:
 - `-U` — users

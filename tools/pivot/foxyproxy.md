@@ -6,7 +6,9 @@ Browser proxy switcher used to send web traffic through a SOCKS pivot without ch
 
 FoxyProxy is GUI-driven, so the reusable value is the configuration rather than a shell command.
 
-Used on: **Wreath** - browsed internal HTTP services exposed through SSH/Chisel SOCKS pivots.
+Used on: **Wreath**
+
+browsed internal HTTP services exposed through SSH/Chisel SOCKS pivots.
 
 ### SOCKS proxy profile
 

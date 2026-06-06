@@ -6,7 +6,9 @@
 mv image.jpg image.jpeg.php
 exiftool -Comment="$(cat /tmp/payload.php)" image.jpeg.php
 ```
-Used on: **Wreath** - embedded PHP webshell code in image metadata to bypass an upload filter.
+Used on: **Wreath**
+
+embedded PHP webshell code in image metadata to bypass an upload filter.
 
 Reads and writes file metadata — EXIF (JPEG), PNG textual chunks, PDF info dict, XMP, IPTC. First tool to run on any image / PDF / media file that surfaces during recon: author names, cameras, GPS, and — on CTFs — passphrases or hints stashed in `Comment` / `Description` fields.
 

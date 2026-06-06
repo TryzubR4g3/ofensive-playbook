@@ -10,7 +10,7 @@ sudo ldapmodify -Y EXTERNAL -H ldapi:// -f ./olcSaslSecProps.ldif && sudo servic
 ```
 Used on: **Breaching Active Directory**
 
-- `-Y EXTERNAL` - authenticate to local `slapd` through the external SASL mechanism
+`-Y EXTERNAL` - authenticate to local `slapd` through the external SASL mechanism
 - `-H ldapi://` - use the local LDAP IPC socket
 - `-f` - read changes from an LDIF file
 
@@ -20,6 +20,6 @@ ldapsearch -H ldap://localhost -x -s base -b "" supportedSASLMechanisms
 ```
 Used on: **Breaching Active Directory**
 
-- `-x` - simple authentication
+`-x` - simple authentication
 - `-s base` - base-object search only
 - `-b ""` - query the root DSE

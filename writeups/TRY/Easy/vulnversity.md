@@ -1,4 +1,4 @@
-﻿# Vulnversity — TryHackMe Writeup
+# Vulnversity — TryHackMe Writeup
 
 **Target:** `TARGET_IP` (10.128.172.212 at time of solve)
 **OS:** Linux (Ubuntu)
@@ -132,7 +132,7 @@ find / -perm -u=s -type f 2>/dev/null
 
 # bill is the local user; check for creds & sudo on his behalf
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: verify files, permissions, or loot in the current path.
 ls -la /home/bill
 # What it does: list sudo permissions for the user bill.
 # Why here: confirm that bill can execute systemctl as root without a password, enabling the systemd unit privilege escalation.
@@ -188,7 +188,7 @@ systemctl start root
 
 ```bash
 # What it does: lists directory contents.
-# Why here: verificar archivos, permisos o loot en la ruta actual.
+# Why here: verify files, permissions, or loot in the current path.
 ls -l /bin/bash
 # -rwsr-xr-x 1 root root … /bin/bash
 # What it does: execute bash with the -p flag.

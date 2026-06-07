@@ -85,4 +85,3 @@ nc -lvnp 8080
 - [hydra](../../../tools/creds/hydra.md)
 - [netcat](../../../tools/pivot/netcat.md)
 - [gdb-suid-privesc](../../../privesc/linux/gdb-suid-privesc.md)
-

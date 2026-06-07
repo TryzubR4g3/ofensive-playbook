@@ -1,6 +1,6 @@
 # 🧠 brain — Offensive Security Second Brain
 
-71 tools · 81 exploits · 34 privesc · 31 techniques · 9 playbooks · 8 payloads · 66 writeups
+73 tools · 84 exploits · 36 privesc · 31 techniques · 9 playbooks · 11 payloads · 67 writeups
 
 This repository is **tool-, exploit- and technique-centric**. Writeups exist as narratives, but the real value lives in the reusable playbooks and command references, instantly searchable via the `brain` CLI.
 

@@ -1,6 +1,6 @@
 # Mimikatz SAM Dump and Pass-the-Hash
 
-Used on: **Wreath**
+Used on: **Wreath**, **eJPT / Course Reference**
 
 With local administrator rights, Mimikatz can dump local SAM hashes. If a password cannot be cracked, the NTLM hash can still be reused directly against WinRM with pass-the-hash.
 

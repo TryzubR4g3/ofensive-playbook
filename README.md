@@ -33,6 +33,7 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 | `creds`       | `credentials`, `password`        | Credential hunting, extraction, and cracking |
 | `ad`          | `active-directory`, `kerberos`   | Active Directory, Kerberos, SMB, LDAP |
 | `web`         | `http`                           | Web vulnerability exploitation |
+| `webdav`      |                                  | WebDAV enumeration and exploitation |
 | `xss`         | `cross-site-scripting`           | Cross-site scripting techniques |
 | `container`   | `docker`, `k8s`                  | Container, Docker, and orchestration abuse |
 | `stego`       | `steganography`                  | Steganography and metadata loot |
@@ -55,5 +56,3 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 * **`writeups/`**: Machine walkthroughs (`HTB/`, `TRY/`, `OffSec/`, `Webverselabs/`).
 
 Writeups link to the techniques. The CLI reverse-indexes those links to show exactly which boxes a technique was used on.
-
-

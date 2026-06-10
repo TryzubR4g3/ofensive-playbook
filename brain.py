@@ -17,10 +17,13 @@ Usage
   brain search <query>           Case-insensitive grep across every .md.
   brain cmd    <query>           Grep inside fenced ``` code blocks only.
 
-  brain tool    [name]           Show a tool note (or list all).
-  brain exploit [name]           Show an exploit note (or list all).
-  brain payload [name]           Show a payload/snippet note (or list all).
-  brain writeup [name]           Show a writeup (or list all).
+  brain tool      [name]                Show a tool note (or list all).
+  brain tool      <name> search <kw>    Search keyword inside a specific tool note.
+  brain exploit   [name]                Show an exploit note (or list all).
+  brain exploit   <name> search <kw>    Search keyword inside a specific exploit note.
+  brain technique <name> search <kw>    Search keyword inside a technique note.
+  brain writeup   <name> search <kw>    Search keyword inside a writeup.
+  brain payload   [name]                Show a payload/snippet note (or list all).
   brain list    [tools|exploits|payloads|writeups|all]
 
   brain used-on <Machine>        Every note tagged "Used on: <Machine>".
@@ -45,6 +48,9 @@ Examples
   brain ad kerberos                           # AD/Kerberos-specific commands
   brain find "nc -lvnp"                       # broad search when unsure
   brain cmd "find /"                          # command-block-only search
+  brain tool metasploit search route          # search 'route' inside metasploit.md
+  brain exploit eternalblue search nmap       # search inside a specific exploit note
+  brain writeup Billing search meterpreter    # search inside a specific writeup
 """
 from __future__ import annotations
 
@@ -202,7 +208,7 @@ TOPICS: dict[str, dict] = {
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
         "tools": ["netcat", "socat", "ssh", "sshpass", "evil-winrm", "impacket", "metasploit", "msfvenom",
-                  "chisel", "plink"],
+                  "meterpreter", "chisel", "plink"],
         "exploits": [],
         "all_payloads": True,
         "keywords": ["bash -i", "/dev/tcp/", "nc -lvnp", "pty.spawn",
@@ -210,7 +216,7 @@ TOPICS: dict[str, dict] = {
     },
     "payloads": {
         "desc": "Reusable payload snippets, webshells and shell stabilization",
-        "tools": ["netcat", "socat", "ssh", "msfvenom"],
+        "tools": ["netcat", "socat", "ssh", "msfvenom", "meterpreter"],
         "exploits": [],
         "all_payloads": True,
     },
@@ -282,6 +288,11 @@ TOPICS: dict[str, dict] = {
                      "freepbx-extractvalue-sqli", "freepbx-unauth-sqli-rce",
                      "xmpp-spark-ntlm-leak", "youtube-dl-command-injection",
                      "nodejs-module-upload-rce"],
+    },
+    "webdav": {
+        "desc": "WebDAV enumeration and exploitation",
+        "tools": ["cadaver", "davtest"],
+        "exploits": ["webdav-upload-rce"],
     },
     "xss": {
         "desc": "Cross-site scripting payloads and XSS note types",
@@ -368,7 +379,8 @@ TOPICS: dict[str, dict] = {
         "tools": ["ssh", "nmap", "chisel", "proxychains", "foxyproxy", "plink",
                   "sshuttle", "socat"],
         "exploits": ["ssh-tunneling", "container-network-pivoting",
-                     "chisel-pivoting", "powershell-empire-hop-listener", "pivoting-tunnelling"],
+                     "chisel-pivoting", "powershell-empire-hop-listener", "pivoting-tunnelling",
+                     "meterpreter-pivoting"],
     },
 }
 
@@ -792,9 +804,33 @@ def _resolve_file(cat: str, name: str, quiet: bool = False) -> Path | None:
     return None
 
 
+def _cmd_file_search(p: Path, query: str) -> int:
+    """Grep a single file for query with colored highlights."""
+    pat = re.compile(re.escape(query), re.IGNORECASE)
+    hits = _grep_file(p, pat, code_only=False)
+    if not hits:
+        print(dim(f"(no matches for '{query}' in {relpath(p)})"))
+        print(dim(f"Try broader: brain search {query}"))
+        return 1
+    print(bold(f"{green(relpath(p))}  — {len(hits)} match(es) for '{yellow(query)}'"))
+    for lineno, line in hits:
+        line = line if len(line) <= 120 else line[:119] + "\u2026"
+        highlighted = pat.sub(lambda m: yellow(bold(m.group(0))), line)
+        print(f"  {dim(str(lineno)):>6}  {highlighted}")
+    return 0
+
+
 def cmd_show(cat: str, argv: list[str]) -> int:
     if not argv:
         return cmd_list([cat])
+    # Inline search: `brain tool metasploit search route`
+    # Works for every category: tools, exploits, techniques, writeups, privesc, etc.
+    if len(argv) >= 3 and argv[1].lower() == "search":
+        p = _resolve_file(cat, argv[0])
+        if not p:
+            return 1
+        query = " ".join(argv[2:])
+        return _cmd_file_search(p, query)
     p = _resolve_file(cat, argv[0])
     if not p:
         return 1
@@ -912,39 +948,41 @@ def main(argv: list[str]) -> int:
     if not argv:
         print(__doc__); return 0
     cmd, rest = argv[0], argv[1:]
-    # Topic dispatch takes precedence when `exploit` is followed by a keyword
-    # that does NOT match an existing exploit file name.
+
+    # Map category command names to their directory categories
+    _CMD_CAT: dict[str, str] = {
+        "exploit": "exploits", "exploits": "exploits",
+        "tool": "tools", "tools": "tools",
+        "payload": "payloads", "payloads": "payloads",
+        "playbook": "playbooks", "playbooks": "playbooks",
+        "technique": "techniques", "techniques": "techniques",
+        "privesc": "privesc",
+        "writeup": "writeups", "writeups": "writeups",
+    }
+
     key = TOPIC_ALIASES.get(cmd, cmd)
+
+    # Category commands (tool, exploit, technique, writeup …) take priority when
+    # followed by a known or partial file name, including inline `search` sub-command.
+    if cmd in _CMD_CAT and rest:
+        cat = _CMD_CAT[cmd]
+        # `brain tool metasploit search route`  →  grep inside that file
+        if len(rest) >= 3 and rest[1].lower() == "search":
+            return cmd_show(cat, rest)
+        # `brain tool metasploit`  →  show the file (exact or partial match)
+        found = _find_exact(cat, rest[0]) or _resolve_file(cat, rest[0], quiet=True)
+        if found:
+            return cmd_show(cat, rest)
+        # No file match → fall through to topic search (e.g. `brain web curl`)
+
+    # Topic dispatch: `brain web curl`, `brain privesc sudo`, …
     if key in TOPICS:
-        # Special-case: `brain exploit <name>` where <name> is a known exploit
-        # file → behave like the old show-file command.
-        if cmd in ("exploit", "exploits") and rest:
-            found = _find_exact("exploits", rest[0])
-            if found:
-                return cmd_show("exploits", rest)
-        if cmd in ("tool", "tools") and rest:
-            found = _find_exact("tools", rest[0])
-            if found:
-                return cmd_show("tools", rest)
-        if cmd in ("payload", "payloads") and rest:
-            found = _find_exact("payloads", rest[0])
-            if found:
-                return cmd_show("payloads", rest)
-        if cmd in ("playbook", "playbooks") and rest:
-            found = _find_exact("playbooks", rest[0])
-            if found:
-                return cmd_show("playbooks", rest)
-        if cmd in ("technique", "techniques") and rest:
-            found = _find_exact("techniques", rest[0])
-            if found:
-                return cmd_show("techniques", rest)
-        if cmd in ("privesc",) and rest:
-            found = _find_exact("privesc", rest[0])
-            if found:
-                return cmd_show("privesc", rest)
         return cmd_topic(key, rest)
+
+    # Fixed top-level commands: search, find, cmd, list, used-on, …
     if cmd in FIXED_COMMANDS:
         return FIXED_COMMANDS[cmd](rest) or 0
+
     print(red(f"Unknown command or topic: {cmd}\n"))
     print(dim("Try `brain guide` for beginner examples, `brain topics` for scopes, or `brain find <keyword>` for broad search.\n"))
     print(__doc__)

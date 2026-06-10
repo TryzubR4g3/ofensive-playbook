@@ -23,6 +23,7 @@ Twist on Yueiua: the file was served as `.jpg` but had PNG bytes, then those PNG
 ## Steps
 
 ### 1. Mirror every image in the assets dir
+<!-- cmd: linux -->
 ```bash
 wget -r -np -nH --cut-dirs=1 http://$TARGET/assets/images/
 # or, one at a time:
@@ -30,6 +31,7 @@ wget http://$TARGET/assets/images/oneforall.jpg
 ```
 
 ### 2. Real file type
+<!-- cmd: linux -->
 ```bash
 file oneforall.jpg
 # oneforall.jpg: data            <- magic is broken
@@ -38,6 +40,7 @@ file oneforall.jpg
 ```
 
 ### 3. Metadata pass
+<!-- cmd: linux -->
 ```bash
 exiftool oneforall.jpg
 # Warning: PNG image did not start with IHDR
@@ -46,6 +49,7 @@ exiftool oneforall.jpg
 ```
 
 ### 4. Fix a corrupted magic (Yueiua pattern)
+<!-- cmd: linux -->
 ```bash
 # Case A — file claims to be .jpg but shows PNG headers.
 # Fake JPEG magic so JPEG-only tools accept it:
@@ -70,6 +74,7 @@ Common magic bytes cheatsheet:
 | ZIP    | `50 4B 03 04` |
 
 ### 5. Find the passphrase elsewhere
+<!-- cmd: linux -->
 ```bash
 # On the target (foothold shell)
 grep -rEi 'pass|passphrase' /home /opt /tmp /var/www 2>/dev/null
@@ -79,6 +84,7 @@ echo '<base64>' | base64 -d
 Yueiua example: `/Hidden_Content/passphrase.txt` contained a base64 string decoding to `AllmightForEver!!!`.
 
 ### 6. Extract with steghide
+<!-- cmd: linux -->
 ```bash
 steghide info oneforall.jpg
 # Runs even without the passphrase — shows whether data is embedded and size.
@@ -92,6 +98,7 @@ cat creds.txt          # SSH creds, users, flags, etc.
 `-xf out.txt` forces the output filename.
 
 ### 7. No passphrase Brute-force with stegseek
+<!-- cmd: linux -->
 ```bash
 stegseek oneforall.jpg /usr/share/wordlists/rockyou.txt
 # Thousands of guesses per second; hits typical CTF passwords in seconds.

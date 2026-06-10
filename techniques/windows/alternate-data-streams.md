@@ -8,6 +8,7 @@ Used on: **eJPT / Course Reference**
 
 You can hide a payload inside an ADS of an innocuous file (like a text file).
 
+<!-- cmd: windows -->
 ```cmd
 # Create an innocent file
 echo "Normal file content" > normal.txt
@@ -23,6 +24,7 @@ type C:\Temp\nc.exe > normal.txt:payload.exe
 
 Standard `dir` commands won't show the ADS.
 
+<!-- cmd: windows -->
 ```cmd
 # List files along with their Alternate Data Streams
 dir /r
@@ -36,6 +38,7 @@ powershell -c "Get-Content -Path normal.txt -Stream hidden"
 
 Executing a hidden binary stream varies by OS version, as modern Windows versions restrict direct execution of ADS.
 
+<!-- cmd: windows -->
 ```cmd
 # Older Windows (WMI approach)
 wmic process call create "C:\full\path\to\normal.txt:payload.exe"

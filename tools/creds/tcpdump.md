@@ -2,6 +2,7 @@
 
 ## Wreath Commands
 
+<!-- cmd: linux -->
 ```bash
 sudo tcpdump -i tun0 icmp
 ```
@@ -14,6 +15,7 @@ Packet sniffer. Used to capture cleartext credentials sent over the wire by sche
 ## Commands Used
 
 ### Capture LDAP bind traffic in hex and ASCII
+<!-- cmd: linux -->
 ```bash
 sudo tcpdump -SX -i breachad tcp port 389
 ```
@@ -25,6 +27,7 @@ captured cleartext LDAP pass-back credentials after lowering rogue LDAP SASL req
 - `-X` - print packet payload in hex and ASCII
 - `tcp port 389` - only LDAP traffic
 ### Capture all traffic on all interfaces with ASCII output
+<!-- cmd: linux -->
 ```bash
 /usr/bin/tcpdump -i any -A
 ```

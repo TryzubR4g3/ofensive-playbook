@@ -5,6 +5,7 @@
 ## Commands Used
 
 ### Full collection with a valid domain user
+<!-- cmd: linux -->
 ```bash
 bloodhound-python \
   -u wallace.everette -p 'Welcome2026@' \
@@ -17,6 +18,7 @@ collected All  revealed `svc_recovery  GenericWrite  MSA_HEALTH$`.
 
 ### Collect with password-cracked domain user
 
+<!-- cmd: linux -->
 ```bash
 bloodhound-python \
   -d windcorp.thm \
@@ -41,16 +43,19 @@ Flags:
 - `--zip` — single zip ready to drag into the UI
 
 ### Minimal / stealthier
+<!-- cmd: linux -->
 ```bash
 bloodhound-python -u <USER> -p <PASS> -d <DOMAIN> -dc <DC> -ns <DC_IP> -c Group,ACL,ObjectProps --zip
 ```
 
 ### Auth via hash instead of password
+<!-- cmd: linux -->
 ```bash
 bloodhound-python -u <USER> --hashes ':<NT_HASH>' -d <DOMAIN> -dc <DC> -ns <DC_IP> -c All --zip
 ```
 
 ### Auth via Kerberos ticket
+<!-- cmd: linux -->
 ```bash
 export KRB5CCNAME=$(pwd)/<USER>.ccache
 bloodhound-python -k --no-pass -u <USER> -d <DOMAIN> -dc <DC> -ns <DC_IP> -c All --zip

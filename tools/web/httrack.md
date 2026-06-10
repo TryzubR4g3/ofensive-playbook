@@ -8,6 +8,7 @@ are hard to spot while browsing interactively.
 
 ### Mirror a site and extract email addresses
 
+<!-- cmd: linux -->
 ```bash
 httrack "http://fire.windcorp.thm" -o /tmp/windcorp
 grep -r "@fire.windcorp.thm" /tmp/windcorp --include="*.html" -h \

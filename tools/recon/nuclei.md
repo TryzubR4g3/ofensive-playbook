@@ -6,6 +6,7 @@ Template-based scanner for quick checks against known exposures, CVEs, and commo
 
 ### Scan a web target
 
+<!-- cmd: linux -->
 ```bash
 nuclei -target http://internal.thm/
 ```
@@ -14,6 +15,7 @@ Used on: **Internal**
 
 identified WordPress, XML-RPC exposure, a user enumeration finding, and an SSH Terrapin finding.
 
+<!-- cmd: linux -->
 ```bash
 nuclei -target http://$TARGET
 ```

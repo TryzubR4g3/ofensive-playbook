@@ -16,6 +16,7 @@ The `checker` binary gates privileged behavior on the `admin` environment variab
 
 ## Steps
 
+<!-- cmd: linux -->
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 export admin=admin

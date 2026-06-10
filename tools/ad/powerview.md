@@ -5,6 +5,7 @@ PowerShell tool to gain network situational awareness on Windows domains. It is 
 ## Commands Used
 
 ### Enumerate Object ACLs
+<!-- cmd: windows -->
 ```powershell
 upload /usr/share/powershell-empire/.../powerview.ps1
 . .\PowerView.ps1

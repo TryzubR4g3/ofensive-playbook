@@ -20,18 +20,21 @@ Blind SQL injection still works even when query results and database errors are 
 
 Original query shape:
 
+<!-- cmd: sql -->
 ```sql
 SELECT * FROM users WHERE username='%username%' AND password='%password%' LIMIT 1;
 ```
 
 Payload in the password field:
 
+<!-- cmd: sql -->
 ```sql
 ' OR 1=1;--
 ```
 
 Resulting logic:
 
+<!-- cmd: sql -->
 ```sql
 SELECT * FROM users WHERE username='' AND password='' OR 1=1;
 ```

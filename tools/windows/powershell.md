@@ -5,6 +5,7 @@ Once inside a Windows box via WinRM / evil-winrm, PowerShell is the native inter
 ## Commands Used
 
 ### Internal network port scan
+<!-- cmd: windows -->
 ```powershell
 Get-Help Invoke-Portscan
 Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50
@@ -12,6 +13,7 @@ Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50
 Used on: **Wreath**
 
 ### Registry-based service enumeration (when `Get-Service` is restricted)
+<!-- cmd: windows -->
 ```powershell
 Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
     Where-Object { $_.PSChildName -like "*nssm*" } |
@@ -20,6 +22,7 @@ Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
 Used on: **Overwatch**
 
 ### List every NSSM-wrapped service and its ImagePath
+<!-- cmd: windows -->
 ```powershell
 Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
     ForEach-Object {
@@ -33,6 +36,7 @@ Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
 Used on: **Overwatch**
 
 ### Dump service configuration from the registry
+<!-- cmd: windows -->
 ```powershell
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch\Parameters" | Format-List *
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" | Format-List *
@@ -41,6 +45,7 @@ Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" | For
 Used on: **Overwatch**
 
 ### Identify the process behind a listening port
+<!-- cmd: windows -->
 ```powershell
 netstat -ano | findstr ":8000"
 Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess
@@ -48,6 +53,7 @@ Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyConti
 Used on: **Overwatch**
 
 ### Build and send a SOAP request from PowerShell
+<!-- cmd: windows -->
 ```powershell
 $killSoap = @"
 <xml version="1.0" encoding="utf-8">

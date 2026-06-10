@@ -6,6 +6,7 @@ A structured methodology for web enumeration and vulnerability discovery.
 
 Before fuzzing, understand what you are attacking.
 
+<!-- cmd: linux -->
 ```bash
 # Whatweb for tech stack fingerprinting
 whatweb http://$TARGET
@@ -22,6 +23,7 @@ curl -i http://$TARGET
 
 Find hidden paths, admin panels, and forgotten backups.
 
+<!-- cmd: linux -->
 ```bash
 # Fast initial pass (common directories)
 feroxbuster -u http://$TARGET -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt --status-codes 200,301,302,403
@@ -37,6 +39,7 @@ feroxbuster -u http://$TARGET/path/ -w /usr/share/seclists/Discovery/Web-Content
 
 If the application redirects to a domain or uses Virtual Hosting, fuzz for subdomains.
 
+<!-- cmd: linux -->
 ```bash
 # Gobuster Vhost mode (useful when DNS isn't resolving externally)
 gobuster vhost -u http://$DOMAIN -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt --append-domain
@@ -51,6 +54,7 @@ ffuf -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Ho
 
 If you find a page that might accept parameters (e.g. `index.php`, `view.php`), fuzz for hidden GET/POST parameters.
 
+<!-- cmd: linux -->
 ```bash
 # Fuzz GET parameters
 ffuf -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u "http://$TARGET/page.php?FUZZ=test" -fs <size_of_default_page>
@@ -73,6 +77,7 @@ ffuf -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u ht
 
 Once you have identified exact versions (e.g. SweetRice CMS 1.5.1, Nostromo 1.9.6):
 
+<!-- cmd: linux -->
 ```bash
 searchsploit "Software Name Version"
 ```

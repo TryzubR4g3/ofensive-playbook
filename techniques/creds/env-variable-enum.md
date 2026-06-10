@@ -12,6 +12,7 @@ Every process on Linux exposes its environment block at `/proc/<pid>/environ`, n
 
 ## Dump PID 1 env (container entrypoint)
 
+<!-- cmd: linux -->
 ```bash
 cat /proc/1/environ | tr '\0' '\n'
 ```
@@ -27,6 +28,7 @@ The `SMTP_PASSWORD` turned out to be reused for the host's `ben` SSH account —
 
 ## Sweep All Processes
 
+<!-- cmd: linux -->
 ```bash
 for pid in $(ls /proc | grep -E '^[0-9]+$'); do
   echo "--- PID $pid ---"
@@ -36,6 +38,7 @@ done
 
 ## Alternative: `ps auxe`
 
+<!-- cmd: linux -->
 ```bash
 ps auxe
 ```
@@ -45,6 +48,7 @@ Shows environment of every visible process. Needs appropriate permissions (own p
 ## Docker-specific
 
 Inside a container:
+<!-- cmd: linux -->
 ```bash
 env
 cat /proc/1/environ | tr '\0' '\n'

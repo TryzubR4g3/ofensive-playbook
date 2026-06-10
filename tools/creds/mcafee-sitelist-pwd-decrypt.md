@@ -6,6 +6,7 @@ Repository: [funoverip/mcafee-sitelist-pwd-decryption](https://github.com/funove
 ## Commands Used
 
 ### Decrypt an AUTH_PASSWD string
+<!-- cmd: linux -->
 ```bash
 python2 mcafee_sitelist_pwd_decrypt.py jWbTyS7BL1Hj7PkO5Di/QhhYmcGj5cOoZ2OkDTrFXsR/abAFPM9B3Q==
 ```

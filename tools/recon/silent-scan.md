@@ -6,6 +6,7 @@ Local scan alias/wrapper used as the fast first-pass TCP discovery step before t
 
 ### Fast target scan wrapper
 
+<!-- cmd: linux -->
 ```bash
 silent-scan $TARGET
 ```

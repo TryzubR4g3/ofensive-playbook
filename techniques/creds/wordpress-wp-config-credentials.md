@@ -19,18 +19,21 @@ WordPress database credentials in `wp-config.php` are often useful for local dat
 
 Extract database configuration:
 
+<!-- cmd: linux -->
 ```bash
 cat /var/www/html/wordpress/wp-config.php | grep -E "DB_|host|port"
 ```
 
 Try local MySQL access:
 
+<!-- cmd: linux -->
 ```bash
 mysql -h localhost -u wordpress -pwordpress123 wordpress
 ```
 
 Continue manual local enumeration when the database does not contain the next pivot:
 
+<!-- cmd: linux -->
 ```bash
 cd /opt/
 ls -lha

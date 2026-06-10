@@ -5,6 +5,7 @@ Command-line client for Redis. Used to authenticate against `requirepass`-protec
 ## Commands Used
 
 ### Authenticate and open interactive session
+<!-- cmd: linux -->
 ```bash
 redis-cli -h $TARGET -a 'B65Hx562F@ggAZ@F'
 ```
@@ -71,6 +72,7 @@ TYPE <key>
 | stream   | `XRANGE <key> - +`                   |
 
 ## Non-interactive one-shots
+<!-- cmd: linux -->
 ```bash
 redis-cli -h $TARGET -a '<pass>' --no-auth-warning PING
 redis-cli -h $TARGET -a '<pass>' --no-auth-warning GET "internal flag"

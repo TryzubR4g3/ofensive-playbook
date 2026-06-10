@@ -18,6 +18,7 @@ Binaries dropped in SMB shares or file servers often ship with their config bake
 
 ## Command Used
 
+<!-- cmd: linux -->
 ```bash
 strings -e l overwatch.exe | grep -iE "password|user|sql|connection"
 ```
@@ -33,12 +34,14 @@ Server=localhost;Database=SecurityLogs;User Id=sqlsvc;Password=TI0LKcfHzZw1Vv;
 
 ## Expanded Grep
 
+<!-- cmd: linux -->
 ```bash
 strings -e l overwatch.exe | grep -iE "password|passwd|pwd|user|admin|token|secret|apikey|connstr|connection|http|https|smtp|ftp"
 ```
 
 ## Dump All String Variants
 
+<!-- cmd: linux -->
 ```bash
 for w in s S l L b B; do
   echo "--- width $w ---"
@@ -51,6 +54,7 @@ done > all-strings.txt
 - With `.exe.config`: open it directly, often contains Entity Framework connection strings.
 - With a .NET exe: decompile with **ILSpy** / **dnSpy** to see secrets that exist only as constants after JIT obfuscation.
 - Validate the credential immediately:
+<!-- cmd: linux -->
   ```bash
   netexec mssql <IP> -u <user> -p '<pass>' --port <port>
   netexec smb <IP> -u <user> -p '<pass>'

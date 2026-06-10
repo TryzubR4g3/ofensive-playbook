@@ -6,6 +6,7 @@ A tool for reverse engineering 3rd party, closed, binary Android apps. It can de
 
 ### Decode an APK
 
+<!-- cmd: linux -->
 ```bash
 apktool d nombre_del_apk.apk -o output_folder/
 ```

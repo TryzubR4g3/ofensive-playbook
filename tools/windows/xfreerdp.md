@@ -6,6 +6,7 @@ FreeRDP client for interactive RDP sessions, clipboard sharing, dynamic resoluti
 
 ### Basic RDP login
 
+<!-- cmd: linux -->
 ```bash
 xfreerdp /v:IP /u:USERNAME /p:PASSWORD
 ```
@@ -16,6 +17,7 @@ stabilized GUI access after creating a local Windows admin.
 
 ### RDP through proxychains with shared tools
 
+<!-- cmd: linux -->
 ```bash
 proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' \
   +clipboard /dynamic-resolution \

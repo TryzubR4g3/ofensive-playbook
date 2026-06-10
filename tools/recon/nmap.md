@@ -89,6 +89,7 @@ These scan types rely on setting TCP flags in unexpected ways to prompt ports fo
 ## Commands Used
 
 ### Standard two-phase pattern (most machines)
+<!-- cmd: linux -->
 ```bash
 # Phase 1 — fast all-port SYN discovery
 nmap -sS -p- -n -Pn --min-rate 5000 --open $TARGET -oN silent
@@ -99,6 +100,7 @@ nmap -sVC -p<PORTS> $TARGET -oN service
 Used on: **Kenobi**, **Internal**, **Decryptify**, **Vulnerability Capstone**, **Team**, **IDE**, **Bookstore**, **Lookup**, **bsidesgtdav**, **bsidesgtthompson**, **coldvvars**, **Reactor**, **AttacktiveDirectory**, **DevHub**, **Aster**
 
 ### Targeted service scans from single-pass discovery
+<!-- cmd: linux -->
 ```bash
 nmap -sVC -p22,80,3000 $TARGET -oN service
 nmap -sVC -p22,80 $TARGET -oN service
@@ -110,6 +112,7 @@ Used on: **davesblog**, **Gaara**, **hfb1royalrouter**, **Parcel**
 targeted service/version scans after known open ports were identified.
 
 ### Minimal default scan
+<!-- cmd: linux -->
 ```bash
 nmap $TARGET
 ```
@@ -118,6 +121,7 @@ Used on: **flower**
 quick reachability and open-port check before web fuzzing.
 
 ### UDP scan for exposed VoIP/SIP services
+<!-- cmd: linux -->
 ```bash
 nmap -sU --top-ports 2000 -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
 nmap -sU -p- -n -Pn --min-rate 2000 $TARGET --open -oN udp-top-2000
@@ -129,6 +133,7 @@ checked UDP services after TCP enumeration, including SIP on `5060/udp`.
 ---
 
 ### Wreath — proxychains pivot (TCP-connect through SOCKS)
+<!-- cmd: linux -->
 ```bash
 nmap -sS -p- -n -Pn --min-rate 5000 $TARGET -oN silent-web-server
 nmap -sVC -p22,80,443,10000 $TARGET -oN service-web-server
@@ -141,6 +146,7 @@ Used on: **Wreath**
 ---
 
 ### Kobold / CCTV / DevArea — full TCP with scripts (no two-phase)
+<!-- cmd: linux -->
 ```bash
 nmap -sC -sV -p- TARGET_IP
 ```
@@ -149,6 +155,7 @@ Used on: **Kobold**, **CCTV**, **DevArea**
 --
 
 ### Overwatch — targeted AD port list (no ping, no DNS)
+<!-- cmd: linux -->
 ```bash
 nmap -sVC -p53,88,135,139,389,445,464,593,636,3268,3269,3389,5985,6520,9389,49664,49667,49958,49959,55427,57249,59340,59343 -Pn -n TARGET_IP
 ```
@@ -157,6 +164,7 @@ Used on: **Overwatch**
 --
 
 ### ohmyweb — static binary drop inside stripped container
+<!-- cmd: linux -->
 ```bash
 # Attacker — serve the binary
 cd ~/static-bins && sudo python3 -m http.server 80
@@ -173,6 +181,7 @@ found OMI/OMIGOD on `5986/tcp`. See: [container-network-pivoting.md](../../explo
 ---
 
 ### Bandit — multi-target SYN scan from input file
+<!-- cmd: linux -->
 ```bash
 # What it does: SYN-scan all ports across a list of IPs loaded from a file.
 # Why here: enumerate multiple hosts in a network range without typing each IP.

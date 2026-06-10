@@ -28,6 +28,7 @@ The Piet interpreter walks the image starting at the top-left, reads pixel colou
 ## Steps
 
 ### 1. Recognise the format
+<!-- cmd: linux -->
 ```bash
 file credentials.png
 # PNG image data, 80 x 80, 8-bit/color RGBA, non-interlaced
@@ -38,6 +39,7 @@ strings credentials.png        # no readable strings
 If `file` says PNG/GIF/BMP and the image is a clean blocky grid of saturated colours -- it's probably Piet.
 
 ### 2. Run it through `npiet`
+<!-- cmd: linux -->
 ```bash
 sudo apt install npiet 2>/dev/null || \
   curl -fsSL https://www.bertnase.de/npiet/npiet-1.3f.tar.gz -o npiet.tgz \
@@ -48,6 +50,7 @@ sudo apt install npiet 2>/dev/null || \
 Used on: **bsidesgtdevelpy** -- output is the user's password.
 
 If the program loops on input, feed it a newline:
+<!-- cmd: linux -->
 ```bash
 echo "" | ./npiet credentials.png
 ```

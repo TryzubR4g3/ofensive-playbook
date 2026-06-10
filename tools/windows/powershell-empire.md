@@ -6,6 +6,7 @@ Post-exploitation C2 framework for listeners, stagers, agents, modules, and hop 
 
 ### Install and start Empire
 
+<!-- cmd: linux -->
 ```bash
 sudo apt install powershell-empire starkiller
 sudo powershell-empire server
@@ -17,6 +18,7 @@ tested as a C2 option before falling back to Chisel for the later pivot.
 
 ### Connect the client
 
+<!-- cmd: linux -->
 ```bash
 powershell-empire client
 ```
@@ -25,6 +27,7 @@ Used on: **Wreath**.
 
 ### Run Empire network scripts through Evil-WinRM
 
+<!-- cmd: linux -->
 ```bash
 proxychains evil-winrm -u Administrator -H NTLM_HASH -i 10.200.180.150 -s /usr/share/powershell-empire/empire/server/data/module_source/situational_awareness/network
 ```
@@ -33,6 +36,7 @@ Used on: **Wreath**
 
 loaded `Invoke-Portscan` helpers into the Evil-WinRM session.
 
+<!-- cmd: windows -->
 ```powershell
 Get-Help Invoke-Portscan
 Invoke-Portscan -Hosts 10.200.180.100 -TopPorts 50

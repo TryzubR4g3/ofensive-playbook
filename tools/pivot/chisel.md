@@ -6,6 +6,7 @@ Fast TCP/UDP tunnel over HTTP, useful for reverse SOCKS pivots and port forwards
 
 ### Reverse SOCKS pivot
 
+<!-- cmd: linux -->
 ```bash
 # Attacker / pivot controller
 ./chisel server -p 15000 --reverse &
@@ -26,6 +27,7 @@ socks5 127.0.0.1 1080
 
 ### Reverse remote port forward
 
+<!-- cmd: linux -->
 ```bash
 # Pivot host
 ./chisel server -p 16000 --reverse &
@@ -40,6 +42,7 @@ exposed `10.200.180.100:80` through `10.200.180.200:15001`.
 
 ### Relay a reverse shell through an intermediate host
 
+<!-- cmd: linux -->
 ```bash
 # Intermediate host
 ./chisel server -p 16000 --reverse &
@@ -68,6 +71,7 @@ the GitStack host could reach the intermediate server but not Kali directly.
 ## Additional Commands Used
 
 ### Reverse SOCKS pivot with SOCKS5 enabled
+<!-- cmd: linux -->
 ```bash
 # Attacker
 ./chisel server -p 9001 --reverse --socks5
@@ -80,6 +84,7 @@ Used on: **DevHub**
 exposed loopback-only services through a reverse SOCKS tunnel.
 
 ### Reverse port forward to JupyterLab
+<!-- cmd: linux -->
 ```bash
 # Attacker
 ./chisel server -p 9001 --reverse --socks5

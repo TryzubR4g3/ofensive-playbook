@@ -5,6 +5,7 @@ Reads POSIX file capabilities — the per-binary fine-grained replacement for SU
 ## Commands Used
 
 ### Recursive capability sweep
+<!-- cmd: linux -->
 ```bash
 getcap -r / 2>/dev/null
 ```
@@ -16,12 +17,14 @@ Result: `/usr/bin/python3.7 = cap_setuid+ep` -> see [linux-capabilities-privesc.
 - `2>/dev/null` -- silence "Operation not supported" on filesystems that don't carry xattrs (`/proc`, `/sys`).
 
 ### Capability of a single binary
+<!-- cmd: linux -->
 ```bash
 getcap /usr/bin/python3.7
 # /usr/bin/python3.7 = cap_setuid+ep
 ```
 
 ### Set / remove capabilities (rarely useful from a low-priv shell, but good to recognise)
+<!-- cmd: linux -->
 ```bash
 setcap cap_setuid+ep ./shell    # need CAP_SETFCAP / root
 setcap -r ./shell               # remove

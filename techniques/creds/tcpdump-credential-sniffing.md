@@ -12,6 +12,7 @@ Some scheduled tasks / cron jobs reach out to internal services with credentials
 
 ## Command Used
 
+<!-- cmd: linux -->
 ```bash
 /usr/bin/tcpdump -i any -A
 ```
@@ -24,6 +25,7 @@ Result on CCTV: a periodic task sent `sa_mark:PASSWORD` in the clear → lateral
 ## Targeted Filtering
 
 Reduce noise with BPF:
+<!-- cmd: linux -->
 ```bash
 # Watch HTTP Basic / form posts
 tcpdump -i any -A 'tcp port 80 or tcp port 8080'

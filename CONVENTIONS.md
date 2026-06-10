@@ -307,3 +307,103 @@ Used on: **Bookstore** - found the hidden parameter
 ssh user@target  # Used on: Internal
 ```
 ```
+
+---
+
+## 6 — Command Marking Convention
+
+Every **fenced code block** containing an executable command MUST be preceded by a **platform marker** so `brain` can distinguish commands from code examples and filter by OS.
+
+### Marker Format
+
+Precede each fenced code block with an HTML comment marker:
+
+```markdown
+<!-- cmd: platform -->
+```bash
+command here
+```
+```
+
+### Supported Platforms
+
+| Platform | Use When | Examples |
+|----------|----------|----------|
+| `linux` | bash/sh/zsh/ansible commands | `find`, `grep`, `sudo`, `curl`, `ssh` |
+| `windows` | PowerShell / cmd.exe commands | `Get-ChildItem`, `whoami`, `net user` |
+| `cross-platform` | Works on Linux AND Windows | Most `curl`, `python`, `ruby` scripts |
+| `docker` | Docker/container-specific | `docker run`, `docker exec`, `kubectl` |
+| `sql` | Database queries | `SELECT`, `INSERT`, `MySQL`, `PostgreSQL` |
+| `http` | HTTP requests / API calls | Raw HTTP packets, `curl` JSON requests |
+| `python` | Python scripts | Exception: marked as `python`, not `cross-platform` |
+
+### Examples
+
+**Linux command:**
+```markdown
+<!-- cmd: linux -->
+```bash
+find / -name "*.sh" -exec grep -l "sudo" {} \;
+```
+```
+
+**Windows command:**
+```markdown
+<!-- cmd: windows -->
+```powershell
+Get-ChildItem -Recurse -Filter *.txt | Select-String "password"
+```
+```
+
+**Cross-platform script:**
+```markdown
+<!-- cmd: cross-platform -->
+```python
+import requests
+response = requests.get("http://target:8080/api")
+print(response.text)
+```
+```
+
+**Inline code in tabular format (no marker needed):**
+```markdown
+| Command | Purpose |
+|---------|---------|
+| `nmap -sT target` | TCP connect scan |
+| `sqlmap -u URL --dbs` | Enumerate databases |
+```
+
+### Rules
+
+1. **Only mark fenced code blocks** — inline `code` in paragraphs is not marked
+2. **Marker goes on the line immediately before** ` ``` `
+3. **One marker per block** — if a block contains multiple languages, use the primary one
+4. **No marker needed for non-code blocks** — pseudocode, SQL in tables, etc. are obvious
+5. **Comments inside the block are fine** — don't mark them separately:
+
+```markdown
+<!-- cmd: linux -->
+```bash
+# This is a comment — still part of the bash block
+find / -type f -name "*.key"
+```
+```
+
+### Why This Matters
+
+- `./brain cmd find` → finds all `find` commands across the repo (searchable)
+- `./brain cmd linux find` → finds only Linux usage
+- `./brain privesc cmd` → shows only actual commands in privesc topic, not prose
+- Colored badges in output: `[linux]`, `[windows]`, etc. for quick visual filtering
+
+### Searchability Checklist
+
+Before submitting a note with commands:
+
+```
+[ ] Every fenced code block has <!-- cmd: platform --> marker
+[ ] Platform is one of: linux, windows, cross-platform, docker, sql, http, python
+[ ] Marker is on the line directly before ```
+[ ] Inline code (in paragraphs) is NOT marked
+[ ] Code in tables is NOT marked
+```

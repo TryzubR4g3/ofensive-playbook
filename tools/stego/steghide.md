@@ -7,6 +7,7 @@ Used on: **Yueiua**
 ## Commands Used
 
 ### Probe without a passphrase
+<!-- cmd: linux -->
 ```bash
 steghide info oneforall.jpg
 # Shows whether data is embedded, the embedded file name, and size —
@@ -14,6 +15,7 @@ steghide info oneforall.jpg
 ```
 
 ### Extract with a known passphrase
+<!-- cmd: linux -->
 ```bash
 steghide extract -sf oneforall.jpg       # [USED — Yueiua]
 # Enter passphrase:
@@ -26,11 +28,13 @@ steghide extract -sf oneforall.jpg       # [USED — Yueiua]
 | `-xf <out>` | explicit output filename |
 
 ### Extract non-interactively
+<!-- cmd: linux -->
 ```bash
 steghide extract -sf oneforall.jpg -p 'AllmightForEver!!!' -xf creds.txt
 ```
 
 ### Embed (reverse — for planting payloads)
+<!-- cmd: linux -->
 ```bash
 steghide embed -cf cover.jpg -ef secret.txt -p 'hunter2' -sf stego.jpg
 ```
@@ -39,6 +43,7 @@ steghide embed -cf cover.jpg -ef secret.txt -p 'hunter2' -sf stego.jpg
 
 Steghide is passphrase-protected. In CTF chains the passphrase is almost always already on the box:
 
+<!-- cmd: linux -->
 ```bash
 # On the foothold shell
 grep -rEi 'pass|pwd|phrase|secret' /home /opt /tmp /var/www 2>/dev/null
@@ -50,6 +55,7 @@ echo '<base64>' | base64 -d
 
 `steghide` itself has no brute mode — use **stegseek** (drop-in, 40k+ guesses/sec):
 
+<!-- cmd: linux -->
 ```bash
 sudo apt install stegseek   # or download from github.com/RickdeJager/stegseek
 stegseek oneforall.jpg /usr/share/wordlists/rockyou.txt

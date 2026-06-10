@@ -5,6 +5,7 @@ MariaDB / MySQL command-line client. Used for authenticated DB enumeration once 
 ## Commands Used
 
 ### Remote login (blocked on Billing — default bind-address)
+<!-- cmd: linux -->
 ```bash
 mysql -h $TARGET -u mbillingUser --password=BLOGYwvtJkI7uaX5
 ```
@@ -13,11 +14,13 @@ Used on: **Billing**
 confirmed 3306 was filtered / bound to localhost; dropped to local client inside the foothold.
 
 ### Local client inside the foothold
+<!-- cmd: linux -->
 ```bash
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5'
 ```
 
 ### One-shot queries (`-e`)
+<!-- cmd: linux -->
 ```bash
 # Dump a full table
 mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -D mbilling -e "SELECT * FROM pkg_user;" > /tmp/usuarios.txt    # Used — Billing
@@ -28,12 +31,14 @@ mysql -u mbillingUser -p'BLOGYwvtJkI7uaX5' -e \
 ```
 
 ### Full database backup
+<!-- cmd: linux -->
 ```bash
 mysqldump -u mbillingUser -p'BLOGYwvtJkI7uaX5' mbilling > /tmp/mbilling_backup.sql    # Used — Billing
 ```
 Handy when you want to grep the schema offline (transfer with meterpreter `download`, then `grep -Ei 'pass|secret|token' mbilling_backup.sql`).
 
 ### Useful introspection queries
+<!-- cmd: linux -->
 ```bash
 # List databases
 mysql -u <USER> -p'<PASS>' -e "SHOW DATABASES;"

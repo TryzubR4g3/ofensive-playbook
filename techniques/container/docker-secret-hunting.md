@@ -18,6 +18,7 @@ After landing in a container, basic container checks plus filesystem sweeps can 
 
 Confirm container context:
 
+<!-- cmd: linux -->
 ```bash
 cat /proc/self/status | grep -E '^Cap'
 hostname
@@ -26,6 +27,7 @@ mount | grep -E 'overlay|aufs'
 
 Search for simple text loot:
 
+<!-- cmd: linux -->
 ```bash
 find / -name "*.txt" 2>/dev/null | grep -v proc
 cat /opt/note.txt

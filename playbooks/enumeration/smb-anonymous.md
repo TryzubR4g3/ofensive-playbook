@@ -6,6 +6,7 @@ Even when null sessions are disabled, individual shares are often readable **ano
 
 ## Null / Guest Session Check
 
+<!-- cmd: linux -->
 ```bash
 netexec smb overwatch.htb -u '' -p '' --shares
 netexec smb TARGET_IP -u 'guest' -p '' --shares
@@ -15,6 +16,7 @@ If blocked: `STATUS_ACCESS_DENIED`. Still try individual shares.
 
 ## Try Specific Share Anonymously
 
+<!-- cmd: linux -->
 ```bash
 smbclient //TARGET_IP/software$ -N
 ```
@@ -24,12 +26,14 @@ smbclient //TARGET_IP/software$ -N
 
 ## Recursive Download
 
+<!-- cmd: linux -->
 ```bash
 smbclient //TARGET/SHARE -U DOMAIN/USER%PASSWORD \
   -c "recurse ON; prompt OFF; cd <path>; mget *"
 ```
 
 Used on **Overwatch** to mirror SYSVOL:
+<!-- cmd: linux -->
 ```bash
 smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *"

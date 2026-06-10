@@ -9,6 +9,7 @@ Both speak the wire protocol and default to `mongodb://127.0.0.1:27017`. Use whi
 ## Commands Used
 
 ### Connect — default localhost, no auth
+<!-- cmd: linux -->
 ```bash
 mongo
 mongosh
@@ -16,6 +17,7 @@ mongosh
 Used on: **cmspit**
 
 ### Connect — custom host/port/db, optional auth
+<!-- cmd: linux -->
 ```bash
 mongo --host 127.0.0.1 --port 27017
 mongo --host $TARGET --port 27017 dbname
@@ -23,12 +25,14 @@ mongo "mongodb://user:pass@127.0.0.1:27017/dbnameauthSource=admin"
 ```
 
 ### Quick non-interactive query (one-shot, useful in scripts)
+<!-- cmd: linux -->
 ```bash
 mongo --quiet --eval "db.adminCommand('listDatabases').databases.forEach(d=>print(d.name))"
 mongo dbname --quiet --eval "db.users.find().forEach(printjson)"
 ```
 
 ### List  walk databases and collections
+<!-- cmd: cross-platform -->
 ```javascript
 > show dbs
 > use sudousersbak                       // [USED — cmspit]
@@ -40,6 +44,7 @@ mongo dbname --quiet --eval "db.users.find().forEach(printjson)"
 Used on: **cmspit**
 
 ### One-shot dump-everything one-liner
+<!-- cmd: cross-platform -->
 ```javascript
 db.adminCommand("listDatabases").databases.forEach(function(d){
   db = db.getSiblingDB(d.name);
@@ -51,6 +56,7 @@ db.adminCommand("listDatabases").databases.forEach(function(d){
 ```
 
 ### Query DSL highlights
+<!-- cmd: cross-platform -->
 ```javascript
 db.users.find({role:"admin"})
 db.users.find({}, {name:1, password:1, _id:0})       // projection
@@ -61,6 +67,7 @@ db.users.stats()
 ```
 
 ### Server / auth state checks
+<!-- cmd: cross-platform -->
 ```javascript
 db.runCommand({connectionStatus:1})       // who am I, what roles
 db.runCommand({getCmdLineOpts:1})         // launch flags (auth on/off)
@@ -71,6 +78,7 @@ db.serverBuildInfo().version
 ## When `mongo` is bound to localhost
 
 Tunnel from the foothold:
+<!-- cmd: linux -->
 ```bash
 ssh -L 27017:127.0.0.1:27017 user@$TARGET
 mongo --host 127.0.0.1 --port 27017
@@ -80,6 +88,7 @@ See [ssh-tunneling.md](../../techniques/pivot/ssh-tunneling.md).
 ## When `mongo` is missing on the box
 
 Install pymongo on your attacker side (after tunnelling), or one-line on the box:
+<!-- cmd: linux -->
 ```bash
 python3 -c "from pymongo import MongoClient; c=MongoClient('mongodb://127.0.0.1'); [print(d) for d in c.list_database_names()]"
 ```
@@ -99,6 +108,7 @@ python3 -c "from pymongo import MongoClient; c=MongoClient('mongodb://127.0.0.1'
 ## Additional Commands Used
 
 ### Enumerate application collections
+<!-- cmd: cross-platform -->
 ```javascript
 mongo
 show dbs

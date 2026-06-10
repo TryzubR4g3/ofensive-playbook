@@ -5,6 +5,7 @@ SNMP application that uses SNMP GETNEXT requests to query a network entity for a
 ## Commands Used
 
 ### Walk the entire MIB tree
+<!-- cmd: linux -->
 ```bash
 snmpwalk -v2c -c pr1v4t3 $TARGET
 ```
@@ -13,6 +14,7 @@ Used on: **operationtakeover**
 full enumeration of the device using the discovered `pr1v4t3` community string.
 
 ### Walk a specific OID subtree
+<!-- cmd: linux -->
 ```bash
 snmpwalk -v2c -c pr1v4t3 $TARGET .1.3.6.1.4.1.8072.1.3.2
 ```

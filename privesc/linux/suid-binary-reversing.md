@@ -23,6 +23,7 @@ Most "magic number" SUID binaries fail at step 3, where you read the constants o
 ## Steps
 
 ### 1. Spot the SUID
+<!-- cmd: linux -->
 ```bash
 find / -perm -4000 -type f 2>/dev/null
 # /home/sid/try-harder
@@ -35,6 +36,7 @@ file /home/sid/try-harder
 A custom binary (no package, in a user's home, owned by root) screams "look at me".
 
 ### 2. Run it once — see what it asks for
+<!-- cmd: linux -->
 ```bash
 ./try-harder
 # What's The Magic Number!
@@ -43,6 +45,7 @@ A custom binary (no package, in a user's home, owned by root) screams "look at m
 ```
 
 ### 3. `strings` first
+<!-- cmd: linux -->
 ```bash
 strings ./try-harder
 strings ./try-harder | grep -iE "magic|number|secret|password|flag|/bin/"
@@ -50,6 +53,7 @@ strings ./try-harder | grep -iE "magic|number|secret|password|flag|/bin/"
 If you see a literal answer, type it. Bookstore's binary stores `0x5dcd21f4` numerically -- nothing useful in `strings`. Move on.
 
 ### 4. `ltrace` — watch the comparison
+<!-- cmd: linux -->
 ```bash
 ltrace ./try-harder
 # __isoc99_scanf("%d", 0x7ffe...)  = 1
@@ -58,6 +62,7 @@ ltrace ./try-harder
 Only `scanf` and `puts`. **No** `strcmp` / `memcmp` -> the comparison is inline. Time for `objdump`.
 
 ### 5. `objdump -d` -- read the assembly
+<!-- cmd: linux -->
 ```bash
 objdump -d ./try-harder | awk '/^.*<main>:/,/^$/'
 ```
@@ -81,12 +86,14 @@ XOR is its own inverse, so:
 ```
 input = 0x5dcd21f4 ^ 0x5db3 ^ 0x1116
 ```
+<!-- cmd: linux -->
 ```bash
 python3 -c 'print(0x5dcd21f4 ^ 0x5db3 ^ 0x1116)'
 # 1573454177
 ```
 
 ### 7. Cash in
+<!-- cmd: linux -->
 ```bash
 ./try-harder
 # What's The Magic Number!

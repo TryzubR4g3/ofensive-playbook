@@ -6,6 +6,7 @@ CLI wrapper that forces a command through a SOCKS or HTTP proxy. Useful after cr
 
 ### Run TCP tools through a SOCKS proxy
 
+<!-- cmd: linux -->
 ```bash
 proxychains nc 172.16.0.100 23
 proxychains telnet 172.16.0.100 23
@@ -17,6 +18,7 @@ quick service reachability checks through a pivot.
 
 ### Scan through SOCKS
 
+<!-- cmd: linux -->
 ```bash
 proxychains nmap -sT -Pn -n 10.200.180.1-255 -oN scan
 ```
@@ -27,6 +29,7 @@ Used on: **Wreath**
 
 ### Trigger webshell commands through a pivot
 
+<!-- cmd: linux -->
 ```bash
 proxychains curl -X POST http://10.200.180.150/web/exploit-tryzub.php --data-urlencode "a=whoami"
 ```
@@ -39,6 +42,7 @@ executed commands on GitStack's uploaded PHP webshell through the Chisel SOCKS p
 
 Copy the global config locally per engagement:
 
+<!-- cmd: linux -->
 ```bash
 cp /etc/proxychains.conf .
 ```

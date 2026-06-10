@@ -28,6 +28,7 @@ Every AD principal has a SID of the form `S-1-5-21-<DOMAIN>-<RID>`. The RID spac
 
 ## netexec (recommended)
 
+<!-- cmd: linux -->
 ```bash
 nxc smb <TARGET> -u guest -p '' --rid-brute > rid_brute.txt
 ```
@@ -35,6 +36,7 @@ nxc smb <TARGET> -u guest -p '' --rid-brute > rid_brute.txt
 Default cycles RIDs 500–4000. Extend with `--rid-brute 10000` for larger domains.
 
 ### Filter to just user accounts
+<!-- cmd: linux -->
 ```bash
 grep '<DOMAIN>\\' rid_brute.txt \
   | cut -d':' -f2- \
@@ -49,6 +51,7 @@ grep '<DOMAIN>\\' rid_brute.txt \
 
 ## Impacket Alternative
 
+<!-- cmd: linux -->
 ```bash
 impacket-lookupsid <DOMAIN>/guest:''@<TARGET>
 impacket-lookupsid <DOMAIN>/<USER>:<PASS>@<TARGET> 4000
@@ -62,6 +65,7 @@ Second form sets the max RID.
 
 When scripted tools are blocked:
 
+<!-- cmd: linux -->
 ```bash
 rpcclient -U 'guest%' //<TARGET>
 rpcclient $> lookupnames administrator    # yields the domain SID

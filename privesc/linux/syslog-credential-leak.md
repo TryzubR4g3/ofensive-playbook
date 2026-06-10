@@ -15,6 +15,7 @@ System logs (`/var/log/syslog`, `/var/log/auth.log`) record elevated commands ex
 
 Check if the current user belongs to the `adm` group.
 
+<!-- cmd: linux -->
 ```bash
 id
 # uid=1000(tim) gid=1000(tim) groups=1000(tim),4(adm)
@@ -24,6 +25,7 @@ id
 
 Recursively search the `/var/log/` directory for keywords like `password`, `passwd`, or `secret`.
 
+<!-- cmd: linux -->
 ```bash
 grep -r -E -i 'password|passwd|PASSWORD' /var/log/ 2>/dev/null
 ```
@@ -42,6 +44,7 @@ In this example, the user `tyler` passed a database password as an environment v
 
 Attempt to use the recovered password to switch to the user who executed the command or to access other internal services like SSH or databases.
 
+<!-- cmd: linux -->
 ```bash
 su tyler
 # Password: _Zd_zx7N823/

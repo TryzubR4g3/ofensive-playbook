@@ -6,6 +6,7 @@ Repository: [wavestone-cdt/powerpxe](https://github.com/wavestone-cdt/powerpxe)
 ## Commands Used
 
 ### Parse a BCD file to find the WIM image path
+<!-- cmd: windows -->
 ```powershell
 powershell -executionpolicy bypass
 Import-Module .\PowerPXE.ps1
@@ -17,6 +18,7 @@ Used on: **Breaching-Active-Directory**
 Identified the path `\Boot\x64\Images\LiteTouchPE_x64.wim` from the downloaded `conf.bcd` file.
 
 ### Extract credentials from a WIM image
+<!-- cmd: windows -->
 ```powershell
 Get-FindCredentials -WimFile pxeboot.wim
 ```

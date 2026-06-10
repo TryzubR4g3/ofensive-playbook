@@ -5,6 +5,7 @@ Fast SNMP scanner used to brute-force community strings. It takes a list of IPs 
 ## Commands Used
 
 ### Brute-force community strings
+<!-- cmd: linux -->
 ```bash
 onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings.txt $TARGET
 ```

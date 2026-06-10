@@ -17,6 +17,7 @@ Used on: **chronicle**
 
 ## Files To Hunt
 
+<!-- cmd: linux -->
 ```bash
 find /home -name logins.json -o -name key4.db -o -name key3.db 2>/dev/null
 ```

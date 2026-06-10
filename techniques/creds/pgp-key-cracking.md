@@ -23,6 +23,7 @@ A password-protected PGP private key is a cracked passphrase away from being ful
 
 ## Step 1 — Convert the Key to a John Hash
 
+<!-- cmd: linux -->
 ```bash
 gpg2john private.asc > pgp_hash.txt
 ```
@@ -30,6 +31,7 @@ gpg2john private.asc > pgp_hash.txt
 The output is a single line per key: `<userid>:$gpg$*1*...*...:::::::`.
 
 For binary keys:
+<!-- cmd: linux -->
 ```bash
 gpg2john ~/.gnupg/secring.gpg > pgp_hash.txt
 ```
@@ -39,22 +41,26 @@ gpg2john ~/.gnupg/secring.gpg > pgp_hash.txt
 ## Step 2 — Crack
 
 ### Wordlist mode (fastest first pass)
+<!-- cmd: linux -->
 ```bash
 john --wordlist=/usr/share/wordlists/rockyou.txt pgp_hash.txt
 ```
 
 ### Show the result
+<!-- cmd: linux -->
 ```bash
 john --show pgp_hash.txt
 ```
 
 ### Rules / incremental (if rockyou alone fails)
+<!-- cmd: linux -->
 ```bash
 john --wordlist=/usr/share/wordlists/rockyou.txt --rules=Jumbo pgp_hash.txt
 john --incremental pgp_hash.txt
 ```
 
 ### GPU (hashcat) alternative — mode 17010 (GPG)
+<!-- cmd: linux -->
 ```bash
 hashcat -m 17010 pgp_hash.txt /usr/share/wordlists/rockyou.txt
 ```
@@ -64,6 +70,7 @@ hashcat -m 17010 pgp_hash.txt /usr/share/wordlists/rockyou.txt
 
 ## Step 3 — Import the Key and Decrypt
 
+<!-- cmd: linux -->
 ```bash
 gpg --import private.asc
 # gpg prompts for the cracked passphrase on first use
@@ -74,6 +81,7 @@ gpg --decrypt backup_encrypted.pgp > backup_decrypted.txt
 ```
 
 If the blob is a tarball:
+<!-- cmd: linux -->
 ```bash
 gpg --decrypt backup.tar.gpg | tar -xvf -
 ```

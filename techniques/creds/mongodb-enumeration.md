@@ -28,6 +28,7 @@ The two collections worth checking on every CMS / app DB:
 ## Steps
 
 ### 1. Connect
+<!-- cmd: linux -->
 ```bash
 mongo                   # legacy shell, no args -> 127.0.0.1:27017
 mongosh                 # 6.x+ shell, same default
@@ -37,6 +38,7 @@ mongo "mongodb://user:pass@127.0.0.1:27017/dbname"   # auth case
 Used on: **cmspit**
 
 ### 2. Map the databases
+<!-- cmd: cross-platform -->
 ```javascript
 > show dbs
 admin     0.000GB
@@ -47,6 +49,7 @@ sudousersbak 0.000GB         unusual name, prime suspect
 ```
 
 ### 3. Walk the suspect DB
+<!-- cmd: cross-platform -->
 ```javascript
 > use sudousersbak
 switched to db sudousersbak
@@ -64,6 +67,7 @@ Used on: **cmspit** -- `stux:p4ssw0rdhack3d!123` -> `su stux`.
 
 ### 4. Generic loot queries
 
+<!-- cmd: cross-platform -->
 ```javascript
 // pretty print
 > db.user.find().pretty()
@@ -88,6 +92,7 @@ Used on: **cmspit** -- `stux:p4ssw0rdhack3d!123` -> `su stux`.
 ### 5. Tunnel out (when mongo is bound to localhost)
 
 If mongo isn't reachable from your attacker box but you have an SSH foothold, [SSH local forward](../pivot/ssh-tunneling.md) it:
+<!-- cmd: linux -->
 ```bash
 ssh -L 27017:127.0.0.1:27017 user@$TARGET
 mongo --host 127.0.0.1 --port 27017

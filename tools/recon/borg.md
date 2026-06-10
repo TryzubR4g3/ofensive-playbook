@@ -5,6 +5,7 @@ BorgBackup (short for Borg) is a deduplicating backup program. Optionally, it su
 ## Commands Used
 
 ### List a Borg repository
+<!-- cmd: linux -->
 ```bash
 borg list .
 ```
@@ -13,6 +14,7 @@ Used on: **cyborgt8**
 listed the contents of a downloaded Borg repository. Prompted for a passphrase which was cracked previously.
 
 ### List contents of a specific archive within a repository
+<!-- cmd: linux -->
 ```bash
 borg list .::music_archive
 ```
@@ -21,6 +23,7 @@ Used on: **cyborgt8**
 verified the contents of the `music_archive` before extraction.
 
 ### Extract a specific archive from a repository
+<!-- cmd: linux -->
 ```bash
 borg extract .::music_archive
 ```

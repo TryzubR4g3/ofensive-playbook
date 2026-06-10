@@ -5,12 +5,14 @@ GnuPG handles PGP encryption, decryption and key management. `gpg2john` (ships w
 ## Commands Used
 
 ### Convert a PGP private key to a john hash
+<!-- cmd: linux -->
 ```bash
 gpg2john private.asc > pgp_hash.txt
 ```
 Used on: **Anonforce (BSides GT)**
 
 ### Crack the passphrase with john
+<!-- cmd: linux -->
 ```bash
 john --wordlist=/usr/share/wordlists/rockyou.txt pgp_hash.txt
 john --show pgp_hash.txt
@@ -20,6 +22,7 @@ Used on: **Anonforce (BSides GT)**
 passphrase cracked to `xbox360`.
 
 ### Import the private key into the keyring
+<!-- cmd: linux -->
 ```bash
 gpg --import private.asc
 ```
@@ -28,6 +31,7 @@ Used on: **Anonforce (BSides GT)**
 prompts for passphrase on first use.
 
 ### Decrypt a file with the imported key
+<!-- cmd: linux -->
 ```bash
 gpg --decrypt backup_encrypted.pgp > backup_decrypted.txt
 ```
@@ -38,23 +42,27 @@ revealed `/etc/shadow` hashes.
 ## Useful extras (not used in the writeups yet)
 
 ### List keys in the keyring
+<!-- cmd: linux -->
 ```bash
 gpg --list-keys
 gpg --list-secret-keys
 ```
 
 ### Non-interactive decrypt (for scripting)
+<!-- cmd: linux -->
 ```bash
 gpg --batch --passphrase '<pass>' --decrypt file.gpg > file.plain
 ```
 
 ### Delete a test key
+<!-- cmd: linux -->
 ```bash
 gpg --delete-secret-keys <KEYID>
 gpg --delete-keys <KEYID>
 ```
 
 ### GPU alternative — hashcat PGP modes
+<!-- cmd: linux -->
 ```bash
 hashcat -m 17010 pgp_hash.txt /usr/share/wordlists/rockyou.txt
 # modes 17010-17060 cover different GPG ciphers; hashcat autodetects or prompts

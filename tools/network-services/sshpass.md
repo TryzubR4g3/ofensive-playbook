@@ -6,12 +6,14 @@ Non-interactive ssh password provider. Extremely useful when scripting ssh conne
 
 ### Basic usage
 Provide the password inline and execute the ssh command:
+<!-- cmd: linux -->
 ```bash
 sshpass -p 'MySecretPassword' ssh user@$TARGET
 ```
 Used on: **marketplace**
 
 ### Execute a specific command remotely
+<!-- cmd: linux -->
 ```bash
 sshpass -p 'MySecretPassword' ssh user@$TARGET "cat /home/user/user.txt"
 ```

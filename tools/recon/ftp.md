@@ -5,6 +5,7 @@ Interactive FTP client. Used primarily for anonymous FTP enumeration when the se
 ## Commands Used
 
 ### Anonymous login
+<!-- cmd: linux -->
 ```bash
 ftp $TARGET
 # Name: anonymous
@@ -48,16 +49,19 @@ get backup_encrypted.pgp
 ## Non-interactive one-shots
 
 ### curl
+<!-- cmd: linux -->
 ```bash
 curl -u 'anonymous:' ftp://$TARGET/etc/passwd -o passwd
 ```
 
 ### wget recursive mirror
+<!-- cmd: linux -->
 ```bash
 wget -r --no-parent -nH ftp://anonymous:@$TARGET/
 ```
 
 ### lftp (cleaner recursive)
+<!-- cmd: linux -->
 ```bash
 lftp -u anonymous, $TARGET -e "mirror / ./ftp_dump; bye"
 ```

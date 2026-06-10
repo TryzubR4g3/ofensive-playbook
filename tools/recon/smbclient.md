@@ -2,6 +2,7 @@
 
 ## Kenobi Commands
 
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/anonymous
 get log.txt
@@ -15,6 +16,7 @@ FTP-like interactive client for SMB shares. Used for anonymous enumeration, down
 ## Commands Used
 
 ### Anonymous access to a specific share
+<!-- cmd: linux -->
 ```bash
 smbclient //TARGET_IP/software$ -N
 ```
@@ -23,6 +25,7 @@ Used on: **Overwatch**
 `-N` — no password (null session)
 
 ### Recursive download of SYSVOL
+<!-- cmd: linux -->
 ```bash
 smbclient //TARGET_IP/SYSVOL -U overwatch.htb/sqlsvc%'TI0LKcfHzZw1Vv' \
   -c "recurse ON; prompt OFF; cd overwatch.htb; mget *"
@@ -34,6 +37,7 @@ Used on: **Overwatch**
 - `recurse ON; prompt OFF; mget *` — recursive mass-get without prompting
 
 ### Push a webshell to a writable share (one-shot upload)
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/nt4wrksv -U 'Bob%!P@$$W0rD!123' -c "put shell.asp"
 ```
@@ -45,6 +49,7 @@ landed `shell.asp` into a share mirrored by IIS at `:49663/nt4wrksv/`. Pair with
 - `-c "put <local>"` — non-interactive single command
 
 ### Anonymous read + grab a file
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/nt4wrksv -N -c "get passwords.txt"
 ```
@@ -53,6 +58,7 @@ Used on: **Relevant**
 `passwords.txt` contained base64-encoded creds (see [base64-encoded-credentials.md](../../techniques/creds/base64-encoded-credentials.md)).
 
 ### Anonymous share walk with recursive download
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/anonymous
 mget *
@@ -62,6 +68,7 @@ Used on: **Skynet**
 guest access exposed internal notes and password-related files under the anonymous share.
 
 ### Authenticated interactive login
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/backup -U svc-admin%management2005
 ```
@@ -72,6 +79,7 @@ connected to backup share to read files.
 
 
 ### Authenticated access to writable web-backed share
+<!-- cmd: linux -->
 ```bash
 smbclient //$TARGET/SECURED -U 'ArthurMorgan%DeadEye'
 ```

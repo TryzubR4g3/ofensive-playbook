@@ -5,6 +5,7 @@ Wrapper around the Samba suite (`smbclient`, `rpcclient`, `net`, `nmblookup`) th
 ## Commands Used
 
 ### Full run
+<!-- cmd: linux -->
 ```bash
 enum4linux -a $TARGET
 ```
@@ -25,6 +26,7 @@ returned RID ranges `500–550` and `1000–1050`, confirming guest LSA access.
 
 ## Partial runs (when you want noise control)
 
+<!-- cmd: linux -->
 ```bash
 enum4linux -S $TARGET                      # just shares
 enum4linux -U -u guest -p '' $TARGET       # users, authenticated as guest
@@ -33,6 +35,7 @@ enum4linux -r -R 500-1500 $TARGET          # RID cycle bounded
 
 ## Follow-up when enum4linux comes back thin
 
+<!-- cmd: linux -->
 ```bash
 # Faster, modern equivalents
 netexec smb $TARGET -u '' -p '' --shares

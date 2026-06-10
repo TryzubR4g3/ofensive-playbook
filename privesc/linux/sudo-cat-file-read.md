@@ -15,6 +15,7 @@ If `sudo -l` allows a low-privileged user to run `/bin/cat` as root without a pa
 
 ## Steps
 
+<!-- cmd: linux -->
 ```bash
 sudo -l
 /bin/cat /etc/shadow

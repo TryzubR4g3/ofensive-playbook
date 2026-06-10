@@ -12,6 +12,7 @@ Use when:
 ## Commands Used
 
 ### Trace every libc call made by a SUID binary
+<!-- cmd: linux -->
 ```bash
 ltrace ./try-harder
 ```

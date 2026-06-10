@@ -7,6 +7,7 @@ Always reach for this **after** `strings` and `ltrace` — `objdump` is the slow
 ## Commands Used
 
 ### Disassemble `main()` of a SUID binary
+<!-- cmd: linux -->
 ```bash
 objdump -d ./try-harder | awk '/^.*<main>:/,/^$/'
 ```

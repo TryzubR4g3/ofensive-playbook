@@ -8,6 +8,7 @@ Used on: **eJPT / Course Reference**
 
 Search the file system for common Unattend / Sysprep files:
 
+<!-- cmd: windows -->
 ```cmd
 dir /s /b c:\unattend.xml
 dir /s /b c:\sysprep.inf
@@ -24,6 +25,7 @@ Common locations:
 ## 2. Extracting Credentials
 
 Read the file and look for `<Password>` or `<AdministratorPassword>` tags.
+<!-- cmd: cross-platform -->
 ```xml
 <UserAccounts>
     <AdministratorPassword>
@@ -34,6 +36,7 @@ Read the file and look for `<Password>` or `<AdministratorPassword>` tags.
 ```
 
 If `<PlainText>` is `false`, the value is usually Base64 encoded. Decode it on the attacker machine:
+<!-- cmd: linux -->
 ```bash
 echo "UGFzc3dvcmQxMjMh" | base64 -d
 ```
@@ -41,6 +44,7 @@ echo "UGFzc3dvcmQxMjMh" | base64 -d
 ## 3. Other Configuration Files
 
 Passwords might also be left in other files. Recursively search the `C:\` drive for the word "password":
+<!-- cmd: windows -->
 ```cmd
 # Using findstr (can be slow across the whole drive)
 findstr /si password *.txt *.xml *.ini

@@ -6,6 +6,7 @@ Dex to Java decompiler. Provides a GUI and CLI to decompile Android Dex and Apk 
 
 ### Open DEX or APK in GUI
 
+<!-- cmd: linux -->
 ```bash
 jadx-gui classes.dex
 ```

@@ -5,6 +5,7 @@ GNU binutils utility that prints printable character sequences from binary files
 ## Commands Used
 
 ### Extract Unicode (UTF-16LE) strings from a Windows binary and grep for credentials
+<!-- cmd: linux -->
 ```bash
 strings -e l overwatch.exe | grep -iE "password|user|sql|connection"
 ```
@@ -17,6 +18,7 @@ Result: found a hardcoded MSSQL connection string ->
 `Server=localhost;Database=SecurityLogs;User Id=sqlsvc;Password=TI0LKcfHzZw1Vv;`
 
 ### First-pass triage of an unknown SUID binary
+<!-- cmd: linux -->
 ```bash
 strings ./try-harder | head -80
 strings ./try-harder | grep -iE "magic|password|flag|key|/bin/"

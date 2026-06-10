@@ -6,6 +6,7 @@ Python bytecode decompiler used to recover readable Python source from `.pyc` fi
 
 ### Decompile a Python bytecode file
 
+<!-- cmd: linux -->
 ```bash
 ./pycdc /output.pyc
 ```

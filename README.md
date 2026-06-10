@@ -9,12 +9,22 @@ This repository is **tool-, exploit- and technique-centric**. Writeups exist as 
 The `./brain` (or `python brain.py`) CLI is the primary way to interact with this repository.
 
 ```bash
-./brain guide                # beginner examples and recipes
-./brain recon nmap           # every nmap command I've ever run
-./brain privesc sudo         # privilege escalation exploits matching "sudo"
-./brain search "bash -i"     # broad text search across the entire repo
-./brain cmd  "find /"        # grep only inside fenced code blocks
-./brain list all             # list all tools, exploits, payloads, writeups
+./brain guide                            # beginner examples and recipes
+./brain recon nmap                       # every nmap command I've ever run
+./brain privesc sudo                     # privilege escalation exploits matching "sudo"
+
+# Global Search
+./brain search "bash -i"                 # broad text search across the entire repo
+./brain cmd  "find /"                    # grep only inside fenced code blocks
+
+# Inline File Search (New)
+./brain tool metasploit search route     # grep a keyword inside a specific tool note
+./brain exploit eternalblue search nmap  # grep a keyword inside a specific exploit note
+./brain writeup Billing search nc        # grep a keyword inside a specific writeup
+
+# Listing & Viewing
+./brain list all                         # list all tools, exploits, payloads, writeups
+./brain tool nmap                        # show the full nmap tool note
 ```
 
 ## Available Topics

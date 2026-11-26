@@ -7,6 +7,8 @@
 - Correct spelling and unclear English in place when asked to copyedit. Preserve the author's meaning, the sequence and the detail of the existing writeup. Identify any uncertainty or missing evidence.
 - Preserve every original step, explanation, command, script, output, screenshot, link and result in the visible body of the writeup. Keep code, captures and quoted material verbatim. Keep the lab record in ordinary Markdown.
 - Use [Ra](writeups/TRY/Hard/Ra.md) as the presentation reference. Choose headings, numbered sections and a table of contents to fit the material in each writeup. Preserve the original observations and evidence in the sections where they belong.
+- Use descriptive headings, short paragraphs and blank lines around lists and fenced blocks. Place a brief explanation beside each observation so readers can tell what the evidence shows and why it matters.
+- Use inline code for parameter names and identifiers. Label fenced blocks according to what they contain. Use `text` for captured URLs and raw output, and the relevant language label for source code. Preserve the captured contents verbatim.
 - Keep case-specific details in the writeup. Capture reusable defensive observations, checks and mitigations in the corresponding catalog notes under `defense/`. Distinguish verified observations from suggestions for follow-up.
 - Mark incomplete source material explicitly. Record the evidence gap without inferring missing steps or outcomes.
 

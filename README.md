@@ -66,3 +66,5 @@ Search by topic to limit results to a specific phase or domain (`./brain <topic>
 * **`writeups/`**: Machine walkthroughs (`HTB/`, `TRY/`, `OffSec/`, `Webverselabs/`).
 
 Writeups link to the techniques. The CLI reverse-indexes those links to show exactly which boxes a technique was used on.
+
+The [PortSwigger draft on server-side parameter pollution](writeups/PortSwigger/api/Exploiting-server-side-parameter-pollution-in-a-query-string.md) includes a [defensive reference](defense/techniques/api-parameter-pollution.md).

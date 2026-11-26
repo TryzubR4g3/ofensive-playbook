@@ -1,5 +1,29 @@
 # Vulnversity — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of file upload validation and storage isolation and Unix host privilege boundaries.
+
+## Defensive takeaways
+
+- Validate file contents against an approved format list and isolate upload storage from executable code and configuration.
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+
+## Defensive references
+
+- [File upload validation and isolation](../../../defense/techniques/file-upload.md)
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.128.172.212 at time of solve)
 **OS:** Linux (Ubuntu)
 **Difficulty:** Easy

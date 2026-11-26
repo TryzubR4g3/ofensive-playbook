@@ -1,5 +1,29 @@
 ﻿# SoupedeCode 01 - TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of directory identity and delegation and service and share exposure.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../defense/techniques/directory-access-review.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.128.129.244 at time of solve)
 **Domain:** `SOUPEDECODE.LOCAL`
 **DC:** `DC01.SOUPEDECODE.LOCAL`

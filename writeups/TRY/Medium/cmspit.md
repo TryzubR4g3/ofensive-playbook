@@ -1,5 +1,29 @@
 # CMSpit A TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of evidence and artifact review and vulnerability remediation.
+
+## Defensive takeaways
+
+- Record the source and timestamp of observed evidence and mark unverified conclusions separately.
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+
+## Defensive references
+
+- [Evidence handling and artifact review](../../../defense/techniques/evidence-handling.md)
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.129.180.199 at time of solve)
 **OS:** Linux (Ubuntu 16.04)
 **Difficulty:** Medium

@@ -1,5 +1,29 @@
 # thenewyorkflankees — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of container runtime isolation and application input boundaries.
+
+## Defensive takeaways
+
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+
+## Defensive references
+
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ---
 
 ## 1. Reconnaissance

@@ -1,5 +1,29 @@
 # Athena — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and application input boundaries.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** TryHackMe  
 **Difficulty:** Medium  
 **OS:** Linux  

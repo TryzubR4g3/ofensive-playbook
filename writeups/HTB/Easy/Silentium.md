@@ -1,5 +1,29 @@
 # Silentium - HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of authorization and account recovery and container runtime isolation.
+
+## Defensive takeaways
+
+- Compare server-side authorization and account recovery with the documented access policy.
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+
+## Defensive references
+
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **Domain:** `silentium.htb`
 **OS:** Linux (Docker-based with Gogs)

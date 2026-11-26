@@ -1,5 +1,29 @@
 # Enigma — HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of vulnerability remediation and service and share exposure.
+
+## Defensive takeaways
+
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** HackTheBox  
 **Difficulty:** Easy  
 **OS:** Linux  

@@ -1,6 +1,30 @@
 # gamingserver
 
-## Reconnacie 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and credential exposure prevention.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
+## Reconnaissance
 ```bash
 nmap -sS -n -p- -Pn --min-rate 4000 $TARGET -oA silent
 nmap -sVC -p22,80 $TARGET -oN service

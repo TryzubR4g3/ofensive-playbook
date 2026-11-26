@@ -1,5 +1,29 @@
 # Steel Mountain — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Windows service and task permissions and vulnerability remediation.
+
+## Defensive takeaways
+
+- Compare service and scheduled-task identities, executable paths and ACLs with the Windows baseline.
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+
+## Defensive references
+
+- [Windows service and task hardening](../../../defense/techniques/windows-service-hardening.md)
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **OS:** Windows Server
 **Difficulty:** Easy

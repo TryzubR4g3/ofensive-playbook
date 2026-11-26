@@ -1,5 +1,29 @@
 # Daily Bugle -- TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and vulnerability remediation.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** WIP / pending full escalation documentation.
 **Target:** `TARGET_IP` (10.130.177.13 at time of solve)
 **OS:** Linux (CentOS)

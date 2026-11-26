@@ -1,5 +1,29 @@
 # Bypass
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and authorization and account recovery.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Compare server-side authorization and account recovery with the documented access policy.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** TryHackMe  
 **Difficulty:** Medium  
 **Status:** Incomplete — packet-trigger password recovery and dashboard shell are documented; host privilege escalation/root still needs to be finished.

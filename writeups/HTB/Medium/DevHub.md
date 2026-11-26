@@ -1,5 +1,29 @@
 # DevHub - HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of credential exposure prevention and authorization and account recovery.
+
+## Defensive takeaways
+
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+- Compare server-side authorization and account recovery with the documented access policy.
+
+## Defensive references
+
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **OS:** Linux (Ubuntu)  
 **Stack:** nginx, MCPJam Inspector, JupyterLab, Python MCP server  
 **Techniques:** Blind RCE in an MCP endpoint, Chisel pivoting, hardcoded credentials, root SSH key dump

@@ -1,5 +1,29 @@
 # TryHackMe - Internal
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of container runtime isolation and credential exposure prevention.
+
+## Defensive takeaways
+
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+
+## Defensive references
+
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Target Metadata
 
 | Field | Value |

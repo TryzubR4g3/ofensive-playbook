@@ -1,5 +1,29 @@
 # HTB — Connected
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+This case provides context for reviewing request processing and mapping deployed components to published remediation guidance.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **IP:** `<TARGET>`
 **Domain:** `connected.htb`
 **OS:** Linux (CentOS)

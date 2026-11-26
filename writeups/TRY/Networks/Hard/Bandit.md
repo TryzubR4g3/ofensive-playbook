@@ -1,5 +1,29 @@
 # Bandit
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of network segmentation and service and share exposure.
+
+## Defensive takeaways
+
+- Compare cross-zone routes with the dependency map and audit access to management systems.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Network segmentation and trust boundaries](../../../../defense/techniques/network-segmentation.md)
+- [Exposed service and share hardening](../../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** WIP / incomplete.
 **Note:** Only initial registration and first scan are documented.
 

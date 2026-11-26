@@ -1,5 +1,29 @@
 # coldvvars
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and credential exposure prevention.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** WIP / pending final flag closure.
 **Note:** The chain covers recon, XPath injection bypass, shell, and local pivot, but final flag proof is not documented.
 

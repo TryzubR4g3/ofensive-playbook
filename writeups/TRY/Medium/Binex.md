@@ -1,4 +1,28 @@
 # Binex — Full CTF Writeup
+
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and service and share exposure.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
 **Platform:** TryHackMe | **Category:** Binary Exploitation | **Difficulty:** Medium
 
 ---

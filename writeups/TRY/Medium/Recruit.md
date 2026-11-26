@@ -1,5 +1,29 @@
 ﻿# Recruit — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and credential exposure prevention.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.129.178.196 at time of solve)
 **OS:** Linux (Ubuntu)
 **Difficulty:** Medium

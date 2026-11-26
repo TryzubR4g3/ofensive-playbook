@@ -1,5 +1,29 @@
 ﻿# Bookstore — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and application input boundaries.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.129.140.255 at time of solve)
 **OS:** Linux (Ubuntu 18.04)
 **Difficulty:** Medium

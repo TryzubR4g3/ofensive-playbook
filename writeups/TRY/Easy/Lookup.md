@@ -1,5 +1,29 @@
 # Lookup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and authorization and account recovery.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Compare server-side authorization and account recovery with the documented access policy.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** WIP / incomplete.
 **Note:** Initial access and privesc are not yet documented.
 

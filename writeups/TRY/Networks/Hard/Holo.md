@@ -1,5 +1,29 @@
 # Holo
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+The network case provides context for reviewing identity permissions and workload isolation across an environment with multiple services.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../../defense/techniques/directory-access-review.md)
+- [Container runtime and workload isolation](../../../../defense/techniques/container-isolation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Network Diagram
 
 ### Topology Overview
@@ -44,7 +68,7 @@
 
 ---
 
-## Initial Reconnaice
+## Initial reconnaissance
 ```bash
 
 ```

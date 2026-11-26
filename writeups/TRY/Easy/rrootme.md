@@ -1,5 +1,29 @@
 # rrootme
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and file upload validation and storage isolation.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Validate file contents against an approved format list and isolate upload storage from executable code and configuration.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [File upload validation and isolation](../../../defense/techniques/file-upload.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Recon
 ```bash
 silent-scan $TARGET

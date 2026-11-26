@@ -1,5 +1,29 @@
 ﻿# Anonforce (BSides GT) - TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of credential exposure prevention and service and share exposure.
+
+## Defensive takeaways
+
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.128.148.141 at time of solve)
 **OS:** Linux
 **Difficulty:** Easy

@@ -1,5 +1,29 @@
 # bsidesgtdav
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and file upload validation and storage isolation.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Validate file contents against an approved format list and isolate upload storage from executable code and configuration.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [File upload validation and isolation](../../../defense/techniques/file-upload.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** Completed
 **Target:** `$TARGET`
 **OS:** Linux (Ubuntu)

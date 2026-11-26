@@ -1,6 +1,30 @@
 # borderlands
 
-## Reconnaice
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of credential exposure prevention and evidence and artifact review.
+
+## Defensive takeaways
+
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+- Record the source and timestamp of observed evidence and mark unverified conclusions separately.
+
+## Defensive references
+
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+- [Evidence handling and artifact review](../../../defense/techniques/evidence-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
+## Reconnaissance
 ```bash
 silent-scan $TARGET
 nmap -sVC -p22,80 $TARGET -oN service
@@ -57,7 +81,7 @@ apktool d nombre_del_apk.apk -o output_folder/
 # Search for the api_key
 grep -r "encrypted_api_key" .
 ```
-### We can apreciate in the original code with jadx that api key is encrypetd with a personalized encryption
+### Reviewing the original code in JADX showed that it encrypts the API key with a custom scheme
 ```bash
  this.apiKey = decrypt(getString(C0228R.string.encrypted_api_key), "#TODO");
         this.apiPath = "/api.php?documentid={}&apikey=" + this.apiKey

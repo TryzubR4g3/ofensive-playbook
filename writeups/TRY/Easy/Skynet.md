@@ -1,5 +1,29 @@
 # Skynet — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and Unix host privilege boundaries.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP` (10.130.137.2 at time of solve)
 **OS:** Linux (Ubuntu)
 **Difficulty:** Easy

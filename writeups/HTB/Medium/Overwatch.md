@@ -1,5 +1,29 @@
 # Overwatch - HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The case combines directory identity with credentials exposed in service artifacts. Review the service's access to credentials as well as the permissions those credentials carry.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../defense/techniques/directory-access-review.md)
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **Domain:** `overwatch.htb`
 **OS:** Windows Server 2022 (Active Directory)

@@ -1,5 +1,29 @@
 # raz0rblack
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of directory identity and delegation and service and share exposure.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../defense/techniques/directory-access-review.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** TryHackMe  
 **Difficulty:** Medium  
 **Status:** Incomplete — NFS loot and user-generation workflow documented; valid-user discovery and exploitation still need to be finished.

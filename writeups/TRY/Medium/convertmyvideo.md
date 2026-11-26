@@ -1,5 +1,29 @@
 # convertmyvideo
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and authorization and account recovery.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Compare server-side authorization and account recovery with the documented access policy.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Recon
 ```bash
 silent-scan $TARGET

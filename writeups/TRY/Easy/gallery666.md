@@ -1,5 +1,29 @@
 # gallery666
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of credential exposure prevention and file upload validation and storage isolation.
+
+## Defensive takeaways
+
+- Review configuration, logs and backups for unintended access to credentials. Rotate any credentials confirmed to be exposed.
+- Validate file contents against an approved format list and isolate upload storage from executable code and configuration.
+
+## Defensive references
+
+- [Credential exposure prevention](../../../defense/techniques/secret-handling.md)
+- [File upload validation and isolation](../../../defense/techniques/file-upload.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** Completed
 **Target:** `$TARGET`
 **OS:** Linux

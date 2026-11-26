@@ -1,5 +1,29 @@
 # Breaching Active Directory - TryHackMe Network Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of directory identity and delegation and network segmentation.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Compare cross-zone routes with the dependency map and audit access to management systems.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../../defense/techniques/directory-access-review.md)
+- [Network segmentation and trust boundaries](../../../../defense/techniques/network-segmentation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** Completed notes
 **Network:** `za.tryhackme.com`
 **Primary host:** `10.200.70.101 THMDC.za.tryhackme.com`

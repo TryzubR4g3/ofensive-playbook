@@ -1,5 +1,29 @@
 # MakeSense — HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and file upload validation and storage isolation.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Validate file contents against an approved format list and isolate upload storage from executable code and configuration.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [File upload validation and isolation](../../../defense/techniques/file-upload.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** HackTheBox  
 **Difficulty:** Medium  
 **OS:** Linux  

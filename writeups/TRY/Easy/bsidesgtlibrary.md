@@ -1,5 +1,29 @@
 # bsidesgtlibrary
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and evidence and artifact review.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Record the source and timestamp of observed evidence and mark unverified conclusions separately.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Evidence handling and artifact review](../../../defense/techniques/evidence-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Recon 
 ```bash
 silent-scan $TARGET

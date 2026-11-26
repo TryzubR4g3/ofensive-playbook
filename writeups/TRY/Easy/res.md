@@ -1,5 +1,29 @@
 # res
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Limited detail
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and network segmentation.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Compare cross-zone routes with the dependency map and audit access to management systems.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Network segmentation and trust boundaries](../../../defense/techniques/network-segmentation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** TryHackMe  
 **Difficulty:** Easy  
 **Status:** Incomplete — Redis webshell foothold documented; privilege escalation/root still needs to be finished.

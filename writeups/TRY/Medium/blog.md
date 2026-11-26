@@ -1,5 +1,29 @@
 # blog
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of Unix host privilege boundaries and vulnerability remediation.
+
+## Defensive takeaways
+
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+
+## Defensive references
+
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** Completed
 **Target:** `$TARGET`
 **OS:** Linux

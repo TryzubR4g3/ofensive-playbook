@@ -1,19 +1,72 @@
 # File Format Conventions
 
-This document defines the canonical structure and naming rules for every file type in
-the repo. `brain` depends on these conventions to surface the right content when you
-search by topic or keyword. Deviating from them makes commands unfindable.
+Follow [AGENTS.md](AGENTS.md) for repository workflow and use this document
+for file formats. Write repository prose in English and keep original writeup
+evidence intact. Use [Ra](writeups/TRY/Hard/Ra.md) as the presentation reference.
 
-Read this alongside `AGENTS.md` / `CLAUDE.md`. When in conflict, this file wins on
-format questions; the guide files win on workflow questions.
+## Writeup report blocks
+
+Put the report block below the existing H1. Add the platform label and the
+difficulty when it is known. Use the exact source status `Documented` or
+`Limited detail`. Explain evidence gaps in the overview. Keep the complete
+lab record visible below the report block. Apply these conventions by hand
+after reading the individual case.
+
+```markdown
+<!-- brain:report -->
+- **Platform** Lab provider
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+State the case context and the controls under review.
+
+## Defensive takeaways
+
+- Identify a control or evidence to verify.
+
+## Defensive references
+
+- [Relevant catalog note](../../../defense/techniques/example.md)
+
+<!-- /brain:report -->
+
+Original writeup in visible Markdown, with its own headings, evidence and code.
+```
+
+Resolve the link relative to the writeup's directory. Include at least one
+existing note from the defensive catalog. Keep the lab sequence and all
+substantive details visible. When copyediting is requested, correct the
+English in the existing prose and keep code, output and quotations verbatim.
+
+## Defensive catalog notes
+
+Place each note in `defense/techniques/`, `defense/tools/` or
+`defense/playbooks/`. Use a globally unique kebab-case filename so the
+CLI can resolve the same ID through `defense show`. Start with a single H1,
+a comma-separated `<!-- tags: ... -->` comment and a summary paragraph.
+Separate the three with blank lines.
+
+Use English tags for names, abbreviations and applicable CWE or OWASP
+identifiers. Describe evidence and mitigations or review checks in the
+body. Put sources and related notes under `## References`. Relative links
+from these notes point to other defensive catalog files.
+
+Run `python brain.py defense check` to validate reports and catalog notes.
+See the [maintenance guide](docs/defense-cli-plan.md) for audit and testing examples.
 
 ---
+
+## Existing reference note formats
+
+The following sections cover the top-level reference directories.
 
 ## 1 — Tool Notes (`tools/`)
 
 ### Structure (strict order)
 
-```markdown
+````markdown
 # toolname
 
 <One paragraph: what the tool is, what it does, when to reach for it.
@@ -38,7 +91,7 @@ Used on: **Machine1**, **Machine2**
 ## Related
 - [exploit-name.md](../../exploits/path/exploit-name.md) — one-line context
 - [technique-name.md](../../techniques/path/name.md) — one-line context
-```
+````
 
 ### Rules
 
@@ -55,7 +108,7 @@ commands into properly named `###` subsections under `## Commands Used`.
 
 **`Used on:` placement and format — strict:**
 
-```markdown
+````markdown
 ### Port forwarding to expose a bound-localhost service
 ```bash
 ssh -L 8080:127.0.0.1:3001 user@TARGET
@@ -63,7 +116,7 @@ ssh -L 8080:127.0.0.1:3001 user@TARGET
 Used on: **Silentium**, **CCTV**
 
 - `-L [local_port]:[remote_host]:[remote_port]` — bind local port to a remote-side socket
-```
+````
 
 - `Used on:` is always on the line immediately after the closing ` ``` `
 - No dash, no inline text, no extra words after the last `**`
@@ -96,7 +149,7 @@ Link to those notes with a one-line description of the relationship.
 
 ### Structure (strict order)
 
-```markdown
+````markdown
 # Exploit Title — Short Noun Phrase
 
 Used on: **Machine1**, **Machine2**
@@ -136,7 +189,7 @@ Used on: **Machine1**, **Machine2**
 - [tool.md](../../tools/path/tool.md)
 - [technique.md](../../techniques/path/technique.md)
 - [other-exploit.md](../path/other-exploit.md) — when to chain
-```
+````
 
 ### Rules
 
@@ -159,7 +212,7 @@ a tool file answers "what exact flag did I use".
 
 ### Structure (strict order)
 
-```markdown
+````markdown
 # Technique Name
 
 Used on: **Machine** ← only if learned/applied on a specific machine; omit for pure theory
@@ -201,7 +254,7 @@ See [sqlmap.md](../../tools/web/sqlmap.md) for the full command reference.
 ## Related
 - [tool.md](../../tools/path/tool.md) — tool used to exploit this
 - [exploit.md](../../exploits/path/exploit.md) — real instance of this technique
-```
+````
 
 ### Rules
 
@@ -230,29 +283,15 @@ See [sqlmap.md](../../tools/web/sqlmap.md) for the full command reference.
 - **kebab-case only** — no CamelCase, no Mixed-Case
 - Descriptive noun phrase: `blind-sql-injection.md`, `time-based-sqli.md`
 
-Files to rename (current → correct):
-
-| Current | Correct |
-|---------|---------|
-| `techniques/sqli/Blind-SQL-Injection.md` | `blind-sql-injection.md` |
-| `techniques/sqli/Blind-SQLi-Bollean-Based.md` | `boolean-based-blind-sqli.md` (fix typo: "Bollean") |
-| `techniques/sqli/Time-Based-Blind-SQL-Injection.md` | `time-based-blind-sqli.md` |
-| `techniques/sqli/in-Band-SQLi.md` | `in-band-sqli.md` |
-| `techniques/xss/Blind-XSS.md` | `blind-xss.md` |
-| `techniques/xss/DOM-Based-XSS.md` | `dom-based-xss.md` |
-| `techniques/xss/Reflected-XSS.md` | `reflected-xss.md` |
-| `techniques/xss/Stored-XSS.md` | `stored-xss.md` |
-
-After renaming, update:
-1. `brain.py` TOPICS entries that reference these stems (check with `grep -n "blind-sql\|dom-based\|stored-xss" brain.py`)
-2. Any writeup that links to these files by relative path
+After a rename, check relative links and any existing topic entry in
+`brain_core/legacy_topics.py` that references the old filename.
 
 ### Playbook files
 - kebab-case: `linux-post-exploitation.md`, `ad-enumeration.md`
 
 ### Writeup files
-- CamelCase matching the machine name, no suffixes: `Kobold.md`, `Silentium.md`
-- Never: `Kobold-Writeup.md`, `Silentium_HTB_Writeup.md`
+- Use the case name in the platform directory. Keep existing names when editing a report.
+- Use CamelCase for new machine names such as `Kobold.md`. Use a readable slug for a new PortSwigger lab title.
 
 ---
 
@@ -270,7 +309,7 @@ Before closing a note, verify:
 [ ] Technique: ## When to Use section exists with observable conditions
 [ ] Technique: filename is kebab-case
 [ ] All: ## Related section links to the other relevant files
-[ ] brain.py TOPICS: new file stem appears in the relevant topic entry
+[ ] Existing topic entries reference the current filename
 ```
 
 After adding or renaming any file, run:
@@ -284,7 +323,7 @@ After adding or renaming any file, run:
 
 ## 6 — Quick Reference: `Used on:` Format
 
-```markdown
+````markdown
 # ✅ Correct — tool subsection
 Used on: **Machine1**, **Machine2**
 
@@ -306,11 +345,11 @@ Used on: **Bookstore** - found the hidden parameter
 ```bash
 ssh user@target  # Used on: Internal
 ```
-```
+````
 
 ---
 
-## 6 — Command Marking Convention
+## 7 — Command Marking Convention
 
 Every **fenced code block** containing an executable command MUST be preceded by a **platform marker** so `brain` can distinguish commands from code examples and filter by OS.
 
@@ -318,12 +357,12 @@ Every **fenced code block** containing an executable command MUST be preceded by
 
 Precede each fenced code block with an HTML comment marker:
 
-```markdown
+````markdown
 <!-- cmd: platform -->
 ```bash
 command here
 ```
-```
+````
 
 ### Supported Platforms
 
@@ -340,30 +379,30 @@ command here
 ### Examples
 
 **Linux command:**
-```markdown
+````markdown
 <!-- cmd: linux -->
 ```bash
 find / -name "*.sh" -exec grep -l "sudo" {} \;
 ```
-```
+````
 
 **Windows command:**
-```markdown
+````markdown
 <!-- cmd: windows -->
 ```powershell
 Get-ChildItem -Recurse -Filter *.txt | Select-String "password"
 ```
-```
+````
 
 **Cross-platform script:**
-```markdown
+````markdown
 <!-- cmd: cross-platform -->
 ```python
 import requests
 response = requests.get("http://target:8080/api")
 print(response.text)
 ```
-```
+````
 
 **Inline code in tabular format (no marker needed):**
 ```markdown
@@ -381,13 +420,13 @@ print(response.text)
 4. **No marker needed for non-code blocks** — pseudocode, SQL in tables, etc. are obvious
 5. **Comments inside the block are fine** — don't mark them separately:
 
-```markdown
+````markdown
 <!-- cmd: linux -->
 ```bash
 # This is a comment — still part of the bash block
 find / -type f -name "*.key"
 ```
-```
+````
 
 ### Why This Matters
 

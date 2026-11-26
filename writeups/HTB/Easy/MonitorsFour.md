@@ -1,5 +1,29 @@
 # MonitorsFour — HTB (Easy)
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of container runtime isolation and authorization and account recovery.
+
+## Defensive takeaways
+
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+- Compare server-side authorization and account recovery with the documented access policy.
+
+## Defensive references
+
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+
+<!-- /brain:report -->
+
+---
+
+
 > **IP:** `TARGET_IP`
 > **Domain:** `monitorsfour.htb`
 > **Host OS:** Windows 11 Pro (Docker Desktop running Linux containers)

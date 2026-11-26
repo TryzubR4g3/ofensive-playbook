@@ -1,5 +1,29 @@
 # biblioteca
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and Unix host privilege boundaries.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Recon
 ```bash
 silent-scan $TARGET

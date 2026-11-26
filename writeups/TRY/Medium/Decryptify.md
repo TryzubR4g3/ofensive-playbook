@@ -1,5 +1,29 @@
 # TryHackMe - Decryptify
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and evidence and artifact review.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Record the source and timestamp of observed evidence and mark unverified conclusions separately.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Evidence handling and artifact review](../../../defense/techniques/evidence-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Target Metadata
 
 | Field | Value |

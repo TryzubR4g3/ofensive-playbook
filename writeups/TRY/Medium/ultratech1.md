@@ -1,5 +1,29 @@
 # ultratech1
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of container runtime isolation and service and share exposure.
+
+## Defensive takeaways
+
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** TryHackMe  
 **Difficulty:** Medium  
 **Status:** Complete

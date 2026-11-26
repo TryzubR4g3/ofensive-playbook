@@ -1,5 +1,29 @@
 # TryHackMe - Wreath
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of network segmentation and Windows service and task permissions.
+
+## Defensive takeaways
+
+- Compare cross-zone routes with the dependency map and audit access to management systems.
+- Compare service and scheduled-task identities, executable paths and ACLs with the Windows baseline.
+
+## Defensive references
+
+- [Network segmentation and trust boundaries](../../../../defense/techniques/network-segmentation.md)
+- [Windows service and task hardening](../../../../defense/techniques/windows-service-hardening.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Target Metadata
 
 | Field | Value |

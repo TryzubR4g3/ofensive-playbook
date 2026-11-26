@@ -1,5 +1,29 @@
 # biteme
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of authorization and account recovery and evidence and artifact review.
+
+## Defensive takeaways
+
+- Compare server-side authorization and account recovery with the documented access policy.
+- Record the source and timestamp of observed evidence and mark unverified conclusions separately.
+
+## Defensive references
+
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+- [Evidence handling and artifact review](../../../defense/techniques/evidence-handling.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Status:** WIP / incomplete.
 **Note:** Only recon and initial fuzzing documented. Needs completion.
 

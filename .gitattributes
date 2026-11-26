@@ -1,1 +1,3 @@
 * linguist-detectable=false
+brain text eol=lf
+*.py text eol=lf

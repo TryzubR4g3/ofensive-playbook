@@ -1,0 +1,27 @@
+name: Brain CLI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate through Bash
+        if: runner.os == 'Linux'
+        run: bash brain defense check
+      - name: Validate through PowerShell
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: python brain.py defense check
+      - name: Run regression tests
+        run: python -m unittest discover -s tests

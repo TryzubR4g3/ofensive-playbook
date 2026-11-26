@@ -1,5 +1,29 @@
 # marketplace
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of application input boundaries and container runtime isolation.
+
+## Defensive takeaways
+
+- Review where request data reaches queries, templates, files or internal requests. Add a regression test at each relevant boundary.
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+
+## Defensive references
+
+- [Input validation and interpreter boundaries](../../../defense/techniques/input-boundaries.md)
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## Recon
 ```bash
 silent-scan $TARGET

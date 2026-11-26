@@ -1,5 +1,29 @@
 # IDE - TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of authorization and account recovery and service and share exposure.
+
+## Defensive takeaways
+
+- Compare server-side authorization and account recovery with the documented access policy.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **Domain:** `ide.thm`
 **OS:** Linux (Ubuntu)

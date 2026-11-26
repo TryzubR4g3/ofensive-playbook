@@ -1,5 +1,27 @@
 # Active Directory Enumeration — Notes
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of directory identity and delegation.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../../defense/techniques/directory-access-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 ## 1. Obtain Credentials
 
 Visit the lab's credential distributor:

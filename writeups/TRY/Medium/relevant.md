@@ -1,5 +1,29 @@
 ﻿# Relevant — TryHackMe Writeup
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of service and share exposure and Windows service and task permissions.
+
+## Defensive takeaways
+
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+- Compare service and scheduled-task identities, executable paths and ACLs with the Windows baseline.
+
+## Defensive references
+
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+- [Windows service and task hardening](../../../defense/techniques/windows-service-hardening.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **OS:** Windows Server 2016 Standard
 **Difficulty:** Medium

@@ -1,5 +1,29 @@
 # Kobold - HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of container runtime isolation and Unix host privilege boundaries.
+
+## Defensive takeaways
+
+- Compare workload identities, runtime access, capabilities and mounts with the deployment policy.
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+
+## Defensive references
+
+- [Container runtime and workload isolation](../../../defense/techniques/container-isolation.md)
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Target:** `TARGET_IP`
 **Domain:** `kobold.htb`
 **OS:** Linux (Docker-based)

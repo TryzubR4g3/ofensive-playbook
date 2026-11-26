@@ -1,5 +1,29 @@
 # Checkpoint — HTB Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Medium
+- **Source status** Documented
+
+## Report overview
+
+This case provides observations for reviewing directory access and the permissions on shared services.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../defense/techniques/directory-access-review.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **Platform:** HackTheBox  
 **Difficulty:** Medium  
 **Status:** Complete

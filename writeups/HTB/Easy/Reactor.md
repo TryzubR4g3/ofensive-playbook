@@ -1,5 +1,29 @@
 # Reactor — HackTheBox Writeup
 
+<!-- brain:report -->
+- **Platform** Hack The Box
+- **Difficulty** Easy
+- **Source status** Documented
+
+## Report overview
+
+The observations in this case inform a review of vulnerability remediation and Unix host privilege boundaries.
+
+## Defensive takeaways
+
+- Match the deployed version to an authoritative advisory and verify the version or compensating control after remediation.
+- Review the execution identity and writable paths of elevated host services, jobs and binaries.
+
+## Defensive references
+
+- [Vulnerability remediation review](../../../defense/playbooks/vulnerability-remediation.md)
+- [Unix host privilege review](../../../defense/techniques/host-privilege-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 > **Difficulty:** Easy  
 > **OS:** Linux (Ubuntu 24)  
 > **CVEs:** CVE-2025-55182 (React2Shell RCE), CVE-2025-29927 (investigated, discarded)  

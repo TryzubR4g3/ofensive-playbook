@@ -1,5 +1,33 @@
 # Ra — TryHackMe Hard
 
+<!-- brain:report -->
+- **Platform** TryHackMe
+- **Difficulty** Hard
+- **Source status** Documented
+
+## Report overview
+
+This case connects account recovery, Windows directory delegation and scheduled task permissions. Review these controls together when directory and host privileges depend on shared administrative identities.
+
+## Defensive takeaways
+
+- Audit effective group membership, service identities and delegated rights against the approved access baseline.
+- Compare server-side authorization and account recovery with the documented access policy.
+- Compare service and scheduled-task identities, executable paths and ACLs with the Windows baseline.
+- Confirm the intended audience for network services and shares, then compare their permissions and reachability with that policy.
+
+## Defensive references
+
+- [Directory identity and delegated access review](../../../defense/techniques/directory-access-review.md)
+- [Web authorization and account recovery](../../../defense/techniques/web-access-control.md)
+- [Windows service and task hardening](../../../defense/techniques/windows-service-hardening.md)
+- [Exposed service and share hardening](../../../defense/techniques/service-exposure-review.md)
+
+<!-- /brain:report -->
+
+---
+
+
 **IP:** `10.129.179.230`
 **Domain:** `windcorp.thm` / `fire.windcorp.thm`
 **OS:** Windows Server 2019
